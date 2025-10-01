@@ -270,7 +270,7 @@
                 <div class="generated-link" id="inject-link"></div>
                 <button class="copy-btn" id="copy-inject-btn">Скопировать ссылку для инжекта</button>
                 <div class="info">
-                    <p>Используйте эту ссылку для инжекта скрипта. Ссылка действительна только в текущей сессии.</p>
+                    <p>Используйте эту ссылку для инжекта скрипта. Ссылка действительна в течение 24 часов.</p>
                 </div>
             </section>
         </section>
@@ -308,6 +308,33 @@
             
             const urlParams = new URLSearchParams(window.location.search);
             const scriptId = urlParams.get('id');
+            const token = urlParams.get('token');
+            
+            if (scriptId && token) {
+                const authData = localStorage.getItem(`auth_${scriptId}`);
+                if (authData) {
+                    try {
+                        const auth = JSON.parse(authData);
+                        if (auth.token === token && Date.now() - auth.timestamp < 24 * 60 * 60 * 1000) {
+                            const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
+                            if (scriptDataStr) {
+                                try {
+                                    const scriptData = JSON.parse(scriptDataStr);
+                                    fetchScriptForInjection(scriptData.url);
+                                    return;
+                                } catch (e) {
+                                    // Ошибка - показываем обычную страницу
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Ошибка парсинга - показываем обычную страницу
+                    }
+                }
+                
+                document.body.innerHTML = '<div class="container"><div class="error">Доступ запрещен. Неверный или просроченный токен.</div></div>';
+                return;
+            }
             
             if (scriptId) {
                 document.querySelector('.input-section').style.display = 'none';
@@ -377,9 +404,14 @@
                 try {
                     const scriptData = JSON.parse(scriptDataStr);
                     
-                    sessionStorage.setItem(`inject_${scriptId}`, 'true');
+                    const token = generateToken();
+                    const authData = {
+                        token: token,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem(`auth_${scriptId}`, JSON.stringify(authData));
                     
-                    const injectUrl = `${window.location.origin}${window.location.pathname}?inject=${scriptId}`;
+                    const injectUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}&token=${token}`;
                     document.getElementById('inject-link').textContent = injectUrl;
                     injectSection.classList.add('active');
                     
@@ -398,23 +430,8 @@
                 });
             });
             
-            const injectId = urlParams.get('inject');
-            if (injectId) {
-                const isAuthorized = sessionStorage.getItem(`inject_${injectId}`);
-                if (isAuthorized === 'true') {
-                    const scriptDataStr = localStorage.getItem(`script_${injectId}`);
-                    if (scriptDataStr) {
-                        try {
-                            const scriptData = JSON.parse(scriptDataStr);
-                            fetchScriptForInjection(scriptData.url);
-                            return;
-                        } catch (e) {
-                            // Ошибка - показываем обычную страницу
-                        }
-                    }
-                }
-                
-                document.body.innerHTML = '<div class="container"><div class="error">Доступ запрещен. Сначала введите ключ на основной странице.</div></div>';
+            function generateToken() {
+                return 'token_' + Math.random().toString(36).substr(2, 16) + '_' + Date.now().toString(36);
             }
             
             function isValidGitHubUrl(url) {
