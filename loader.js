@@ -1,11 +1,19 @@
+// loader.js
 function getDecryptionCode(level) {
-    // Эта функция остается без изменений
     switch(level) {
         case 'basic':
+            // Это уже было корректно
             return `originalScript = decodeURIComponent(escape(atob(protectedScript)));`;
         case 'advanced':
             return `
-                let decoded = atob(protectedScript);
+                let decoded;
+                try {
+                    // ИСПРАВЛЕНО: Сначала декодируем Base64, затем UTF-8
+                    decoded = decodeURIComponent(escape(atob(protectedScript))); 
+                } catch (e) {
+                    throw new Error("Base64/UTF-8 decode failed: " + e.message);
+                }
+                
                 originalScript = '';
                 for (let i = 0; i < decoded.length; i++) {
                     originalScript += String.fromCharCode(decoded.charCodeAt(i) ^ 0x42);
@@ -14,7 +22,14 @@ function getDecryptionCode(level) {
         case 'military':
             return `
                 const parts = protectedScript.split('::');
-                let decoded = atob(parts[0]);
+                let decoded;
+                try {
+                    // ИСПРАВЛЕНО: Сначала декодируем Base64, затем UTF-8
+                    decoded = decodeURIComponent(escape(atob(parts[0]))); 
+                } catch (e) {
+                    throw new Error("Base64/UTF-8 decode failed: " + e.message);
+                }
+
                 const key = 'MILITARY_GRADE_PROTECTION_KEY_2024';
                 originalScript = '';
                 for (let i = 0; i < decoded.length; i++) {
@@ -24,12 +39,13 @@ function getDecryptionCode(level) {
                 }
             `;
         default:
-            return 'originalScript = atob(protectedScript);';
+            // Базовый дефолт для Base64 (не рекомендуется для UTF-8)
+            return 'originalScript = atob(protectedScript);'; 
     }
 }
 
+// Функция создания HTML (без изменений, т.к. исправление в script.js)
 function createLoaderHtml(protectedScript, level, scriptId) {
-    // Вся логика меняется здесь
     return `
 <!DOCTYPE html>
 <html>
@@ -68,10 +84,10 @@ function createLoaderHtml(protectedScript, level, scriptId) {
         function showDecryptedCode() {
             let originalScript = '';
             try {
-                // Код деобфускации остается тем же
+                // Код деобфускации берется из getDecryptionCode
                 ${getDecryptionCode(level)}
                 
-                // ИЗМЕНЕНО: Помещаем результат в textarea
+                // Помещаем результат в textarea
                 document.getElementById('luaCodeOutput').value = originalScript;
                 
             } catch (error) {
@@ -90,7 +106,7 @@ function createLoaderHtml(protectedScript, level, scriptId) {
             }
         }
         
-        // ИЗМЕНЕНО: Кнопка для копирования LUA кода
+        // Кнопка для копирования LUA кода
         document.getElementById('copyLuaBtn').addEventListener('click', () => {
             const luaCodeArea = document.getElementById('luaCodeOutput');
             luaCodeArea.select();
@@ -103,7 +119,7 @@ function createLoaderHtml(protectedScript, level, scriptId) {
         document.getElementById('ownerKeyInput').addEventListener('keyup', (e) => {
             if (e.key === 'Enter') checkOwnerAccess();
         });
-    <\/script>
+    </\script>
 </body>
 </html>`;
 }
