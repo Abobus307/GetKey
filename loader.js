@@ -1,197 +1,176 @@
-// script.js
-// Конфигурация
-const CONFIG = {
-    OWNER_KEY: "MASTER_KEY_123",
-    LOG_STORAGE_KEY: "script_protector_logs"
-};
-
-// Генератор уникального Script ID
-function generateScriptId() {
-    return 'SCR-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
-}
-
-// Инициализация
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('createBtn').addEventListener('click', createProtectedScript);
-    document.getElementById('copyBtn').addEventListener('click', copyLink);
-    document.getElementById('loginBtn').addEventListener('click', loginAsOwner);
-    document.getElementById('clearLogs').addEventListener('click', clearLogs);
-
-    const savedKey = sessionStorage.getItem('owner_key');
-    if (savedKey && Logger.authenticateOwner(savedKey)) {
-        showOwnerDashboard();
-    }
-});
-
-// Система логов (Исправлено: добавлена проверка на существование элементов)
-const Logger = {
-    log: function(type, message, scriptId = null) {
-        const logEntry = {
-            id: Date.now() + Math.random(),
-            timestamp: new Date().toISOString(),
-            type, // 'creation', 'owner_login', 'view', 'attempted_breach', 'owner_access'
-            message,
-            scriptId,
-            userAgent: navigator.userAgent
-        };
-        const logs = this.getLogs();
-        logs.push(logEntry);
-        localStorage.setItem(CONFIG.LOG_STORAGE_KEY, JSON.stringify(logs));
-        this.updateDashboard();
-    },
-    getLogs: function() {
-        return JSON.parse(localStorage.getItem(CONFIG.LOG_STORAGE_KEY) || '[]');
-    },
-    clearLogs: function() {
-        localStorage.removeItem(CONFIG.LOG_STORAGE_KEY);
-        this.updateDashboard();
-    },
-    updateDashboard: function() {
-        const totalAccessEl = document.getElementById('totalAccess');
-        // КРИТИЧЕСКИЙ ФИКС: Если дашборд не найден, выходим
-        if (!totalAccessEl) return; 
-
-        const logs = this.getLogs();
-        
-        totalAccessEl.textContent = logs.length;
-        
-        // Обновляем только существующие элементы
-        const createdScriptsEl = document.getElementById('createdScripts');
-        if (createdScriptsEl) createdScriptsEl.textContent = logs.filter(log => log.type === 'creation').length;
-        
-        const ownerLoginsEl = document.getElementById('ownerLogins');
-        if (ownerLoginsEl) ownerLoginsEl.textContent = logs.filter(log => log.type === 'owner_login' || log.type === 'owner_access').length;
-        
-        const breachAttemptsEl = document.getElementById('breachAttempts');
-        if (breachAttemptsEl) breachAttemptsEl.textContent = logs.filter(log => log.type === 'attempted_breach').length;
-        
-        this.displayLogs();
-    },
-    displayLogs: function() {
-        if (!document.getElementById('accessLogs')) return;
-        const logs = this.getLogs();
-        const container = document.getElementById('accessLogs');
-        container.innerHTML = '';
-        logs.slice().reverse().forEach(log => {
-            const logElement = document.createElement('div');
-            let typeClass;
-            if (log.type === 'creation') typeClass = 'success';
-            else if (log.type === 'owner_login' || log.type === 'owner_access') typeClass = 'owner';
-            else if (log.type === 'attempted_breach') typeClass = 'breach';
-            else typeClass = ''; 
-
-            logElement.className = `log-entry ${typeClass}`;
-            const time = new Date(log.timestamp).toLocaleString();
-            logElement.innerHTML = `<strong>[${time}]</strong> [${log.type.toUpperCase()}] ${log.message}${log.scriptId ? `<br><small>Script ID: ${log.scriptId}</small>` : ''}`;
-            container.appendChild(logElement);
-        });
-    },
-    authenticateOwner: function(key) {
-        return key === CONFIG.OWNER_KEY;
-    }
-};
-
-// Функции владельца (без изменений)
-function loginAsOwner() {
-    const key = document.getElementById('ownerKey').value;
-    if (Logger.authenticateOwner(key)) {
-        sessionStorage.setItem('owner_key', key);
-        showOwnerDashboard();
-        Logger.log('owner_login', 'Доступ владельца к панели управления предоставлен.');
-        alert('✅ Доступ владельца предоставлен!');
-    } else {
-        alert('❌ Неверный ключ владельца!');
-    }
-}
-
-function showOwnerDashboard() {
-    document.getElementById('ownerDashboard').classList.remove('hidden');
-    Logger.updateDashboard();
-}
-
-function clearLogs() {
-    if (confirm('Вы уверены, что хотите очистить все логи?')) {
-        Logger.clearLogs();
-        alert('Логи очищены!');
-    }
-}
-
-// Основные функции (Исправлено: добавлена проверка кнопки в finally)
-async function createProtectedScript() {
-    const scriptUrl = document.getElementById('scriptUrl').value;
-    const protectionLevel = document.getElementById('protectionLevel').value;
-    if (!scriptUrl) {
-        alert('Пожалуйста, введите URL скрипта');
-        return;
-    }
-    const btn = document.getElementById('createBtn');
-    if (btn) { // Дополнительная проверка на всякий случай
-        btn.textContent = '🛡️ Защита...';
-        btn.disabled = true;
-    }
-    
-    try {
-        const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(scriptUrl)}`);
-        if (!response.ok) throw new Error(`Failed to fetch script. Status: ${response.status}`);
-        const originalScript = await response.text();
-        
-        const scriptId = generateScriptId(); 
-        
-        const protectedScript = applyProtection(originalScript, protectionLevel, scriptId); 
-        const protectedUrl = createProtectedUrl(protectedScript, protectionLevel, scriptId);
-        
-        document.getElementById('protectedLink').value = protectedUrl;
-        document.getElementById('result').classList.remove('hidden');
-        Logger.log('creation', `Создан защищенный скрипт: ${scriptUrl}`, scriptId);
-    } catch (error) {
-        alert('Ошибка при получении скрипта: ' + error.message);
-    } finally {
-        // КРИТИЧЕСКИЙ ФИКС: Проверяем, существует ли кнопка, прежде чем ее обновлять
-        if (btn) {
-            btn.textContent = '🚀 Создать защищенный скрипт';
-            btn.disabled = false;
-        }
-    }
-}
-
-// ИСПРАВЛЕНО: applyProtection с фиксом btoa
-function applyProtection(script, level, scriptId) {
-    switch (level) {
+// loader.js
+function getDecryptionCode(level) {
+    switch(level) {
         case 'basic':
-            return btoa(unescape(encodeURIComponent(script)));
+            return `originalScript = decodeURIComponent(escape(atob(protectedScript)));`;
         case 'advanced':
-            let advancedObfuscated = '';
-            for (let i = 0; i < script.length; i++) {
-                advancedObfuscated += String.fromCharCode(script.charCodeAt(i) ^ 0x42);
-            }
-            return btoa(unescape(encodeURIComponent(advancedObfuscated))) + '::' + btoa(scriptId);
+            return `
+                const parts = protectedScript.split('::');
+                let decoded;
+                try {
+                    decoded = decodeURIComponent(escape(atob(parts[0]))); 
+                } catch (e) {
+                    throw new Error("Base64/UTF-8 decode failed: " + e.message);
+                }
+                
+                originalScript = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    originalScript += String.fromCharCode(decoded.charCodeAt(i) ^ 0x42);
+                }
+            `;
         case 'military':
-            let militaryObfuscated = '';
-            const key = 'MILITARY_GRADE_PROTECTION_KEY_2024';
-            for (let i = 0; i < script.length; i++) {
-                militaryObfuscated += String.fromCharCode(script.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-            }
-            return btoa(unescape(encodeURIComponent(militaryObfuscated))) + '::' + btoa(scriptId) + '::' + btoa(Date.now().toString());
+            return `
+                const parts = protectedScript.split('::');
+                let decoded;
+                try {
+                    decoded = decodeURIComponent(escape(atob(parts[0]))); 
+                } catch (e) {
+                    throw new Error("Base64/UTF-8 decode failed: " + e.message);
+                }
+
+                const key = 'MILITARY_GRADE_PROTECTION_KEY_2024';
+                originalScript = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    originalScript += String.fromCharCode(
+                        decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+                    );
+                }
+            `;
         default:
-            return script;
+            return 'originalScript = atob(protectedScript);';
     }
 }
 
-// ИСПРАВЛЕНО: createProtectedUrl с фиксом btoa
-function createProtectedUrl(script, level, scriptId) {
-    const escapedScript = script.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/`/g, "\\`");
-    const htmlContent = createLoaderHtml(escapedScript, level, scriptId); 
-    // Фикс btoa для кодирования HTML с русскими символами
-    return 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(htmlContent)));
-}
+// ИСПРАВЛЕНО: Новый HTML-шаблон для страницы "ACCESS DENIED"
+function createLoaderHtml(protectedScript, level, scriptId) {
+    
+    // Функция для ИМИТАЦИИ отправки логов (выводит в консоль лоадера)
+    const loggingFunction = `
+        const SCRIPT_ID = '${scriptId}';
+        const PROTECTION_LEVEL = '${level}';
+        const MASTER_KEY = 'MASTER_KEY_123';
+        
+        // ВНИМАНИЕ: Это имитация бэкенд-логирования. Логи выводятся в консоль.
+        function sendLog(type, details = {}) {
+            console.warn(\`[${type.toUpperCase()}] SCRIPT_ID: \${SCRIPT_ID}\`);
+            console.log("Log Details:", details); 
+            
+            // Здесь должна быть реальная отправка на ваш сервер через fetch.
+        }
+        
+        // Логируем посещение страницы 
+        sendLog('view', { status: 'Page loaded', level: PROTECTION_LEVEL, userAgent: navigator.userAgent });
+        
+        function showDecryptedCode() {
+            let originalScript = '';
+            try {
+                // Код деобфускации
+                ${getDecryptionCode(level)}
+                
+                document.getElementById('luaCodeOutput').value = originalScript;
+                
+            } catch (error) {
+                document.getElementById('luaCodeOutput').value = "Error decrypting script: " + error.message;
+                sendLog('breach_failed', { error: error.message });
+            }
+        }
+        
+        function checkOwnerAccess() {
+            const inputKey = document.getElementById('ownerKeyInput').value;
+            
+            if (inputKey === MASTER_KEY) {
+                document.getElementById('accessDenied').classList.add('hidden');
+                document.getElementById('ownerAccess').classList.remove('hidden');
+                showDecryptedCode();
+                sendLog('owner_access', { success: true });
+            } else {
+                // Логируем попытку взлома
+                sendLog('attempted_breach', { success: false, key_tried: inputKey.substring(0, 10) + '...' });
+                const errorStatusEl = document.getElementById('errorStatus');
+                if (errorStatusEl) errorStatusEl.textContent = 'Access key is invalid! Logging breach attempt...';
+            }
+        }
+    `;
 
-function copyLink() {
-    const linkInput = document.getElementById('protectedLink');
-    linkInput.select();
-    linkInput.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(linkInput.value).then(() => {
-        alert('✅ Ссылка скопирована!');
-    }, (err) => {
-        alert('Не удалось скопировать текст: ' + err);
-    });
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ACCESS DENIED</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #000; color: #ff0000; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column; }
+        .skull { font-size: 80px; margin-bottom: 10px; color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+        .container { max-width: 500px; width: 90%; text-align: center; }
+        h1 { color: #ff0000; text-shadow: 0 0 5px #ff0000; font-size: 30px; margin-bottom: 20px; }
+        .alert-box { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff0000; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .alert-box p { margin: 5px 0; color: #fff; }
+        .feature-box { background: #1a1a1a; border: 1px solid #444; padding: 10px; margin: 5px; display: inline-block; width: 45%; border-radius: 4px; font-size: 12px; color: #bbb; }
+        .log-console { background: #0a0a0a; border: 1px solid #333; padding: 15px; margin-top: 30px; text-align: left; font-family: 'Courier New', monospace; font-size: 14px; color: #00ff00; }
+        .input-group { margin: 20px 0; }
+        #ownerKeyInput { padding: 10px; background: #000; border: 1px solid #ff0000; color: #ff0000; width: 150px; text-align: center; }
+        #ownerSubmit { padding: 10px 15px; background: #ff0000; color: #000; border: none; cursor: pointer; margin-left: 10px; font-weight: bold; border-radius: 4px; }
+        .hidden { display: none; }
+        #luaCodeOutput { width: 100%; box-sizing: border-box; height: 300px; background: #111; color: #00ff00; border: 1px solid #00ff00; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="skull">☠️</div>
+        <div id="accessDenied">
+            <h1>ACCESS DENIED</h1>
+            <div class="alert-box">
+                <p>⚠️ **SECURITY BREACH DETECTED** ⚠️</p>
+                <p>Unauthorized browser access attempted</p>
+                <p>This incident has been logged with your digital fingerprint</p>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <div class="feature-box">🔒 Military Encryption</div>
+                <div class="feature-box">👁️ You Are Being Monitoring</div>
+                <div class="feature-box">⚡ Auto-Defense</div>
+                <div class="feature-box">🍯 Honeypot System</div>
+            </div>
+
+            <div class="log-console">
+                [SYSTEM] Scanning threat level...<br>
+                [ALERT] Browser fingerprint logged<br>
+                [ACTION] Deploying countermeasures...<br>
+                [STATUS] <span id="errorStatus">Access permanently denied</span>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="ownerKeyInput" placeholder="Owner Bypass Key">
+                <button id="ownerSubmit">Enter</button>
+            </div>
+
+            <div style="color: #444; margin-top: 20px;">Error Code: 403<br>You Cannot Access This Page</div>
+        </div>
+
+        <div id="ownerAccess" class="hidden">
+            <h2>✅ Decrypting Script...</h2>
+            <textarea id="luaCodeOutput" readonly></textarea>
+            <button id="copyLuaBtn">Copy Lua Code</button>
+        </div>
+    </div>
+    <script>
+        const protectedScript = '${protectedScript}';
+        
+        ${loggingFunction}
+        
+        document.getElementById('copyLuaBtn').addEventListener('click', () => {
+            const luaCodeArea = document.getElementById('luaCodeOutput');
+            luaCodeArea.select();
+            navigator.clipboard.writeText(luaCodeArea.value).then(() => {
+                alert('Lua code copied to clipboard!');
+            });
+        });
+
+        document.getElementById('ownerSubmit').addEventListener('click', checkOwnerAccess);
+        document.getElementById('ownerKeyInput').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') checkOwnerAccess();
+        });
+    </script>
+</body>
+</html>`;
 }
