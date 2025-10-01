@@ -26,6 +26,12 @@ document.addEventListener('DOMContentLoaded', function() {
 // Система логов
 const Logger = {
     log: function(type, message, scriptId = null) {
+        // Убедимся, что 'type' и 'message' являются строками.
+        if (typeof type !== 'string' || typeof message !== 'string') {
+             console.error("Logger Error: 'type' or 'message' is not defined or not a string.");
+             return; // Предотвращаем падение, если тип не задан
+        }
+        
         const logEntry = {
             id: Date.now() + Math.random(),
             timestamp: new Date().toISOString(),
@@ -46,7 +52,6 @@ const Logger = {
         localStorage.removeItem(CONFIG.LOG_STORAGE_KEY);
         this.updateDashboard();
     },
-    // ФИКС: 'Cannot set properties of null'
     updateDashboard: function() {
         const totalAccessEl = document.getElementById('totalAccess');
         if (!totalAccessEl) return; 
@@ -62,7 +67,6 @@ const Logger = {
         if (ownerLoginsEl) ownerLoginsEl.textContent = logs.filter(log => log.type === 'owner_login' || log.type === 'owner_access').length;
         
         const breachAttemptsEl = document.getElementById('breachAttempts');
-        // ФИКС: Учитываем 'fetch_error' как попытку или ошибку
         if (breachAttemptsEl) breachAttemptsEl.textContent = logs.filter(log => log.type === 'attempted_breach' || log.type === 'fetch_error').length;
         
         this.displayLogs();
@@ -77,13 +81,14 @@ const Logger = {
             let typeClass;
             if (log.type === 'creation') typeClass = 'success';
             else if (log.type === 'owner_login' || log.type === 'owner_access') typeClass = 'owner';
-            // ФИКС: Учитываем 'fetch_error' как breach
             else if (log.type === 'attempted_breach' || log.type === 'fetch_error') typeClass = 'breach';
             else typeClass = ''; 
 
             logElement.className = `log-entry ${typeClass}`;
             const time = new Date(log.timestamp).toLocaleString();
-            logElement.innerHTML = `<strong>[${time}]</strong> [${log.type.toUpperCase()}] ${log.message}${log.scriptId ? `<br><small>Script ID: ${log.scriptId}</small>` : ''}`;
+            // Убеждаемся, что log.type существует, прежде чем вызывать toUpperCase()
+            const logType = log.type ? log.type.toUpperCase() : 'UNKNOWN'; 
+            logElement.innerHTML = `<strong>[${time}]</strong> [${logType}] ${log.message}${log.scriptId ? `<br><small>Script ID: ${log.scriptId}</small>` : ''}`;
             container.appendChild(logElement);
         });
     },
@@ -117,7 +122,7 @@ function clearLogs() {
     }
 }
 
-// Основные функции
+// Основные функции (ФИКС: Гарантируем, что type и message переданы в Logger.log)
 async function createProtectedScript() {
     const scriptUrl = document.getElementById('scriptUrl').value;
     const protectionLevel = document.getElementById('protectionLevel').value;
@@ -145,9 +150,10 @@ async function createProtectedScript() {
         document.getElementById('result').classList.remove('hidden');
         Logger.log('creation', `Создан защищенный скрипт: ${scriptUrl}`, scriptId);
     } catch (error) {
-        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Явно задаём тип лога ('fetch_error')
-        Logger.log('fetch_error', `Ошибка загрузки скрипта: ${error.message}`, 'N/A'); 
-        alert('Ошибка при получении скрипта: ' + error.message);
+        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Явно задаём оба аргумента
+        const errorMessage = error && error.message ? error.message : 'Unknown network error.';
+        Logger.log('fetch_error', `Ошибка загрузки скрипта: ${errorMessage}`, 'N/A'); 
+        alert('Ошибка при получении скрипта: ' + errorMessage);
     } finally {
         if (btn) {
             btn.textContent = '🚀 Создать защищенный скрипт';
@@ -156,7 +162,7 @@ async function createProtectedScript() {
     }
 }
 
-// applyProtection (с фиксом btoa)
+// applyProtection (без изменений)
 function applyProtection(script, level, scriptId) {
     switch (level) {
         case 'basic':
@@ -179,7 +185,7 @@ function applyProtection(script, level, scriptId) {
     }
 }
 
-// createProtectedUrl (с фиксом btoa)
+// createProtectedUrl (без изменений)
 function createProtectedUrl(script, level, scriptId) {
     const escapedScript = script.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/`/g, "\\`");
     const htmlContent = createLoaderHtml(escapedScript, level, scriptId); 
