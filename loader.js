@@ -1,4 +1,5 @@
 function getDecryptionCode(level) {
+    // Эта функция остается без изменений
     switch(level) {
         case 'basic':
             return `originalScript = decodeURIComponent(escape(atob(protectedScript)));`;
@@ -28,48 +29,54 @@ function getDecryptionCode(level) {
 }
 
 function createLoaderHtml(protectedScript, level, scriptId) {
+    // Вся логика меняется здесь
     return `
 <!DOCTYPE html>
 <html>
 <head>
     <title>Protected Content</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #000; color: #ff0000; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        .container { max-width: 800px; width: 100%; border: 2px solid #ff0000; padding: 20px; background: #111; }
+        body { font-family: 'Courier New', monospace; background: #000; color: #00ff00; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .container { max-width: 800px; width: 100%; border: 2px solid #00ff00; padding: 20px; background: #111; }
         .hidden { display: none; }
-        .security-alert { border: 1px solid #ff0000; padding: 15px; margin: 10px 0; background: rgba(255, 0, 0, 0.1); }
-        .system-log { background: #111; padding: 10px; margin: 10px 0; border-left: 3px solid #ff0000; }
-        #ownerKeyInput { padding: 10px; background: #000; border: 1px solid gold; color: gold; width: 250px; }
-        #ownerSubmit { padding: 10px 20px; background: gold; color: #000; border: none; cursor: pointer; margin-left: 10px; }
-        .owner-hint { color: #888; font-size: 12px; margin-top: 10px; }
+        h1, h2 { color: #fff; }
+        #ownerKeyInput { padding: 10px; background: #000; border: 1px solid #00ff00; color: #00ff00; width: 250px; }
+        #ownerSubmit, #copyLuaBtn { padding: 10px 20px; background: #00ff00; color: #000; border: none; cursor: pointer; margin-left: 10px; font-weight: bold; }
+        #luaCodeOutput { width: 100%; box-sizing: border-box; height: 300px; background: #000; color: #00ff00; border: 1px solid #00ff00; margin-top: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="accessDenied">
-            <h1>ACCESS DENIED</h1>
-            <div class="security-alert">Security system activated</div>
-            <div class="system-log">[SYSTEM] Access restricted. Waiting for key.</div>
+            <h1>LUA SCRIPT LOCKED</h1>
             <div style="margin: 20px 0;">
                 <input type="password" id="ownerKeyInput" placeholder="Owner Access Key">
-                <button id="ownerSubmit">Access</button>
-                <div class="owner-hint">Press Shift+Ctrl+Space for quick access</div>
+                <button id="ownerSubmit">Unlock</button>
             </div>
         </div>
+
         <div id="ownerAccess" class="hidden">
-            <h2>Owner Access Granted</h2>
-            <p>Script execution enabled.</p>
-            <div id="scriptContainer"></div>
+            <h2>✅ Script Unlocked</h2>
+            <textarea id="luaCodeOutput" readonly></textarea>
+            <button id="copyLuaBtn">Copy Lua Code</button>
         </div>
     </div>
     <script>
-        const scriptId = '${scriptId}';
-        const protectionLevel = '${level}';
         const protectedScript = '${protectedScript}';
         const MASTER_KEY = 'MASTER_KEY_123';
         
-        function logAccess(type, message) {
-            console.log('ACCESS LOG:', { scriptId, type, message, timestamp: new Date().toISOString() });
+        function showDecryptedCode() {
+            let originalScript = '';
+            try {
+                // Код деобфускации остается тем же
+                ${getDecryptionCode(level)}
+                
+                // ИЗМЕНЕНО: Помещаем результат в textarea
+                document.getElementById('luaCodeOutput').value = originalScript;
+                
+            } catch (error) {
+                document.getElementById('luaCodeOutput').value = "Error decrypting script: " + error.message;
+            }
         }
 
         function checkOwnerAccess() {
@@ -77,41 +84,25 @@ function createLoaderHtml(protectedScript, level, scriptId) {
             if (inputKey === MASTER_KEY) {
                 document.getElementById('accessDenied').classList.add('hidden');
                 document.getElementById('ownerAccess').classList.remove('hidden');
-                executeScript();
-                logAccess('owner_access', 'Owner accessed protected content');
+                showDecryptedCode();
             } else {
                 alert('Invalid access key!');
-                logAccess('access_denied', 'Failed authentication attempt');
             }
         }
         
-        function executeScript() {
-            let originalScript = '';
-            try {
-                ${getDecryptionCode(level)}
-                const scriptElement = document.createElement('script');
-                scriptElement.textContent = originalScript;
-                document.getElementById('scriptContainer').appendChild(scriptElement);
-                logAccess('success', 'Script executed successfully');
-            } catch (error) {
-                console.error('Script execution failed:', error);
-                logAccess('access_denied', 'Script execution failed: ' + error.message);
-            }
-        }
-        
+        // ИЗМЕНЕНО: Кнопка для копирования LUA кода
+        document.getElementById('copyLuaBtn').addEventListener('click', () => {
+            const luaCodeArea = document.getElementById('luaCodeOutput');
+            luaCodeArea.select();
+            navigator.clipboard.writeText(luaCodeArea.value).then(() => {
+                alert('Lua code copied to clipboard!');
+            });
+        });
+
         document.getElementById('ownerSubmit').addEventListener('click', checkOwnerAccess);
         document.getElementById('ownerKeyInput').addEventListener('keyup', (e) => {
             if (e.key === 'Enter') checkOwnerAccess();
         });
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.shiftKey && e.ctrlKey && e.code === 'Space') {
-                e.preventDefault();
-                document.getElementById('ownerKeyInput').focus();
-            }
-        });
-        
-        logAccess('access_denied', 'Protected content loaded, waiting for key.');
     <\/script>
 </body>
 </html>`;
