@@ -193,6 +193,19 @@
             border: 1px solid rgba(63, 185, 80, 0.4);
         }
         
+        .inject-section {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .inject-section.active {
+            display: block;
+        }
+        
         footer {
             text-align: center;
             margin-top: 40px;
@@ -211,7 +224,7 @@
                 font-size: 2rem;
             }
             
-            .input-section, .result-section, .view-section {
+            .input-section, .result-section, .view-section, .inject-section {
                 padding: 15px;
             }
         }
@@ -237,8 +250,7 @@
             <div class="generated-link" id="generated-link"></div>
             <button class="copy-btn" id="copy-btn">Скопировать ссылку</button>
             <div class="info">
-                <p>Для инжекта скрипта используйте эту ссылку в вашем инжекторе.</p>
-                <p>Для просмотра исходного кода добавьте <strong>?view=source</strong> к ссылке.</p>
+                <p>Для просмотра исходного кода по этой ссылке потребуется ввести ключ доступа.</p>
             </div>
         </section>
         
@@ -252,6 +264,15 @@
             <div class="code-container" id="code-container">
                 <pre id="source-code"></pre>
             </div>
+            
+            <section class="inject-section" id="inject-section">
+                <h2 class="result-title">Ссылка для инжекта:</h2>
+                <div class="generated-link" id="inject-link"></div>
+                <button class="copy-btn" id="copy-inject-btn">Скопировать ссылку для инжекта</button>
+                <div class="info">
+                    <p>Используйте эту ссылку для инжекта скрипта. Ссылка действительна только в текущей сессии.</p>
+                </div>
+            </section>
         </section>
         
         <footer>
@@ -277,32 +298,21 @@
             const generateBtn = document.getElementById('generate-btn');
             const copyBtn = document.getElementById('copy-btn');
             const viewSourceBtn = document.getElementById('view-source-btn');
+            const copyInjectBtn = document.getElementById('copy-inject-btn');
             const resultSection = document.getElementById('result-section');
             const viewSection = document.getElementById('view-section');
+            const injectSection = document.getElementById('inject-section');
             const codeContainer = document.getElementById('code-container');
             
             const SECRET_KEY = getSecretKey();
             
             const urlParams = new URLSearchParams(window.location.search);
             const scriptId = urlParams.get('id');
-            const viewMode = urlParams.get('view');
             
-            if (scriptId && viewMode === 'source') {
+            if (scriptId) {
                 document.querySelector('.input-section').style.display = 'none';
                 viewSection.classList.add('active');
                 viewSection.setAttribute('data-script-id', scriptId);
-            } else if (scriptId) {
-                const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
-                if (scriptDataStr) {
-                    try {
-                        const scriptData = JSON.parse(scriptDataStr);
-                        fetchScriptForInjection(scriptData.url);
-                    } catch (e) {
-                        document.body.innerHTML = '<div class="container"><div class="error">Ошибка загрузки скрипта</div></div>';
-                    }
-                } else {
-                    document.body.innerHTML = '<div class="container"><div class="error">Скрипт не найден</div></div>';
-                }
             }
             
             generateBtn.addEventListener('click', function() {
@@ -328,7 +338,6 @@
                 localStorage.setItem(`script_${scriptId}`, JSON.stringify(scriptData));
                 
                 const protectedUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}`;
-                const viewUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}&view=source`;
                 
                 document.getElementById('generated-link').textContent = protectedUrl;
                 resultSection.classList.add('active');
@@ -367,11 +376,46 @@
                 
                 try {
                     const scriptData = JSON.parse(scriptDataStr);
+                    
+                    sessionStorage.setItem(`inject_${scriptId}`, 'true');
+                    
+                    const injectUrl = `${window.location.origin}${window.location.pathname}?inject=${scriptId}`;
+                    document.getElementById('inject-link').textContent = injectUrl;
+                    injectSection.classList.add('active');
+                    
                     fetchScriptSource(scriptData.url);
                 } catch (e) {
                     showError('Ошибка при загрузке данных скрипта', viewSection);
                 }
             });
+            
+            copyInjectBtn.addEventListener('click', function() {
+                const linkText = document.getElementById('inject-link').textContent;
+                navigator.clipboard.writeText(linkText).then(function() {
+                    showSuccess('Ссылка для инжекта скопирована!', injectSection);
+                }, function() {
+                    showError('Не удалось скопировать ссылку', injectSection);
+                });
+            });
+            
+            const injectId = urlParams.get('inject');
+            if (injectId) {
+                const isAuthorized = sessionStorage.getItem(`inject_${injectId}`);
+                if (isAuthorized === 'true') {
+                    const scriptDataStr = localStorage.getItem(`script_${injectId}`);
+                    if (scriptDataStr) {
+                        try {
+                            const scriptData = JSON.parse(scriptDataStr);
+                            fetchScriptForInjection(scriptData.url);
+                            return;
+                        } catch (e) {
+                            // Ошибка - показываем обычную страницу
+                        }
+                    }
+                }
+                
+                document.body.innerHTML = '<div class="container"><div class="error">Доступ запрещен. Сначала введите ключ на основной странице.</div></div>';
+            }
             
             function isValidGitHubUrl(url) {
                 return url.startsWith('https://raw.githubusercontent.com/') && 
@@ -393,8 +437,7 @@
                         return response.text();
                     })
                     .then(data => {
-                        document.contentType = 'text/plain';
-                        document.body.textContent = data;
+                        document.body.innerHTML = `<pre>${data}</pre>`;
                     })
                     .catch(error => {
                         document.body.innerHTML = '<div class="container"><div class="error">Ошибка при загрузке скрипта: ' + error.message + '</div></div>';
