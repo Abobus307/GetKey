@@ -3,152 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrivateObf Script Protector</title>
+    <title>GitHub Script Generator</title>
     <style>
+        :root {
+            --primary-color: #2d333b;
+            --secondary-color: #22272e;
+            --accent-color: #347d39;
+            --text-color: #cdd9e5;
+            --border-color: #444c56;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
+            background-color: var(--primary-color);
+            color: var(--text-color);
             line-height: 1.6;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
         }
+        
         .container {
-            width: 100%;
-            max-width: 700px;
-            background: #1e1e1e;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .input-section {
+            background-color: var(--secondary-color);
             padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
         }
-        h1, h2 {
-            color: #ffffff;
-            border-bottom: 2px solid #444;
-            padding-bottom: 10px;
-        }
+        
         .input-group {
             margin-bottom: 20px;
         }
+        
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
-            color: #bbb;
+            font-weight: 600;
         }
-        input, select, textarea {
+        
+        input[type="text"] {
             width: 100%;
-            padding: 12px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            border-radius: 5px;
-            color: #e0e0e0;
-            box-sizing: border-box;
+            padding: 12px 15px;
+            background-color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.2s;
         }
-        textarea {
-            min-height: 100px;
-            resize: vertical;
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
         }
+        
         button {
-            padding: 12px 20px;
-            background-color: #007bff;
+            background-color: var(--accent-color);
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 12px 25px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 1rem;
+            font-weight: 600;
             transition: background-color 0.2s;
+            display: block;
+            width: 100%;
         }
+        
         button:hover {
-            background-color: #0056b3;
+            background-color: #46954a;
         }
-        button:disabled {
-            background-color: #555;
-            cursor: not-allowed;
-        }
-        .hidden {
+        
+        .result-section {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
             display: none;
         }
-        #result {
-            margin-top: 20px;
+        
+        .result-section.active {
+            display: block;
         }
-        #ownerDashboard {
-            margin-top: 30px;
+        
+        .result-title {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .generated-link {
+            background-color: var(--primary-color);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            word-break: break-all;
+            border: 1px solid var(--border-color);
+        }
+        
+        .copy-btn {
+            width: auto;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .view-section {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+        
+        .view-section.active {
+            display: block;
+        }
+        
+        .code-container {
+            background-color: var(--primary-color);
+            border-radius: 6px;
             padding: 20px;
-            background: #2a2a2a;
-            border-radius: 5px;
-            border-left: 4px solid #ffc107;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
         }
-        .log-entry {
-            padding: 8px;
-            margin-bottom: 5px;
-            border-radius: 4px;
+        
+        pre {
+            white-space: pre-wrap;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
-        .log-entry.success { background-color: rgba(40, 167, 69, 0.2); }
-        .log-entry.owner { background-color: rgba(255, 193, 7, 0.2); }
-        .log-entry.breach { background-color: rgba(220, 53, 69, 0.2); }
+        
+        .error {
+            color: #f85149;
+            background-color: rgba(248, 81, 73, 0.1);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border: 1px solid rgba(248, 81, 73, 0.4);
+        }
+        
+        .success {
+            color: #3fb950;
+            background-color: rgba(63, 185, 80, 0.1);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border: 1px solid rgba(63, 185, 80, 0.4);
+        }
+        
+        .info {
+            background-color: rgba(65, 132, 228, 0.1);
+            color: #539bf5;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border: 1px solid rgba(65, 132, 228, 0.4);
+        }
+        
+        .key-input {
+            margin-top: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .input-section, .result-section, .view-section {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h1>🛡️ PrivateObf Script Protector</h1>
-
-        <div class="input-group">
-            <label for="scriptUrl">URL вашего скрипта</label>
-            <input type="text" id="scriptUrl" placeholder="https://example.com/myscript.lua">
-        </div>
-
-        <div class="input-group">
-            <label for="protectionLevel">Уровень защиты</label>
-            <select id="protectionLevel">
-                <option value="basic">Базовый (Basic)</option>
-                <option value="advanced">Продвинутый (Advanced)</option>
-                <option value="military">Максимальный (Military)</option>
-            </select>
-        </div>
-
-        <button id="createBtn">🚀 Создать защищенный скрипт</button>
-
-        <div id="result" class="hidden">
-            <h2>✅ Готово!</h2>
+        <header>
+            <h1>GitHub Script Generator</h1>
+            <p class="description">Создавайте защищенные ссылки на ваши .lua и .txt файлы с GitHub</p>
+        </header>
+        
+        <section class="input-section">
             <div class="input-group">
-                <label for="protectedLink">Ваша защищенная ссылка</label>
-                <textarea id="protectedLink" readonly></textarea>
+                <label for="github-url">Введите ссылку на ваш .lua или .txt файл на GitHub:</label>
+                <input type="text" id="github-url" placeholder="https://raw.githubusercontent.com/username/repo/main/script.lua">
             </div>
-            <button id="copyBtn">📋 Копировать ссылку</button>
-        </div>
-
-        <hr style="border-color: #444; margin: 30px 0;">
-
-        <div>
-            <h2>🔑 Доступ для владельца</h2>
-            <div class="input-group">
-                <label for="ownerKey">Ключ владельца</label>
-                <input type="password" id="ownerKey" placeholder="Введите ваш MASTER_KEY">
+            <button id="generate-btn">Сгенерировать ссылку</button>
+        </section>
+        
+        <section class="result-section" id="result-section">
+            <h2 class="result-title">Ваша защищенная ссылка:</h2>
+            <div class="generated-link" id="generated-link"></div>
+            <button class="copy-btn" id="copy-btn">Скопировать ссылку</button>
+            <div class="info">
+                <p>Для просмотра исходного кода по этой ссылке потребуется ввести ключ доступа.</p>
             </div>
-            <button id="loginBtn">Войти</button>
-        </div>
-
-        <div id="ownerDashboard" class="hidden">
-            <h2>📊 Панель управления</h2>
-            <p>
-                Всего событий: <span id="totalAccess">0</span> | 
-                Создано скриптов: <span id="createdScripts">0</span> | 
-                Входов владельца: <span id="ownerLogins">0</span> |
-                Попыток взлома/Ошибок: <span id="breachAttempts">0</span>
-            </p>
-            <div id="accessLogs" style="max-height: 300px; overflow-y: auto; background: #1e1e1e; padding: 10px; border-radius: 5px;">
+        </section>
+        
+        <section class="view-section" id="view-section">
+            <h2 class="result-title">Просмотр исходного кода</h2>
+            <div class="input-group key-input">
+                <label for="access-key">Введите ключ доступа для просмотра исходного кода:</label>
+                <input type="text" id="access-key" placeholder="Master_Vasia2_Cool">
             </div>
-            <button id="clearLogs" style="margin-top: 15px; background-color: #dc3545;">Очистить логи</button>
-        </div>
+            <button id="view-source-btn">Показать исходный код</button>
+            <div class="code-container" id="code-container" style="display: none;">
+                <pre id="source-code"></pre>
+            </div>
+        </section>
+        
+        <footer>
+            <p>GitHub Script Generator &copy; 2023</p>
+        </footer>
     </div>
 
-    <script src="loader.js" defer></script>
-    <script src="script.js" defer></script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generate-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const viewSourceBtn = document.getElementById('view-source-btn');
+            const resultSection = document.getElementById('result-section');
+            const viewSection = document.getElementById('view-section');
+            const codeContainer = document.getElementById('code-container');
+            
+            // Проверяем, есть ли параметр id в URL (для просмотра скрипта)
+            const urlParams = new URLSearchParams(window.location.search);
+            const scriptId = urlParams.get('id');
+            
+            if (scriptId) {
+                // Показываем секцию для просмотра скрипта
+                document.querySelector('.input-section').style.display = 'none';
+                viewSection.classList.add('active');
+                
+                // Сохраняем ID скрипта в data-атрибут
+                viewSection.setAttribute('data-script-id', scriptId);
+            }
+            
+            // Генерация защищенной ссылки
+            generateBtn.addEventListener('click', function() {
+                const githubUrl = document.getElementById('github-url').value.trim();
+                
+                if (!githubUrl) {
+                    showError('Пожалуйста, введите ссылку на GitHub');
+                    return;
+                }
+                
+                // Проверяем, является ли ссылка действительной
+                if (!isValidGitHubUrl(githubUrl)) {
+                    showError('Пожалуйста, введите корректную ссылку на raw файл GitHub');
+                    return;
+                }
+                
+                // Генерируем уникальный ID для скрипта
+                const scriptId = generateId();
+                
+                // Сохраняем данные в localStorage
+                localStorage.setItem(`script_${scriptId}`, githubUrl);
+                
+                // Генерируем защищенную ссылку
+                const protectedUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}`;
+                
+                // Показываем результат
+                document.getElementById('generated-link').textContent = protectedUrl;
+                resultSection.classList.add('active');
+                
+                // Прокручиваем к результату
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Копирование ссылки
+            copyBtn.addEventListener('click', function() {
+                const linkText = document.getElementById('generated-link').textContent;
+                navigator.clipboard.writeText(linkText).then(function() {
+                    showSuccess('Ссылка скопирована в буфер обмена!');
+                }, function() {
+                    showError('Не удалось скопировать ссылку');
+                });
+            });
+            
+            // Просмотр исходного кода
+            viewSourceBtn.addEventListener('click', function() {
+                const accessKey = document.getElementById('access-key').value.trim();
+                const scriptId = viewSection.getAttribute('data-script-id');
+                
+                if (!accessKey) {
+                    showError('Пожалуйста, введите ключ доступа');
+                    return;
+                }
+                
+                // Проверяем ключ доступа
+                if (accessKey !== 'Master_Vasia2_Cool') {
+                    showError('Неверный ключ доступа');
+                    return;
+                }
+                
+                // Получаем URL скрипта из localStorage
+                const scriptUrl = localStorage.getItem(`script_${scriptId}`);
+                
+                if (!scriptUrl) {
+                    showError('Скрипт не найден или срок его действия истек');
+                    return;
+                }
+                
+                // Загружаем и отображаем исходный код
+                fetchScriptSource(scriptUrl);
+            });
+            
+            // Вспомогательные функции
+            function isValidGitHubUrl(url) {
+                // Проверяем, является ли URL действительной сырой ссылкой GitHub
+                return url.startsWith('https://raw.githubusercontent.com/') && 
+                       (url.endsWith('.lua') || url.endsWith('.txt'));
+            }
+            
+            function generateId() {
+                // Генерируем случайный ID
+                return 'script_' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            function fetchScriptSource(url) {
+                // Используем прокси для обхода CORS
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                
+                fetch(proxyUrl + encodeURIComponent(url))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Не удалось загрузить скрипт');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        document.getElementById('source-code').textContent = data;
+                        codeContainer.style.display = 'block';
+                        showSuccess('Исходный код успешно загружен');
+                    })
+                    .catch(error => {
+                        showError('Ошибка при загрузке скрипта: ' + error.message);
+                    });
+            }
+            
+            function showError(message) {
+                // Удаляем существующие сообщения об ошибках
+                removeMessages();
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = message;
+                
+                // Вставляем сообщение об ошибке после кнопки
+                const currentSection = viewSection.classList.contains('active') ? viewSection : resultSection;
+                currentSection.appendChild(errorDiv);
+                
+                // Автоматически удаляем сообщение через 5 секунд
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.parentNode.removeChild(errorDiv);
+                    }
+                }, 5000);
+            }
+            
+            function showSuccess(message) {
+                // Удаляем существующие сообщения
+                removeMessages();
+                
+                const successDiv = document.createElement('div');
+                successDiv.className = 'success';
+                successDiv.textContent = message;
+                
+                // Вставляем сообщение об успехе после кнопки
+                const currentSection = viewSection.classList.contains('active') ? viewSection : resultSection;
+                currentSection.appendChild(successDiv);
+                
+                // Автоматически удаляем сообщение через 5 секунд
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.parentNode.removeChild(successDiv);
+                    }
+                }, 5000);
+            }
+            
+            function removeMessages() {
+                const messages = document.querySelectorAll('.error, .success');
+                messages.forEach(message => {
+                    if (message.parentNode) {
+                        message.parentNode.removeChild(message);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
