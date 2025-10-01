@@ -23,13 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Система логов (Расширена для новых типов логов)
+// Система логов (Исправлено: добавлена проверка на существование элементов)
 const Logger = {
     log: function(type, message, scriptId = null) {
         const logEntry = {
             id: Date.now() + Math.random(),
             timestamp: new Date().toISOString(),
-            type, // 'creation', 'owner_login', 'view', 'attempted_breach'
+            type, // 'creation', 'owner_login', 'view', 'attempted_breach', 'owner_access'
             message,
             scriptId,
             userAgent: navigator.userAgent
@@ -47,12 +47,24 @@ const Logger = {
         this.updateDashboard();
     },
     updateDashboard: function() {
-        if (!document.getElementById('totalAccess')) return;
+        const totalAccessEl = document.getElementById('totalAccess');
+        // КРИТИЧЕСКИЙ ФИКС: Если дашборд не найден, выходим
+        if (!totalAccessEl) return; 
+
         const logs = this.getLogs();
-        document.getElementById('totalAccess').textContent = logs.length;
-        document.getElementById('createdScripts').textContent = logs.filter(log => log.type === 'creation').length;
-        document.getElementById('ownerLogins').textContent = logs.filter(log => log.type === 'owner_login').length;
-        document.getElementById('breachAttempts').textContent = logs.filter(log => log.type === 'attempted_breach').length;
+        
+        totalAccessEl.textContent = logs.length;
+        
+        // Обновляем только существующие элементы
+        const createdScriptsEl = document.getElementById('createdScripts');
+        if (createdScriptsEl) createdScriptsEl.textContent = logs.filter(log => log.type === 'creation').length;
+        
+        const ownerLoginsEl = document.getElementById('ownerLogins');
+        if (ownerLoginsEl) ownerLoginsEl.textContent = logs.filter(log => log.type === 'owner_login' || log.type === 'owner_access').length;
+        
+        const breachAttemptsEl = document.getElementById('breachAttempts');
+        if (breachAttemptsEl) breachAttemptsEl.textContent = logs.filter(log => log.type === 'attempted_breach').length;
+        
         this.displayLogs();
     },
     displayLogs: function() {
@@ -64,9 +76,9 @@ const Logger = {
             const logElement = document.createElement('div');
             let typeClass;
             if (log.type === 'creation') typeClass = 'success';
-            else if (log.type === 'owner_login') typeClass = 'owner';
+            else if (log.type === 'owner_login' || log.type === 'owner_access') typeClass = 'owner';
             else if (log.type === 'attempted_breach') typeClass = 'breach';
-            else typeClass = ''; // Для 'view'
+            else typeClass = ''; 
 
             logElement.className = `log-entry ${typeClass}`;
             const time = new Date(log.timestamp).toLocaleString();
@@ -104,7 +116,7 @@ function clearLogs() {
     }
 }
 
-// Основные функции
+// Основные функции (Исправлено: добавлена проверка кнопки в finally)
 async function createProtectedScript() {
     const scriptUrl = document.getElementById('scriptUrl').value;
     const protectionLevel = document.getElementById('protectionLevel').value;
@@ -113,16 +125,18 @@ async function createProtectedScript() {
         return;
     }
     const btn = document.getElementById('createBtn');
-    btn.textContent = '🛡️ Защита...';
-    btn.disabled = true;
+    if (btn) { // Дополнительная проверка на всякий случай
+        btn.textContent = '🛡️ Защита...';
+        btn.disabled = true;
+    }
+    
     try {
         const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(scriptUrl)}`);
         if (!response.ok) throw new Error(`Failed to fetch script. Status: ${response.status}`);
         const originalScript = await response.text();
         
-        const scriptId = generateScriptId(); // Генерируем уникальный ID
+        const scriptId = generateScriptId(); 
         
-        // Передаем scriptId для включения его в URL
         const protectedScript = applyProtection(originalScript, protectionLevel, scriptId); 
         const protectedUrl = createProtectedUrl(protectedScript, protectionLevel, scriptId);
         
@@ -132,15 +146,16 @@ async function createProtectedScript() {
     } catch (error) {
         alert('Ошибка при получении скрипта: ' + error.message);
     } finally {
-        btn.textContent = '🚀 Создать защищенный скрипт';
-        btn.disabled = false;
+        // КРИТИЧЕСКИЙ ФИКС: Проверяем, существует ли кнопка, прежде чем ее обновлять
+        if (btn) {
+            btn.textContent = '🚀 Создать защищенный скрипт';
+            btn.disabled = false;
+        }
     }
 }
 
-// ИСПРАВЛЕНО: applyProtection с фиксом btoa и добавлением Script ID
+// ИСПРАВЛЕНО: applyProtection с фиксом btoa
 function applyProtection(script, level, scriptId) {
-    // Используем btoa(unescape(encodeURIComponent(...))) для безопасной работы с UTF-8
-    
     switch (level) {
         case 'basic':
             return btoa(unescape(encodeURIComponent(script)));
@@ -149,7 +164,6 @@ function applyProtection(script, level, scriptId) {
             for (let i = 0; i < script.length; i++) {
                 advancedObfuscated += String.fromCharCode(script.charCodeAt(i) ^ 0x42);
             }
-            // Добавляем Script ID для логирования в лоадере
             return btoa(unescape(encodeURIComponent(advancedObfuscated))) + '::' + btoa(scriptId);
         case 'military':
             let militaryObfuscated = '';
@@ -157,19 +171,17 @@ function applyProtection(script, level, scriptId) {
             for (let i = 0; i < script.length; i++) {
                 militaryObfuscated += String.fromCharCode(script.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
-            // Добавляем Script ID и дополнительную метку времени
             return btoa(unescape(encodeURIComponent(militaryObfuscated))) + '::' + btoa(scriptId) + '::' + btoa(Date.now().toString());
         default:
             return script;
     }
 }
 
-// ИСПРАВЛЕНО: createProtectedUrl с фиксом btoa и передачей Script ID
+// ИСПРАВЛЕНО: createProtectedUrl с фиксом btoa
 function createProtectedUrl(script, level, scriptId) {
     const escapedScript = script.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/`/g, "\\`");
-    // Передаем scriptId в лоадер
     const htmlContent = createLoaderHtml(escapedScript, level, scriptId); 
-    // Кодируем HTML-контент с русскими символами (фиксом btoa)
+    // Фикс btoa для кодирования HTML с русскими символами
     return 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(htmlContent)));
 }
 
