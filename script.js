@@ -1,10 +1,11 @@
+// script.js
 // Конфигурация
 const CONFIG = {
     OWNER_KEY: "MASTER_KEY_123",
     LOG_STORAGE_KEY: "script_protector_logs"
 };
 
-// Инициализация
+// Инициализация (без изменений)
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('createBtn').addEventListener('click', createProtectedScript);
     document.getElementById('copyBtn').addEventListener('click', copyLink);
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Система логов
+// Система логов (без изменений)
 const Logger = {
     log: function(type, message, scriptId = null) {
         const logEntry = {
@@ -67,7 +68,7 @@ const Logger = {
     }
 };
 
-// Функции владельца
+// Функции владельца (без изменений)
 function loginAsOwner() {
     const key = document.getElementById('ownerKey').value;
     if (Logger.authenticateOwner(key)) {
@@ -92,7 +93,7 @@ function clearLogs() {
     }
 }
 
-// Основные функции
+// Основные функции (без изменений)
 async function createProtectedScript() {
     const scriptUrl = document.getElementById('scriptUrl').value;
     const protectionLevel = document.getElementById('protectionLevel').value;
@@ -121,35 +122,52 @@ async function createProtectedScript() {
     }
 }
 
+// **********************************************
+// ИСПРАВЛЕНО: Функция applyProtection
+// Добавлено unescape(encodeURIComponent(...)) для Advanced и Military 
+// для безопасной работы с UTF-8.
+// **********************************************
 function applyProtection(script, level) {
     switch (level) {
         case 'basic':
-            return btoa(unescape(encodeURIComponent(script)));
+            // Это уже было корректно
+            return btoa(unescape(encodeURIComponent(script))); 
         case 'advanced':
             let advancedObfuscated = '';
             for (let i = 0; i < script.length; i++) {
                 advancedObfuscated += String.fromCharCode(script.charCodeAt(i) ^ 0x42);
             }
-            return btoa(advancedObfuscated);
+            // ИСПРАВЛЕНО
+            return btoa(unescape(encodeURIComponent(advancedObfuscated)));
         case 'military':
             let militaryObfuscated = '';
             const key = 'MILITARY_GRADE_PROTECTION_KEY_2024';
             for (let i = 0; i < script.length; i++) {
                 militaryObfuscated += String.fromCharCode(script.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
-            return btoa(militaryObfuscated) + '::' + btoa(Date.now().toString());
+            // ИСПРАВЛЕНО
+            const base64Part = btoa(unescape(encodeURIComponent(militaryObfuscated)));
+            return base64Part + '::' + btoa(Date.now().toString());
         default:
             return script;
     }
 }
 
+// **********************************************
+// ИСПРАВЛЕНО: Функция createProtectedUrl
+// Добавлено unescape(encodeURIComponent(htmlContent)) для 
+// безопасной кодировки Base64 всего HTML (включая русские символы в нем).
+// **********************************************
 function createProtectedUrl(script, level, scriptId) {
     const escapedScript = script.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/`/g, "\\`");
     // Эта функция вызывается из файла loader.js
     const htmlContent = createLoaderHtml(escapedScript, level, scriptId);
-    return 'data:text/html;base64,' + btoa(htmlContent);
+    
+    // ИСПРАВЛЕНО
+    return 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(htmlContent)));
 }
 
+// Функция копирования (без изменений)
 function copyLink() {
     const linkInput = document.getElementById('protectedLink');
     linkInput.select();
