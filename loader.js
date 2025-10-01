@@ -41,7 +41,7 @@ function getDecryptionCode(level) {
     }
 }
 
-// ИСПРАВЛЕНО: Новый HTML-шаблон для страницы "ACCESS DENIED"
+// ИСПРАВЛЕНО: Шаблон с имитацией страницы "ACCESS DENIED"
 function createLoaderHtml(protectedScript, level, scriptId) {
     
     // Функция для ИМИТАЦИИ отправки логов (выводит в консоль лоадера)
@@ -52,10 +52,10 @@ function createLoaderHtml(protectedScript, level, scriptId) {
         
         // ВНИМАНИЕ: Это имитация бэкенд-логирования. Логи выводятся в консоль.
         function sendLog(type, details = {}) {
-            console.warn(\`[${type.toUpperCase()}] SCRIPT_ID: \${SCRIPT_ID}\`);
+            console.warn(\`[LOGGING: \${type.toUpperCase()}] SCRIPT_ID: \${SCRIPT_ID}\`);
             console.log("Log Details:", details); 
             
-            // Здесь должна быть реальная отправка на ваш сервер через fetch.
+            // Если вам нужен рабочий логгинг, замените это на fetch к вашему бэкенду.
         }
         
         // Логируем посещение страницы 
