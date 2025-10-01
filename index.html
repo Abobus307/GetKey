@@ -70,7 +70,7 @@
             font-weight: 600;
         }
         
-        input[type="text"] {
+        input[type="text"], input[type="password"] {
             width: 100%;
             padding: 12px 15px;
             background-color: var(--primary-color);
@@ -81,7 +81,7 @@
             transition: border-color 0.2s;
         }
         
-        input[type="text"]:focus {
+        input[type="text"]:focus, input[type="password"]:focus {
             outline: none;
             border-color: var(--accent-color);
         }
@@ -193,10 +193,6 @@
             border: 1px solid rgba(63, 185, 80, 0.4);
         }
         
-        .key-input {
-            margin-top: 15px;
-        }
-        
         footer {
             text-align: center;
             margin-top: 40px;
@@ -247,9 +243,9 @@
         
         <section class="view-section" id="view-section">
             <h2 class="result-title">Просмотр исходного кода</h2>
-            <div class="input-group key-input">
+            <div class="input-group">
                 <label for="access-key">Введите ключ доступа для просмотра исходного кода:</label>
-                <input type="password" id="access-key" placeholder="Введите ключ">
+                <input type="password" id="access-key" placeholder="Master_Vasia2_Cool">
             </div>
             <button id="view-source-btn">Показать исходный код</button>
             <div class="code-container" id="code-container">
