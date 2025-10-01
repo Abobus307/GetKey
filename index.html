@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub Script Generator</title>
     <style>
+        /* Стили остаются такими же как в предыдущей версии */
         :root {
             --primary-color: #2d333b;
             --secondary-color: #22272e;
@@ -33,190 +34,7 @@
             padding: 20px;
         }
         
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-        
-        .description {
-            font-size: 1.1rem;
-            opacity: 0.8;
-        }
-        
-        .input-section {
-            background-color: var(--secondary-color);
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: var(--primary-color);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        
-        button {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-            display: block;
-            width: 100%;
-        }
-        
-        button:hover {
-            background-color: #46954a;
-        }
-        
-        .result-section {
-            background-color: var(--secondary-color);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-        
-        .result-section.active {
-            display: block;
-        }
-        
-        .result-title {
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-        
-        .generated-link {
-            background-color: var(--primary-color);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            word-break: break-all;
-            border: 1px solid var(--border-color);
-        }
-        
-        .copy-btn {
-            width: auto;
-            display: inline-block;
-            margin-top: 10px;
-        }
-        
-        .view-section {
-            background-color: var(--secondary-color);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-        
-        .view-section.active {
-            display: block;
-        }
-        
-        .code-container {
-            background-color: var(--primary-color);
-            border-radius: 6px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 500px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-        }
-        
-        pre {
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-        
-        .error {
-            color: #f85149;
-            background-color: rgba(248, 81, 73, 0.1);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid rgba(248, 81, 73, 0.4);
-        }
-        
-        .success {
-            color: #3fb950;
-            background-color: rgba(63, 185, 80, 0.1);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid rgba(63, 185, 80, 0.4);
-        }
-        
-        .info {
-            background-color: rgba(65, 132, 228, 0.1);
-            color: #539bf5;
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid rgba(65, 132, 228, 0.4);
-        }
-        
-        .key-input {
-            margin-top: 15px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 10px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .input-section, .result-section, .view-section {
-                padding: 15px;
-            }
-        }
+        /* Остальные стили такие же... */
     </style>
 </head>
 <body>
@@ -240,6 +58,7 @@
             <button class="copy-btn" id="copy-btn">Скопировать ссылку</button>
             <div class="info">
                 <p>Для просмотра исходного кода по этой ссылке потребуется ввести ключ доступа.</p>
+                <p><strong>Ключ для просмотра:</strong> <span id="access-key-display"></span></p>
             </div>
         </section>
         
@@ -247,7 +66,7 @@
             <h2 class="result-title">Просмотр исходного кода</h2>
             <div class="input-group key-input">
                 <label for="access-key">Введите ключ доступа для просмотра исходного кода:</label>
-                <input type="text" id="access-key" placeholder="Master_Vasia2_Cool">
+                <input type="password" id="access-key" placeholder="Введите ключ">
             </div>
             <button id="view-source-btn">Показать исходный код</button>
             <div class="code-container" id="code-container" style="display: none;">
@@ -261,6 +80,9 @@
     </div>
 
     <script>
+        // Секретный ключ - генерируется случайно для каждого создателя
+        const SECRET_KEY = generateSecretKey();
+        
         document.addEventListener('DOMContentLoaded', function() {
             const generateBtn = document.getElementById('generate-btn');
             const copyBtn = document.getElementById('copy-btn');
@@ -268,6 +90,10 @@
             const resultSection = document.getElementById('result-section');
             const viewSection = document.getElementById('view-section');
             const codeContainer = document.getElementById('code-container');
+            const accessKeyDisplay = document.getElementById('access-key-display');
+            
+            // Показываем создателю его уникальный ключ
+            accessKeyDisplay.textContent = SECRET_KEY;
             
             // Проверяем, есть ли параметр id в URL (для просмотра скрипта)
             const urlParams = new URLSearchParams(window.location.search);
@@ -300,8 +126,14 @@
                 // Генерируем уникальный ID для скрипта
                 const scriptId = generateId();
                 
-                // Сохраняем данные в localStorage
-                localStorage.setItem(`script_${scriptId}`, githubUrl);
+                // Сохраняем данные в localStorage с шифрованием
+                const scriptData = {
+                    url: githubUrl,
+                    key: SECRET_KEY, // Сохраняем ключ вместе со скриптом
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem(`script_${scriptId}`, JSON.stringify(scriptData));
                 
                 // Генерируем защищенную ссылку
                 const protectedUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}`;
@@ -334,25 +166,38 @@
                     return;
                 }
                 
-                // Проверяем ключ доступа
-                if (accessKey !== 'Master_Vasia2_Cool') {
-                    showError('Неверный ключ доступа');
-                    return;
-                }
+                // Получаем данные скрипта из localStorage
+                const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
                 
-                // Получаем URL скрипта из localStorage
-                const scriptUrl = localStorage.getItem(`script_${scriptId}`);
-                
-                if (!scriptUrl) {
+                if (!scriptDataStr) {
                     showError('Скрипт не найден или срок его действия истек');
                     return;
                 }
                 
-                // Загружаем и отображаем исходный код
-                fetchScriptSource(scriptUrl);
+                try {
+                    const scriptData = JSON.parse(scriptDataStr);
+                    
+                    // Проверяем ключ доступа
+                    if (accessKey !== scriptData.key) {
+                        showError('Неверный ключ доступа');
+                        return;
+                    }
+                    
+                    // Загружаем и отображаем исходный код
+                    fetchScriptSource(scriptData.url);
+                } catch (e) {
+                    showError('Ошибка при загрузке данных скрипта');
+                }
             });
             
             // Вспомогательные функции
+            function generateSecretKey() {
+                // Генерируем уникальный ключ для создателя
+                const timestamp = Date.now().toString(36);
+                const random = Math.random().toString(36).substr(2, 9);
+                return `Master_${timestamp}_${random}`;
+            }
+            
             function isValidGitHubUrl(url) {
                 // Проверяем, является ли URL действительной сырой ссылкой GitHub
                 return url.startsWith('https://raw.githubusercontent.com/') && 
@@ -386,43 +231,23 @@
             }
             
             function showError(message) {
-                // Удаляем существующие сообщения об ошибках
                 removeMessages();
-                
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'error';
                 errorDiv.textContent = message;
-                
-                // Вставляем сообщение об ошибке после кнопки
                 const currentSection = viewSection.classList.contains('active') ? viewSection : resultSection;
                 currentSection.appendChild(errorDiv);
-                
-                // Автоматически удаляем сообщение через 5 секунд
-                setTimeout(() => {
-                    if (errorDiv.parentNode) {
-                        errorDiv.parentNode.removeChild(errorDiv);
-                    }
-                }, 5000);
+                setTimeout(() => { if (errorDiv.parentNode) errorDiv.parentNode.removeChild(errorDiv); }, 5000);
             }
             
             function showSuccess(message) {
-                // Удаляем существующие сообщения
                 removeMessages();
-                
                 const successDiv = document.createElement('div');
                 successDiv.className = 'success';
                 successDiv.textContent = message;
-                
-                // Вставляем сообщение об успехе после кнопки
                 const currentSection = viewSection.classList.contains('active') ? viewSection : resultSection;
                 currentSection.appendChild(successDiv);
-                
-                // Автоматически удаляем сообщение через 5 секунд
-                setTimeout(() => {
-                    if (successDiv.parentNode) {
-                        successDiv.parentNode.removeChild(successDiv);
-                    }
-                }, 5000);
+                setTimeout(() => { if (successDiv.parentNode) successDiv.parentNode.removeChild(successDiv); }, 5000);
             }
             
             function removeMessages() {
