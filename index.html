@@ -237,7 +237,8 @@
             <div class="generated-link" id="generated-link"></div>
             <button class="copy-btn" id="copy-btn">Скопировать ссылку</button>
             <div class="info">
-                <p>Для просмотра исходного кода по этой ссылке потребуется ввести ключ доступа.</p>
+                <p>Для инжекта скрипта используйте эту ссылку в вашем инжекторе.</p>
+                <p>Для просмотра исходного кода добавьте <strong>?view=source</strong> к ссылке.</p>
             </div>
         </section>
         
@@ -284,11 +285,24 @@
             
             const urlParams = new URLSearchParams(window.location.search);
             const scriptId = urlParams.get('id');
+            const viewMode = urlParams.get('view');
             
-            if (scriptId) {
+            if (scriptId && viewMode === 'source') {
                 document.querySelector('.input-section').style.display = 'none';
                 viewSection.classList.add('active');
                 viewSection.setAttribute('data-script-id', scriptId);
+            } else if (scriptId) {
+                const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
+                if (scriptDataStr) {
+                    try {
+                        const scriptData = JSON.parse(scriptDataStr);
+                        fetchScriptForInjection(scriptData.url);
+                    } catch (e) {
+                        document.body.innerHTML = '<div class="container"><div class="error">Ошибка загрузки скрипта</div></div>';
+                    }
+                } else {
+                    document.body.innerHTML = '<div class="container"><div class="error">Скрипт не найден</div></div>';
+                }
             }
             
             generateBtn.addEventListener('click', function() {
@@ -314,6 +328,7 @@
                 localStorage.setItem(`script_${scriptId}`, JSON.stringify(scriptData));
                 
                 const protectedUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}`;
+                const viewUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}&view=source`;
                 
                 document.getElementById('generated-link').textContent = protectedUrl;
                 resultSection.classList.add('active');
@@ -365,6 +380,25 @@
             
             function generateId() {
                 return 'script_' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            function fetchScriptForInjection(url) {
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                
+                fetch(proxyUrl + encodeURIComponent(url))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Не удалось загрузить скрипт');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        document.contentType = 'text/plain';
+                        document.body.textContent = data;
+                    })
+                    .catch(error => {
+                        document.body.innerHTML = '<div class="container"><div class="error">Ошибка при загрузке скрипта: ' + error.message + '</div></div>';
+                    });
             }
             
             function fetchScriptSource(url) {
