@@ -5,20 +5,42 @@ const CONFIG = {
     LOG_STORAGE_KEY: "script_protector_logs"
 };
 
-// Генератор уникального Script ID
+// Генератор уникального Script ID (использует crypto.randomUUID если доступно)
 function generateScriptId() {
-    return 'SCR-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+    try {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return 'SCR-' + crypto.randomUUID();
+        }
+    } catch (e) { /* fallback ниже */ }
+
+    // fallback
+    return 'SCR-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+// Генератор per-link bypass key (длина зависит от уровня защиты)
+function generateBypassKey(level) {
+    const pool = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    let len = 6;
+    if (level === 'advanced') len = 8;
+    if (level === 'military') len = 14;
+    let out = '';
+    for (let i = 0; i < len; i++) out += pool.charAt(Math.floor(Math.random() * pool.length));
+    return out;
 }
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('createBtn').addEventListener('click', createProtectedScript);
-    document.getElementById('copyBtn').addEventListener('click', copyLink);
-    document.getElementById('loginBtn').addEventListener('click', loginAsOwner);
-    document.getElementById('clearLogs').addEventListener('click', clearLogs);
+    const createBtnEl = document.getElementById('createBtn');
+    if (createBtnEl) createBtnEl.addEventListener('click', createProtectedScript);
+    const copyBtnEl = document.getElementById('copyBtn');
+    if (copyBtnEl) copyBtnEl.addEventListener('click', copyLink);
+    const loginBtnEl = document.getElementById('loginBtn');
+    if (loginBtnEl) loginBtnEl.addEventListener('click', loginAsOwner);
+    const clearLogsEl = document.getElementById('clearLogs');
+    if (clearLogsEl) clearLogsEl.addEventListener('click', clearLogs);
 
     const savedKey = sessionStorage.getItem('owner_key');
-    if (savedKey && Logger.authenticateOwner(savedKey)) {
+    if (savedKey && Logger && typeof Logger.authenticateOwner === 'function' && Logger.authenticateOwner(savedKey)) {
         showOwnerDashboard();
     }
 });
@@ -26,16 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // Система логов
 const Logger = {
     log: function(type, message, scriptId = null) {
-        // Убедимся, что 'type' и 'message' являются строками.
         if (typeof type !== 'string' || typeof message !== 'string') {
              console.error("Logger Error: 'type' or 'message' is not defined or not a string.");
-             return; // Предотвращаем падение, если тип не задан
+             return;
         }
-        
+
         const logEntry = {
             id: Date.now() + Math.random(),
             timestamp: new Date().toISOString(),
-            type, // 'creation', 'owner_login', 'view', 'attempted_breach', 'owner_access', 'fetch_error'
+            type,
             message,
             scriptId,
             userAgent: navigator.userAgent
@@ -46,7 +67,9 @@ const Logger = {
         this.updateDashboard();
     },
     getLogs: function() {
-        return JSON.parse(localStorage.getItem(CONFIG.LOG_STORAGE_KEY) || '[]');
+        try {
+            return JSON.parse(localStorage.getItem(CONFIG.LOG_STORAGE_KEY) || '[]');
+        } catch (e) { return []; }
     },
     clearLogs: function() {
         localStorage.removeItem(CONFIG.LOG_STORAGE_KEY);
@@ -54,21 +77,21 @@ const Logger = {
     },
     updateDashboard: function() {
         const totalAccessEl = document.getElementById('totalAccess');
-        if (!totalAccessEl) return; 
+        if (!totalAccessEl) return;
 
         const logs = this.getLogs();
-        
+
         totalAccessEl.textContent = logs.length;
-        
+
         const createdScriptsEl = document.getElementById('createdScripts');
         if (createdScriptsEl) createdScriptsEl.textContent = logs.filter(log => log.type === 'creation').length;
-        
+
         const ownerLoginsEl = document.getElementById('ownerLogins');
         if (ownerLoginsEl) ownerLoginsEl.textContent = logs.filter(log => log.type === 'owner_login' || log.type === 'owner_access').length;
-        
+
         const breachAttemptsEl = document.getElementById('breachAttempts');
         if (breachAttemptsEl) breachAttemptsEl.textContent = logs.filter(log => log.type === 'attempted_breach' || log.type === 'fetch_error').length;
-        
+
         this.displayLogs();
     },
     displayLogs: function() {
@@ -82,12 +105,11 @@ const Logger = {
             if (log.type === 'creation') typeClass = 'success';
             else if (log.type === 'owner_login' || log.type === 'owner_access') typeClass = 'owner';
             else if (log.type === 'attempted_breach' || log.type === 'fetch_error') typeClass = 'breach';
-            else typeClass = ''; 
+            else typeClass = '';
 
             logElement.className = `log-entry ${typeClass}`;
             const time = new Date(log.timestamp).toLocaleString();
-            // Убеждаемся, что log.type существует, прежде чем вызывать toUpperCase()
-            const logType = log.type ? log.type.toUpperCase() : 'UNKNOWN'; 
+            const logType = log.type ? log.type.toUpperCase() : 'UNKNOWN';
             logElement.innerHTML = `<strong>[${time}]</strong> [${logType}] ${log.message}${log.scriptId ? `<br><small>Script ID: ${log.scriptId}</small>` : ''}`;
             container.appendChild(logElement);
         });
@@ -97,9 +119,10 @@ const Logger = {
     }
 };
 
-// Функции владельца (без изменений)
+// Функции владельца
 function loginAsOwner() {
-    const key = document.getElementById('ownerKey').value;
+    const keyEl = document.getElementById('ownerKey');
+    const key = keyEl ? keyEl.value : '';
     if (Logger.authenticateOwner(key)) {
         sessionStorage.setItem('owner_key', key);
         showOwnerDashboard();
@@ -111,7 +134,8 @@ function loginAsOwner() {
 }
 
 function showOwnerDashboard() {
-    document.getElementById('ownerDashboard').classList.remove('hidden');
+    const dash = document.getElementById('ownerDashboard');
+    if (dash) dash.classList.remove('hidden');
     Logger.updateDashboard();
 }
 
@@ -122,10 +146,13 @@ function clearLogs() {
     }
 }
 
-// Основные функции (ФИКС: Гарантируем, что type и message переданы в Logger.log)
+// Основные функции
 async function createProtectedScript() {
-    const scriptUrl = document.getElementById('scriptUrl').value;
-    const protectionLevel = document.getElementById('protectionLevel').value;
+    const scriptUrlEl = document.getElementById('scriptUrl');
+    const protectionLevelEl = document.getElementById('protectionLevel');
+    const scriptUrl = scriptUrlEl ? scriptUrlEl.value : '';
+    const protectionLevel = protectionLevelEl ? protectionLevelEl.value : 'basic';
+
     if (!scriptUrl) {
         alert('Пожалуйста, введите URL скрипта');
         return;
@@ -135,24 +162,31 @@ async function createProtectedScript() {
         btn.textContent = '🛡️ Защита...';
         btn.disabled = true;
     }
-    
+
     try {
         const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(scriptUrl)}`);
         if (!response.ok) throw new Error(`Failed to fetch script. Status: ${response.status}`);
         const originalScript = await response.text();
-        
-        const scriptId = generateScriptId(); 
-        
-        const protectedScript = applyProtection(originalScript, protectionLevel, scriptId); 
-        const protectedUrl = createProtectedUrl(protectedScript, protectionLevel, scriptId);
-        
-        document.getElementById('protectedLink').value = protectedUrl;
-        document.getElementById('result').classList.remove('hidden');
+
+        // Генерируем уникальный id и bypassKey для этой ссылки
+        const scriptId = generateScriptId();
+        const bypassKey = generateBypassKey(protectionLevel);
+
+        // Обфускация/защита
+        const protectedScript = applyProtection(originalScript, protectionLevel, scriptId);
+        const protectedUrl = createProtectedUrl(protectedScript, protectionLevel, scriptId, bypassKey);
+
+        // Выводим ссылку и Bypass Key в textarea (сразу виден создателю)
+        const out = document.getElementById('protectedLink');
+        if (out) out.value = protectedUrl + '\n\nBypass Key: ' + bypassKey;
+        const resEl = document.getElementById('result');
+        if (resEl) resEl.classList.remove('hidden');
+
         Logger.log('creation', `Создан защищенный скрипт: ${scriptUrl}`, scriptId);
+        // НЕ логируем bypassKey в localStorage по соображениям приватности.
     } catch (error) {
-        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Явно задаём оба аргумента
         const errorMessage = error && error.message ? error.message : 'Unknown network error.';
-        Logger.log('fetch_error', `Ошибка загрузки скрипта: ${errorMessage}`, 'N/A'); 
+        Logger.log('fetch_error', `Ошибка загрузки скрипта: ${errorMessage}`, 'N/A');
         alert('Ошибка при получении скрипта: ' + errorMessage);
     } finally {
         if (btn) {
@@ -162,7 +196,7 @@ async function createProtectedScript() {
     }
 }
 
-// applyProtection (без изменений)
+// applyProtection (без включения scriptId в protectedScript — scriptId передаётся отдельно в лоадер)
 function applyProtection(script, level, scriptId) {
     switch (level) {
         case 'basic':
@@ -172,28 +206,33 @@ function applyProtection(script, level, scriptId) {
             for (let i = 0; i < script.length; i++) {
                 advancedObfuscated += String.fromCharCode(script.charCodeAt(i) ^ 0x42);
             }
-            return btoa(unescape(encodeURIComponent(advancedObfuscated))) + '::' + btoa(scriptId);
+            // advanced оставляем в формате base64(obf) :: (опционально можно добавить метаданные)
+            return btoa(unescape(encodeURIComponent(advancedObfuscated)));
         case 'military':
             let militaryObfuscated = '';
             const key = 'MILITARY_GRADE_PROTECTION_KEY_2024';
             for (let i = 0; i < script.length; i++) {
                 militaryObfuscated += String.fromCharCode(script.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
-            return btoa(unescape(encodeURIComponent(militaryObfuscated))) + '::' + btoa(scriptId) + '::' + btoa(Date.now().toString());
+            // military остаётся base64(obf) (timestamp и scriptId передаются в лоадер отдельно)
+            return btoa(unescape(encodeURIComponent(militaryObfuscated)));
         default:
-            return script;
+            return btoa(unescape(encodeURIComponent(script)));
     }
 }
 
-// createProtectedUrl (без изменений)
-function createProtectedUrl(script, level, scriptId) {
+// createProtectedUrl: теперь принимает bypassKey и передаёт в createLoaderHtml
+function createProtectedUrl(script, level, scriptId, bypassKey = '') {
+    // Экранируем проблемные символы, чтобы корректно вставлять в шаблон HTML
     const escapedScript = script.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/`/g, "\\`");
-    const htmlContent = createLoaderHtml(escapedScript, level, scriptId); 
+    // createLoaderHtml находится в loader.js и ожидает (protectedScript, level, scriptId, bypassKey)
+    const htmlContent = createLoaderHtml(escapedScript, level, scriptId, bypassKey);
     return 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(htmlContent)));
 }
 
 function copyLink() {
     const linkInput = document.getElementById('protectedLink');
+    if (!linkInput) return;
     linkInput.select();
     linkInput.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(linkInput.value).then(() => {
