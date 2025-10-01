@@ -41,9 +41,9 @@ function getDecryptionCode(level) {
     }
 }
 
-// ИСПРАВЛЕНО: Шаблон с имитацией страницы "ACCESS DENIED"
+// Создаём HTML-лоадер. ВАЖНО: внутри loggingFunction не используются вложенные шаблоны ${...},
+// чтобы не было подстановок в момент генерации строки (исходная причина ошибки "type is not defined").
 function createLoaderHtml(protectedScript, level, scriptId) {
-    
     // Функция для ИМИТАЦИИ отправки логов (выводит в консоль лоадера)
     const loggingFunction = `
         const SCRIPT_ID = '${scriptId}';
@@ -52,41 +52,49 @@ function createLoaderHtml(protectedScript, level, scriptId) {
         
         // ВНИМАНИЕ: Это имитация бэкенд-логирования. Логи выводятся в консоль.
         function sendLog(type, details = {}) {
-            console.warn(\`[LOGGING: \${type.toUpperCase()}] SCRIPT_ID: \${SCRIPT_ID}\`);
-            console.log("Log Details:", details); 
-            
-            // Если вам нужен рабочий логгинг, замените это на fetch к вашему бэкенду.
+            try {
+                var t = (type && typeof type.toUpperCase === 'function') ? type.toUpperCase() : String(type);
+                console.warn('[LOGGING: ' + t + '] SCRIPT_ID: ' + SCRIPT_ID);
+            } catch (e) {
+                console.warn('[LOGGING: ERROR] SCRIPT_ID: ' + SCRIPT_ID, e);
+            }
+            console.log("Log Details:", details);
+            // Если нужен рабочий логгинг — замените на fetch к вашему бэкенду.
         }
         
-        // Логируем посещение страницы 
+        // Логируем посещение страницы
         sendLog('view', { status: 'Page loaded', level: PROTECTION_LEVEL, userAgent: navigator.userAgent });
         
         function showDecryptedCode() {
             let originalScript = '';
             try {
-                // Код деобфускации
+                // Код деобфускации будет вставлен сюда
                 ${getDecryptionCode(level)}
-                
-                document.getElementById('luaCodeOutput').value = originalScript;
+
+                var out = document.getElementById('luaCodeOutput');
+                if (out) out.value = originalScript;
                 
             } catch (error) {
-                document.getElementById('luaCodeOutput').value = "Error decrypting script: " + error.message;
+                var outErr = document.getElementById('luaCodeOutput');
+                if (outErr) outErr.value = "Error decrypting script: " + error.message;
                 sendLog('breach_failed', { error: error.message });
             }
         }
         
         function checkOwnerAccess() {
-            const inputKey = document.getElementById('ownerKeyInput').value;
+            var inputEl = document.getElementById('ownerKeyInput');
+            var inputKey = inputEl ? inputEl.value : '';
             
             if (inputKey === MASTER_KEY) {
-                document.getElementById('accessDenied').classList.add('hidden');
-                document.getElementById('ownerAccess').classList.remove('hidden');
+                var denied = document.getElementById('accessDenied');
+                var owner = document.getElementById('ownerAccess');
+                if (denied) denied.classList.add('hidden');
+                if (owner) owner.classList.remove('hidden');
                 showDecryptedCode();
                 sendLog('owner_access', { success: true });
             } else {
-                // Логируем попытку взлома
-                sendLog('attempted_breach', { success: false, key_tried: inputKey.substring(0, 10) + '...' });
-                const errorStatusEl = document.getElementById('errorStatus');
+                sendLog('attempted_breach', { success: false, key_tried: (inputKey || '').substring(0, 10) + '...' });
+                var errorStatusEl = document.getElementById('errorStatus');
                 if (errorStatusEl) errorStatusEl.textContent = 'Access key is invalid! Logging breach attempt...';
             }
         }
@@ -158,18 +166,32 @@ function createLoaderHtml(protectedScript, level, scriptId) {
         
         ${loggingFunction}
         
-        document.getElementById('copyLuaBtn').addEventListener('click', () => {
-            const luaCodeArea = document.getElementById('luaCodeOutput');
-            luaCodeArea.select();
-            navigator.clipboard.writeText(luaCodeArea.value).then(() => {
-                alert('Lua code copied to clipboard!');
-            });
-        });
+        (function(){
+            var copyBtn = document.getElementById('copyLuaBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function(){
+                    var luaCodeArea = document.getElementById('luaCodeOutput');
+                    if (!luaCodeArea) return;
+                    luaCodeArea.select();
+                    try {
+                        navigator.clipboard.writeText(luaCodeArea.value).then(function(){
+                            alert('Lua code copied to clipboard!');
+                        }, function(err){
+                            alert('Не удалось скопировать: ' + err);
+                        });
+                    } catch (e) {
+                        // fallback
+                        document.execCommand('copy');
+                        alert('Lua code copied (fallback)');
+                    }
+                });
+            }
 
-        document.getElementById('ownerSubmit').addEventListener('click', checkOwnerAccess);
-        document.getElementById('ownerKeyInput').addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') checkOwnerAccess();
-        });
+            var ownerSubmit = document.getElementById('ownerSubmit');
+            if (ownerSubmit) ownerSubmit.addEventListener('click', checkOwnerAccess);
+            var ownerInput = document.getElementById('ownerKeyInput');
+            if (ownerInput) ownerInput.addEventListener('keyup', function(e){ if (e.key === 'Enter') checkOwnerAccess(); });
+        })();
     </script>
 </body>
 </html>`;
