@@ -1,0 +1,211 @@
+document.getElementById('createBtn').addEventListener('click', createProtectedScript);
+document.getElementById('copyBtn').addEventListener('click', copyLink);
+
+async function createProtectedScript() {
+    const scriptUrl = document.getElementById('scriptUrl').value;
+    const protectionLevel = document.getElementById('protectionLevel').value;
+    
+    if (!scriptUrl) {
+        alert('Please enter a script URL');
+        return;
+    }
+    
+    // Показываем загрузку
+    const btn = document.getElementById('createBtn');
+    btn.textContent = '🛡️ Protecting...';
+    btn.disabled = true;
+    
+    try {
+        // Загружаем исходный скрипт
+        const response = await fetch(scriptUrl);
+        if (!response.ok) throw new Error('Failed to fetch script');
+        const originalScript = await response.text();
+        
+        // Применяем защиту
+        const protectedScript = applyProtection(originalScript, protectionLevel);
+        
+        // Создаем защищенную ссылку
+        const protectedUrl = createProtectedUrl(protectedScript, protectionLevel);
+        
+        // Показываем результат
+        document.getElementById('protectedLink').value = protectedUrl;
+        document.getElementById('result').classList.remove('hidden');
+        
+    } catch (error) {
+        alert('Error: ' + error.message);
+    } finally {
+        btn.textContent = '🚀 Create Protected Script';
+        btn.disabled = false;
+    }
+}
+
+function applyProtection(script, level) {
+    let protectedScript = script;
+    
+    switch(level) {
+        case 'basic':
+            protectedScript = basicObfuscation(script);
+            break;
+        case 'advanced':
+            protectedScript = advancedObfuscation(script);
+            break;
+        case 'military':
+            protectedScript = militaryObfuscation(script);
+            break;
+    }
+    
+    return protectedScript;
+}
+
+function basicObfuscation(script) {
+    // Базовая обфускация - кодирование в base64
+    return btoa(script);
+}
+
+function advancedObfuscation(script) {
+    // Более сложная обфускация
+    let obfuscated = '';
+    for (let i = 0; i < script.length; i++) {
+        obfuscated += String.fromCharCode(script.charCodeAt(i) ^ 0x42);
+    }
+    return btoa(obfuscated);
+}
+
+function militaryObfuscation(script) {
+    // Максимальная защита
+    let obfuscated = '';
+    const key = 'MILITARY_GRADE_KEY';
+    for (let i = 0; i < script.length; i++) {
+        obfuscated += String.fromCharCode(
+            script.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+        );
+    }
+    return btoa(obfuscated) + '::' + btoa(Date.now().toString());
+}
+
+function createProtectedUrl(script, level) {
+    // Создаем data URL с защищенным скриптом
+    const htmlContent = createLoaderHtml(script, level);
+    return 'data:text/html;base64,' + btoa(htmlContent);
+}
+
+function createLoaderHtml(protectedScript, level) {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Protected Script</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: #000; 
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="accessDenied">
+            <h1># ACCESS DENIED</h1>
+            
+            <div class="security-alert">
+                <strong>SECURITY BREACH DETECTED</strong><br>
+                Unauthorized browser access attempted<br>
+                This incident has been logged with your digital fingerprint
+            </div>
+            
+            <div class="security-info">
+                <strong>Military Encryption</strong><br>
+                AES-256 Protection
+            </div>
+            
+            <div class="security-info">
+                <strong>You Are Being Monitoring</strong><br>
+                Real-time Threat Detection
+            </div>
+            
+            <div class="system-log">
+                [SYSTEM] Scanning threat level...<br>
+                [ALERT] Browser fingerprint logged<br>
+                [ACTION] Deploying countermeasures...<br>
+                [STATUS] Access permanently denied
+            </div>
+            
+            <div class="error-code">
+                Error Code: 403<br>
+                You Cannot Access This Page
+            </div>
+        </div>
+        
+        <div id="scriptContainer" class="hidden"></div>
+    </div>
+
+    <script>
+        // Проверяем, является ли запрос инжекцией в игру
+        const isGameInjection = window.self !== window.top || 
+                               navigator.userAgent.includes('Game') ||
+                               window.location !== window.parent.location;
+        
+        if (isGameInjection) {
+            document.getElementById('accessDenied').classList.add('hidden');
+            document.getElementById('scriptContainer').classList.remove('hidden');
+            
+            // Деобфускация и выполнение скрипта
+            const protectedScript = "${protectedScript}";
+            let originalScript = "";
+            
+            try {
+                ${getDecryptionCode(level)}
+                
+                const scriptElement = document.createElement('script');
+                scriptElement.textContent = originalScript;
+                document.getElementById('scriptContainer').appendChild(scriptElement);
+                
+            } catch (error) {
+                console.error('Script execution failed:', error);
+            }
+        }
+    </script>
+</body>
+</html>`;
+}
+
+function getDecryptionCode(level) {
+    switch(level) {
+        case 'basic':
+            return 'originalScript = atob(protectedScript);';
+        case 'advanced':
+            return `
+                let decoded = atob(protectedScript);
+                originalScript = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    originalScript += String.fromCharCode(decoded.charCodeAt(i) ^ 0x42);
+                }
+            `;
+        case 'military':
+            return `
+                const parts = protectedScript.split('::');
+                let decoded = atob(parts[0]);
+                const key = 'MILITARY_GRADE_KEY';
+                originalScript = '';
+                for (let i = 0; i < decoded.length; i++) {
+                    originalScript += String.fromCharCode(
+                        decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+                    );
+                }
+            `;
+        default:
+            return 'originalScript = atob(protectedScript);';
+    }
+}
+
+function copyLink() {
+    const linkInput = document.getElementById('protectedLink');
+    linkInput.select();
+    document.execCommand('copy');
+    alert('Link copied to clipboard!');
+}
