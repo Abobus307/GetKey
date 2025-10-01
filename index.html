@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub Script Generator</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary-color: #2d333b;
             --secondary-color: #22272e;
@@ -259,15 +260,43 @@
     </div>
 
     <script>
-        // Простой и надежный способ скрыть ключ в коде
+        // Сложное шифрование ключа
         const getSecretKey = () => {
-            // Ключ разбит на части и склеивается в правильном порядке
-            const part1 = "Mast";
-            const part2 = "er_V";
-            const part3 = "asia";
-            const part4 = "2_Co";
-            const part5 = "ol";
-            return part1 + part2 + part3 + part4 + part5;
+            // Хешируем строку и извлекаем части
+            const hashString = (str) => {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(36);
+            };
+            
+            // Несколько разных строк, которые вместе дают ключ
+            const data = [
+                {v: "MzI", o: 2}, 
+                {v: "dGVy", o: 1},
+                {v: "VmFza", o: 3},
+                {v: "YXJl", o: 0},
+                {v: "TWFzdA==", o: 4},
+                {v: "aWEyX0Nvb2w=", o: 5}
+            ];
+            
+            // Сортируем по порядку и декодируем
+            return data
+                .sort((a, b) => a.o - b.o)
+                .map(item => atob(item.v))
+                .join('')
+                .replace(/[0-9]/g, '')
+                .split('')
+                .reverse()
+                .join('')
+                .replace(/(.{6})/g, '$1_')
+                .slice(0, -1)
+                .split('_')
+                .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                .join('_');
         };
         
         document.addEventListener('DOMContentLoaded', function() {
