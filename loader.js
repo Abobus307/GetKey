@@ -1,157 +1,194 @@
-// loader.js
-function getDecryptionCode(level) {
-    switch(level) {
-        case 'basic':
-            return `originalScript = decodeURIComponent(escape(atob(protectedScript)));`;
-        case 'advanced':
-            return `
-                const parts = protectedScript.split('::');
-                let decoded;
-                try {
-                    // Обратная операция для Base64/UTF-8
-                    decoded = decodeURIComponent(escape(atob(parts[0]))); 
-                } catch (e) {
-                    throw new Error("Base64/UTF-8 decode failed: " + e.message);
-                }
-                
-                originalScript = '';
-                for (let i = 0; i < decoded.length; i++) {
-                    originalScript += String.fromCharCode(decoded.charCodeAt(i) ^ 0x42);
-                }
-            `;
-        case 'military':
-            return `
-                const parts = protectedScript.split('::');
-                let decoded;
-                try {
-                    // Обратная операция для Base64/UTF-8
-                    decoded = decodeURIComponent(escape(atob(parts[0]))); 
-                } catch (e) {
-                    throw new Error("Base64/UTF-8 decode failed: " + e.message);
-                }
+// script.js
+// Конфигурация
+const CONFIG = {
+    OWNER_KEY: "MASTER_KEY_123",
+    LOG_STORAGE_KEY: "script_protector_logs"
+};
 
-                const key = 'MILITARY_GRADE_PROTECTION_KEY_2024';
-                originalScript = '';
-                for (let i = 0; i < decoded.length; i++) {
-                    originalScript += String.fromCharCode(
-                        decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)
-                    );
-                }
-            `;
-        default:
-            return 'originalScript = atob(protectedScript);';
+// Генератор уникального Script ID
+function generateScriptId() {
+    return 'SCR-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('createBtn').addEventListener('click', createProtectedScript);
+    document.getElementById('copyBtn').addEventListener('click', copyLink);
+    document.getElementById('loginBtn').addEventListener('click', loginAsOwner);
+    document.getElementById('clearLogs').addEventListener('click', clearLogs);
+
+    const savedKey = sessionStorage.getItem('owner_key');
+    if (savedKey && Logger.authenticateOwner(savedKey)) {
+        showOwnerDashboard();
+    }
+});
+
+// Система логов (Исправлено: добавлена проверка на существование элементов для фикса ошибки 'Cannot set properties of null')
+const Logger = {
+    log: function(type, message, scriptId = null) {
+        const logEntry = {
+            id: Date.now() + Math.random(),
+            timestamp: new Date().toISOString(),
+            type, // 'creation', 'owner_login', 'view', 'attempted_breach', 'owner_access'
+            message,
+            scriptId,
+            userAgent: navigator.userAgent
+        };
+        const logs = this.getLogs();
+        logs.push(logEntry);
+        localStorage.setItem(CONFIG.LOG_STORAGE_KEY, JSON.stringify(logs));
+        this.updateDashboard();
+    },
+    getLogs: function() {
+        return JSON.parse(localStorage.getItem(CONFIG.LOG_STORAGE_KEY) || '[]');
+    },
+    clearLogs: function() {
+        localStorage.removeItem(CONFIG.LOG_STORAGE_KEY);
+        this.updateDashboard();
+    },
+    updateDashboard: function() {
+        const totalAccessEl = document.getElementById('totalAccess');
+        // Если дашборд еще не инициализирован (null), выходим
+        if (!totalAccessEl) return; 
+
+        const logs = this.getLogs();
+        
+        totalAccessEl.textContent = logs.length;
+        
+        // Проверяем существование каждого элемента перед обновлением
+        const createdScriptsEl = document.getElementById('createdScripts');
+        if (createdScriptsEl) createdScriptsEl.textContent = logs.filter(log => log.type === 'creation').length;
+        
+        const ownerLoginsEl = document.getElementById('ownerLogins');
+        if (ownerLoginsEl) ownerLoginsEl.textContent = logs.filter(log => log.type === 'owner_login' || log.type === 'owner_access').length;
+        
+        const breachAttemptsEl = document.getElementById('breachAttempts');
+        if (breachAttemptsEl) breachAttemptsEl.textContent = logs.filter(log => log.type === 'attempted_breach').length;
+        
+        this.displayLogs();
+    },
+    displayLogs: function() {
+        if (!document.getElementById('accessLogs')) return;
+        const logs = this.getLogs();
+        const container = document.getElementById('accessLogs');
+        container.innerHTML = '';
+        logs.slice().reverse().forEach(log => {
+            const logElement = document.createElement('div');
+            let typeClass;
+            if (log.type === 'creation') typeClass = 'success';
+            else if (log.type === 'owner_login' || log.type === 'owner_access') typeClass = 'owner';
+            else if (log.type === 'attempted_breach') typeClass = 'breach';
+            else typeClass = ''; // Для 'view'
+
+            logElement.className = `log-entry ${typeClass}`;
+            const time = new Date(log.timestamp).toLocaleString();
+            logElement.innerHTML = `<strong>[${time}]</strong> [${log.type.toUpperCase()}] ${log.message}${log.scriptId ? `<br><small>Script ID: ${log.scriptId}</small>` : ''}`;
+            container.appendChild(logElement);
+        });
+    },
+    authenticateOwner: function(key) {
+        return key === CONFIG.OWNER_KEY;
+    }
+};
+
+// Функции владельца
+function loginAsOwner() {
+    const key = document.getElementById('ownerKey').value;
+    if (Logger.authenticateOwner(key)) {
+        sessionStorage.setItem('owner_key', key);
+        showOwnerDashboard();
+        Logger.log('owner_login', 'Доступ владельца к панели управления предоставлен.');
+        alert('✅ Доступ владельца предоставлен!');
+    } else {
+        alert('❌ Неверный ключ владельца!');
     }
 }
 
-// ИСПРАВЛЕНО: Добавлены scriptId и логика логирования в HTML
-function createLoaderHtml(protectedScript, level, scriptId) {
-    // ВНИМАНИЕ: Эта функция ИМИТИРУЕТ логирование, сохраняя логи в localStorage 
-    // родительской страницы. В реальном приложении здесь нужен реальный бэкенд.
-    const loggingFunction = `
-        const SCRIPT_ID = '${scriptId}';
-        const MASTER_KEY = 'MASTER_KEY_123';
+function showOwnerDashboard() {
+    document.getElementById('ownerDashboard').classList.remove('hidden');
+    Logger.updateDashboard();
+}
+
+function clearLogs() {
+    if (confirm('Вы уверены, что хотите очистить все логи?')) {
+        Logger.clearLogs();
+        alert('Логи очищены!');
+    }
+}
+
+// Основные функции
+async function createProtectedScript() {
+    const scriptUrl = document.getElementById('scriptUrl').value;
+    const protectionLevel = document.getElementById('protectionLevel').value;
+    if (!scriptUrl) {
+        alert('Пожалуйста, введите URL скрипта');
+        return;
+    }
+    const btn = document.getElementById('createBtn');
+    btn.textContent = '🛡️ Защита...';
+    btn.disabled = true;
+    try {
+        const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(scriptUrl)}`);
+        if (!response.ok) throw new Error(`Failed to fetch script. Status: ${response.status}`);
+        const originalScript = await response.text();
         
-        // Функция для отправки логов на родительскую страницу (имитация бэкенда)
-        function sendFrontendLog(type, message) {
-            try {
-                if (window.opener && window.opener.Logger) {
-                    window.opener.Logger.log(type, message, SCRIPT_ID);
-                }
-                // Для логов, которые должны быть в реальном времени (попытка взлома)
-                if (type === 'attempted_breach') {
-                    console.error(\`!!! АЛЕРТ ВЗЛОМА !!! Скрипт: \${SCRIPT_ID}\`);
-                    // Здесь в реальном проекте отправлялось бы уведомление (Telegram/Email)
-                }
-            } catch (e) {
-                console.error("Failed to send log to parent window:", e);
+        const scriptId = generateScriptId(); 
+        
+        const protectedScript = applyProtection(originalScript, protectionLevel, scriptId); 
+        const protectedUrl = createProtectedUrl(protectedScript, protectionLevel, scriptId);
+        
+        document.getElementById('protectedLink').value = protectedUrl;
+        document.getElementById('result').classList.remove('hidden');
+        Logger.log('creation', `Создан защищенный скрипт: ${scriptUrl}`, scriptId);
+    } catch (error) {
+        // Мы используем alert, но ошибка, которую вы видели, была связана с дашбордом.
+        alert('Ошибка при получении скрипта: ' + error.message);
+    } finally {
+        btn.textContent = '🚀 Создать защищенный скрипт';
+        btn.disabled = false;
+    }
+}
+
+// ИСПРАВЛЕНО: applyProtection с фиксом btoa и добавлением Script ID
+function applyProtection(script, level, scriptId) {
+    switch (level) {
+        case 'basic':
+            return btoa(unescape(encodeURIComponent(script)));
+        case 'advanced':
+            let advancedObfuscated = '';
+            for (let i = 0; i < script.length; i++) {
+                advancedObfuscated += String.fromCharCode(script.charCodeAt(i) ^ 0x42);
             }
-        }
-        
-        // Логируем посещение страницы (кто сейчас смотрит)
-        sendFrontendLog('view', 'Скрипт загружен. Ожидание доступа.');
-
-        function showDecryptedCode() {
-            let originalScript = '';
-            try {
-                // Код деобфускации
-                ${getDecryptionCode(level)}
-                
-                document.getElementById('luaCodeOutput').value = originalScript;
-                
-            } catch (error) {
-                document.getElementById('luaCodeOutput').value = "Error decrypting script: " + error.message;
-                // Отправка лога о неудачной дешифровке
-                sendFrontendLog('breach_failed', 'Неудачная попытка дешифровки скрипта.');
+            // Добавляем Script ID для логирования в лоадере
+            return btoa(unescape(encodeURIComponent(advancedObfuscated))) + '::' + btoa(scriptId);
+        case 'military':
+            let militaryObfuscated = '';
+            const key = 'MILITARY_GRADE_PROTECTION_KEY_2024';
+            for (let i = 0; i < script.length; i++) {
+                militaryObfuscated += String.fromCharCode(script.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
-        }
+            // Добавляем Script ID и дополнительную метку времени
+            return btoa(unescape(encodeURIComponent(militaryObfuscated))) + '::' + btoa(scriptId) + '::' + btoa(Date.now().toString());
+        default:
+            return script;
+    }
+}
 
-        function checkOwnerAccess() {
-            const inputKey = document.getElementById('ownerKeyInput').value;
-            
-            if (inputKey === MASTER_KEY) {
-                document.getElementById('accessDenied').classList.add('hidden');
-                document.getElementById('ownerAccess').classList.remove('hidden');
-                showDecryptedCode();
-                sendFrontendLog('owner_access', 'Владелец получил доступ.');
-            } else {
-                // Логируем попытку взлома (если неверный ключ)
-                sendFrontendLog('attempted_breach', 'Неудачная попытка доступа с ключом: ' + inputKey.substring(0, 10) + '...');
-                alert('Invalid access key!');
-            }
-        }
-    `;
+// ИСПРАВЛЕНО: createProtectedUrl с фиксом btoa и передачей Script ID
+function createProtectedUrl(script, level, scriptId) {
+    const escapedScript = script.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/`/g, "\\`");
+    const htmlContent = createLoaderHtml(escapedScript, level, scriptId); 
+    // Кодируем HTML-контент с русскими символами (фиксом btoa)
+    return 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(htmlContent)));
+}
 
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Protected Content</title>
-    <style>
-        body { font-family: 'Courier New', monospace; background: #000; color: #00ff00; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        .container { max-width: 800px; width: 100%; border: 2px solid #00ff00; padding: 20px; background: #111; }
-        .hidden { display: none; }
-        h1, h2 { color: #fff; }
-        #ownerKeyInput { padding: 10px; background: #000; border: 1px solid #00ff00; color: #00ff00; width: 250px; }
-        #ownerSubmit, #copyLuaBtn { padding: 10px 20px; background: #00ff00; color: #000; border: none; cursor: pointer; margin-left: 10px; font-weight: bold; }
-        #luaCodeOutput { width: 100%; box-sizing: border-box; height: 300px; background: #000; color: #00ff00; border: 1px solid #00ff00; margin-top: 10px; margin-bottom: 10px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div id="accessDenied">
-            <h1>LUA SCRIPT LOCKED</h1>
-            <div style="margin: 20px 0;">
-                <input type="password" id="ownerKeyInput" placeholder="Owner Access Key">
-                <button id="ownerSubmit">Unlock</button>
-            </div>
-        </div>
-
-        <div id="ownerAccess" class="hidden">
-            <h2>✅ Script Unlocked</h2>
-            <textarea id="luaCodeOutput" readonly></textarea>
-            <button id="copyLuaBtn">Copy Lua Code</button>
-        </div>
-    </div>
-    <script>
-        const protectedScript = '${protectedScript}';
-        
-        // ВСТАВЛЯЕМ ЛОГИКУ ЛОГИРОВАНИЯ И КОНТРОЛЯ ДОСТУПА
-        ${loggingFunction}
-        
-        // Копирование LUA кода (без изменений)
-        document.getElementById('copyLuaBtn').addEventListener('click', () => {
-            const luaCodeArea = document.getElementById('luaCodeOutput');
-            luaCodeArea.select();
-            navigator.clipboard.writeText(luaCodeArea.value).then(() => {
-                alert('Lua code copied to clipboard!');
-            });
-        });
-
-        document.getElementById('ownerSubmit').addEventListener('click', checkOwnerAccess);
-        document.getElementById('ownerKeyInput').addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') checkOwnerAccess();
-        });
-    </script>
-</body>
-</html>`;
+function copyLink() {
+    const linkInput = document.getElementById('protectedLink');
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(linkInput.value).then(() => {
+        alert('✅ Ссылка скопирована!');
+    }, (err) => {
+        alert('Не удалось скопировать текст: ' + err);
+    });
 }
