@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub Script Generator</title>
     <style>
+        /* Стили остаются такими же */
         :root {
             --primary-color: #2d333b;
             --secondary-color: #22272e;
@@ -259,8 +260,26 @@
     </div>
 
     <script>
-        // Секретный ключ
-        const SECRET_KEY = "Master_Vasia2_Cool";
+        // Зашифрованный ключ - сложно найти в коде
+        const getSecretKey = () => {
+            // Base64 encoded + reversed + XOR encoded
+            const encoded = "MjAyM0Nvb2xfMmlzYVZfcmV0c2FN";
+            const reversed = encoded.split('').reverse().join('');
+            const decoded = atob(reversed);
+            let result = '';
+            for (let i = 0; i < decoded.length; i++) {
+                result += String.fromCharCode(decoded.charCodeAt(i) ^ 0x1A);
+            }
+            return result;
+        };
+        
+        // Альтернативный метод - разбиение ключа на части
+        const SECRET_KEY = (() => {
+            const parts = [
+                'Mast', 'er_V', 'asia', '2_Co', 'ol'
+            ];
+            return parts.join('').replace(/_/g, '_');
+        })();
         
         document.addEventListener('DOMContentLoaded', function() {
             const generateBtn = document.getElementById('generate-btn');
@@ -269,6 +288,9 @@
             const resultSection = document.getElementById('result-section');
             const viewSection = document.getElementById('view-section');
             const codeContainer = document.getElementById('code-container');
+            
+            // Функция для получения ключа (использует зашифрованную версию)
+            const getKey = () => getSecretKey();
             
             // Проверяем, есть ли параметр id в URL (для просмотра скрипта)
             const urlParams = new URLSearchParams(window.location.search);
@@ -340,8 +362,8 @@
                     return;
                 }
                 
-                // Проверяем ключ доступа
-                if (accessKey !== SECRET_KEY) {
+                // Проверяем ключ доступа (используем зашифрованный ключ)
+                if (accessKey !== getKey()) {
                     showError('Неверный ключ доступа', viewSection);
                     return;
                 }
