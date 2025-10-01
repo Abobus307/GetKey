@@ -2,14 +2,14 @@
 function getDecryptionCode(level) {
     switch(level) {
         case 'basic':
-            // Это уже было корректно
             return `originalScript = decodeURIComponent(escape(atob(protectedScript)));`;
         case 'advanced':
             return `
+                const parts = protectedScript.split('::');
                 let decoded;
                 try {
-                    // ИСПРАВЛЕНО: Сначала декодируем Base64, затем UTF-8
-                    decoded = decodeURIComponent(escape(atob(protectedScript))); 
+                    // Обратная операция для Base64/UTF-8
+                    decoded = decodeURIComponent(escape(atob(parts[0]))); 
                 } catch (e) {
                     throw new Error("Base64/UTF-8 decode failed: " + e.message);
                 }
@@ -24,7 +24,7 @@ function getDecryptionCode(level) {
                 const parts = protectedScript.split('::');
                 let decoded;
                 try {
-                    // ИСПРАВЛЕНО: Сначала декодируем Base64, затем UTF-8
+                    // Обратная операция для Base64/UTF-8
                     decoded = decodeURIComponent(escape(atob(parts[0]))); 
                 } catch (e) {
                     throw new Error("Base64/UTF-8 decode failed: " + e.message);
@@ -39,13 +39,68 @@ function getDecryptionCode(level) {
                 }
             `;
         default:
-            // Базовый дефолт для Base64 (не рекомендуется для UTF-8)
-            return 'originalScript = atob(protectedScript);'; 
+            return 'originalScript = atob(protectedScript);';
     }
 }
 
-// Функция создания HTML (без изменений, т.к. исправление в script.js)
+// ИСПРАВЛЕНО: Добавлены scriptId и логика логирования в HTML
 function createLoaderHtml(protectedScript, level, scriptId) {
+    // ВНИМАНИЕ: Эта функция ИМИТИРУЕТ логирование, сохраняя логи в localStorage 
+    // родительской страницы. В реальном приложении здесь нужен реальный бэкенд.
+    const loggingFunction = `
+        const SCRIPT_ID = '${scriptId}';
+        const MASTER_KEY = 'MASTER_KEY_123';
+        
+        // Функция для отправки логов на родительскую страницу (имитация бэкенда)
+        function sendFrontendLog(type, message) {
+            try {
+                if (window.opener && window.opener.Logger) {
+                    window.opener.Logger.log(type, message, SCRIPT_ID);
+                }
+                // Для логов, которые должны быть в реальном времени (попытка взлома)
+                if (type === 'attempted_breach') {
+                    console.error(\`!!! АЛЕРТ ВЗЛОМА !!! Скрипт: \${SCRIPT_ID}\`);
+                    // Здесь в реальном проекте отправлялось бы уведомление (Telegram/Email)
+                }
+            } catch (e) {
+                console.error("Failed to send log to parent window:", e);
+            }
+        }
+        
+        // Логируем посещение страницы (кто сейчас смотрит)
+        sendFrontendLog('view', 'Скрипт загружен. Ожидание доступа.');
+
+        function showDecryptedCode() {
+            let originalScript = '';
+            try {
+                // Код деобфускации
+                ${getDecryptionCode(level)}
+                
+                document.getElementById('luaCodeOutput').value = originalScript;
+                
+            } catch (error) {
+                document.getElementById('luaCodeOutput').value = "Error decrypting script: " + error.message;
+                // Отправка лога о неудачной дешифровке
+                sendFrontendLog('breach_failed', 'Неудачная попытка дешифровки скрипта.');
+            }
+        }
+
+        function checkOwnerAccess() {
+            const inputKey = document.getElementById('ownerKeyInput').value;
+            
+            if (inputKey === MASTER_KEY) {
+                document.getElementById('accessDenied').classList.add('hidden');
+                document.getElementById('ownerAccess').classList.remove('hidden');
+                showDecryptedCode();
+                sendFrontendLog('owner_access', 'Владелец получил доступ.');
+            } else {
+                // Логируем попытку взлома (если неверный ключ)
+                sendFrontendLog('attempted_breach', 'Неудачная попытка доступа с ключом: ' + inputKey.substring(0, 10) + '...');
+                alert('Invalid access key!');
+            }
+        }
+    `;
+
     return `
 <!DOCTYPE html>
 <html>
@@ -79,34 +134,11 @@ function createLoaderHtml(protectedScript, level, scriptId) {
     </div>
     <script>
         const protectedScript = '${protectedScript}';
-        const MASTER_KEY = 'MASTER_KEY_123';
         
-        function showDecryptedCode() {
-            let originalScript = '';
-            try {
-                // Код деобфускации берется из getDecryptionCode
-                ${getDecryptionCode(level)}
-                
-                // Помещаем результат в textarea
-                document.getElementById('luaCodeOutput').value = originalScript;
-                
-            } catch (error) {
-                document.getElementById('luaCodeOutput').value = "Error decrypting script: " + error.message;
-            }
-        }
-
-        function checkOwnerAccess() {
-            const inputKey = document.getElementById('ownerKeyInput').value;
-            if (inputKey === MASTER_KEY) {
-                document.getElementById('accessDenied').classList.add('hidden');
-                document.getElementById('ownerAccess').classList.remove('hidden');
-                showDecryptedCode();
-            } else {
-                alert('Invalid access key!');
-            }
-        }
+        // ВСТАВЛЯЕМ ЛОГИКУ ЛОГИРОВАНИЯ И КОНТРОЛЯ ДОСТУПА
+        ${loggingFunction}
         
-        // Кнопка для копирования LUA кода
+        // Копирование LUA кода (без изменений)
         document.getElementById('copyLuaBtn').addEventListener('click', () => {
             const luaCodeArea = document.getElementById('luaCodeOutput');
             luaCodeArea.select();
@@ -119,7 +151,7 @@ function createLoaderHtml(protectedScript, level, scriptId) {
         document.getElementById('ownerKeyInput').addEventListener('keyup', (e) => {
             if (e.key === 'Enter') checkOwnerAccess();
         });
-    </\script>
+    </script>
 </body>
 </html>`;
 }
