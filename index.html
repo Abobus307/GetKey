@@ -89,6 +89,7 @@
         }
         .log-entry.success { background-color: rgba(40, 167, 69, 0.2); }
         .log-entry.owner { background-color: rgba(255, 193, 7, 0.2); }
+        .log-entry.breach { background-color: rgba(220, 53, 69, 0.2); }
     </style>
 </head>
 <body>
@@ -136,8 +137,9 @@
             <h2>📊 Панель управления</h2>
             <p>
                 Всего событий: <span id="totalAccess">0</span> | 
-                Создано скриптов: <span id="blockedAttempts">0</span> | 
-                Входов владельца: <span id="successfulAccess">0</span>
+                Создано скриптов: <span id="createdScripts">0</span> | 
+                Входов владельца: <span id="ownerLogins">0</span> |
+                Попыток взлома: <span id="breachAttempts">0</span>
             </p>
             <div id="accessLogs" style="max-height: 300px; overflow-y: auto; background: #1e1e1e; padding: 10px; border-radius: 5px;">
             </div>
