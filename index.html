@@ -208,86 +208,64 @@
 
     <script>
         const generateId = () => {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            for (let i = 0; i < 12; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        };
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 12; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+};
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const generateBtn = document.getElementById('generate-btn');
-            const copyBtn = document.getElementById('copy-btn');
-            const resultSection = document.getElementById('result-section');
-            
-            // Проверяем, не находимся ли мы на странице защищенного скрипта
-            const urlParams = new URLSearchParams(window.location.search);
-            const scriptId = urlParams.get('id');
-            const key = urlParams.get('key');
-            
-            if (scriptId && key === 'Master_Vasia2_Cool') {
-                // Это запрос из Roblox - возвращаем скрипт
-                const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
-                if (scriptDataStr) {
-                    try {
-                        const scriptData = JSON.parse(scriptDataStr);
-                        fetchScriptForRoblox(scriptData.url);
-                        return;
-                    } catch (e) {
-                        // Ошибка - показываем обычную страницу
-                    }
-                }
-            } else if (scriptId) {
-                // Прямой доступ из браузера - показываем защитную страницу
-                showProtectedPage();
-                return;
-            }
-            
-            generateBtn.addEventListener('click', function() {
-                const githubUrl = document.getElementById('github-url').value.trim();
-                
-                if (!githubUrl) {
-                    alert('Пожалуйста, введите ссылку на GitHub');
-                    return;
-                }
-                
-                if (!isValidGitHubUrl(githubUrl)) {
-                    alert('Пожалуйста, введите корректную ссылку на raw файл GitHub');
-                    return;
-                }
-                
-                const scriptId = generateId();
-                const timestamp = Date.now();
-                
-                // Сохраняем в localStorage
-                const scriptData = {
-                    url: githubUrl,
-                    timestamp: timestamp
-                };
-                
-                localStorage.setItem(`script_${scriptId}`, JSON.stringify(scriptData));
-                
-                // Генерируем ссылку в формате ?id=ID&key=KEY
-                const protectedUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}&key=Master_Vasia2_Cool`;
-                
-                document.getElementById('generated-link').textContent = protectedUrl;
-                resultSection.classList.add('active');
-                resultSection.scrollIntoView({ behavior: 'smooth' });
-            });
-            
-            copyBtn.addEventListener('click', function() {
-                const linkText = document.getElementById('generated-link').textContent;
-                navigator.clipboard.writeText(linkText).then(function() {
-                    alert('Ссылка скопирована в буфер обмена!');
-                }, function() {
-                    alert('Не удалось скопировать ссылку');
-                });
-            });
-            
-            function isValidGitHubUrl(url) {
-                return url.startsWith('https://raw.githubusercontent.com/') && url.endsWith('.lua');
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generate-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const resultSection = document.getElementById('result-section');
+    
+    generateBtn.addEventListener('click', function() {
+        const githubUrl = document.getElementById('github-url').value.trim();
+        
+        if (!githubUrl) {
+            alert('Пожалуйста, введите ссылку на GitHub');
+            return;
+        }
+        
+        if (!isValidGitHubUrl(githubUrl)) {
+            alert('Пожалуйста, введите корректную ссылку на raw файл GitHub');
+            return;
+        }
+        
+        const scriptId = generateId();
+        const timestamp = Date.now();
+        
+        // Сохраняем в localStorage
+        const scriptData = {
+            url: githubUrl,
+            timestamp: timestamp
+        };
+        
+        localStorage.setItem(`script_${scriptId}`, JSON.stringify(scriptData));
+        
+        // Генерируем ссылку на script.html с параметрами
+        const protectedUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}script.html?id=${scriptId}&key=Master_Vasia2_Cool&source=roblox&t=${timestamp}`;
+        
+        document.getElementById('generated-link').textContent = protectedUrl;
+        resultSection.classList.add('active');
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+    });
+    
+    copyBtn.addEventListener('click', function() {
+        const linkText = document.getElementById('generated-link').textContent;
+        navigator.clipboard.writeText(linkText).then(function() {
+            alert('Ссылка скопирована в буфер обмена!');
+        }, function() {
+            alert('Не удалось скопировать ссылку');
+        });
+    });
+    
+    function isValidGitHubUrl(url) {
+        return url.startsWith('https://raw.githubusercontent.com/') && url.endsWith('.lua');
+    }
+});
             
             function fetchScriptForRoblox(url) {
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
