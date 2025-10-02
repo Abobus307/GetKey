@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Script Loader</title>
+    <script>
+        // Проверяем, является ли запрос из Roblox
+        const isRobloxRequest = () => {
+            const userAgent = navigator.userAgent;
+            const referrer = document.referrer;
+            return userAgent.includes('Roblox') || 
+                   referrer.includes('roblox.com') ||
+                   new URLSearchParams(window.location.search).get('source') === 'roblox';
+        };
+
+        // Получаем параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const scriptId = urlParams.get('id');
+        const key = urlParams.get('key');
+        const secretKey = "Master_Vasia2_Cool";
+
+        // Если это запрос из Roblox и ключ правильный
+        if (isRobloxRequest() && key === secretKey) {
+            const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
+            
+            if (scriptDataStr) {
+                try {
+                    const scriptData = JSON.parse(scriptDataStr);
+                    
+                    // Загружаем и возвращаем скрипт
+                    fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(scriptData.url))
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network error');
+                            return response.text();
+                        })
+                        .then(data => {
+                            // Устанавливаем content-type для Lua
+                            document.contentType = 'text/plain';
+                            document.body.innerHTML = `<pre>${data}</pre>`;
+                        })
+                        .catch(error => {
+                            document.body.innerHTML = 'Error loading script';
+                        });
+                } catch (e) {
+                    document.body.innerHTML = 'Invalid script data';
+                }
+            } else {
+                document.body.innerHTML = 'Script not found';
+            }
+        } else {
+            // Показываем Access Denied для браузера
+            document.body.innerHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Access Denied</title>
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            background: #1a1a1a; 
+                            color: #e0e0e0; 
+                            margin: 0; 
+                            padding: 40px 20px; 
+                            text-align: center; 
+                        }
+                        .container { 
+                            max-width: 600px; 
+                            margin: 0 auto; 
+                        }
+                        h1 { 
+                            color: #ff6b00; 
+                            margin-bottom: 20px; 
+                        }
+                        .info { 
+                            background: #2d2d2d; 
+                            padding: 20px; 
+                            border-radius: 8px; 
+                            margin: 20px 0; 
+                            text-align: left; 
+                        }
+                        .code { 
+                            background: #1a1a1a; 
+                            padding: 15px; 
+                            border-radius: 4px; 
+                            margin: 15px 0; 
+                            font-family: monospace; 
+                            border-left: 3px solid #ff6b00; 
+                        }
+                        button { 
+                            background: #ff6b00; 
+                            color: white; 
+                            border: none; 
+                            padding: 10px 20px; 
+                            border-radius: 4px; 
+                            cursor: pointer; 
+                            margin-top: 20px; 
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h1>Access Denied</h1>
+                        <p>You do not have access to these files.</p>
+                        <p>This content is only accessible from Roblox clients. Browser access is blocked for security reasons.</p>
+                        
+                        <div class='info'>
+                            <h3>Why am I seeing this?</h3>
+                            <ul>
+                                <li>This link contains protected Lua script content</li>
+                                <li>Only Roblox clients can access protected scripts</li>
+                                <li>Browser access is automatically blocked</li>
+                                <li>This prevents unauthorized script viewing</li>
+                            </ul>
+                            
+                            <p>If you're a Roblox developer, use this link in your script with:</p>
+                            <div class='code'>
+                                <strong>loadstring(game:HttpGet('${window.location.href}'))()</strong>
+                            </div>
+                        </div>
+                        
+                        <button onclick='window.history.back()'>Go Back</button>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+    </script>
+</head>
+<body>
+    <!-- Content will be replaced by JavaScript -->
+</body>
+</html>
