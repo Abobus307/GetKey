@@ -78,7 +78,7 @@
             padding: 12px 15px;
             background-color: var(--primary-color);
             border: 1px solid var(--border-color);
-            borderRadius: 6px;
+            border-radius: 6px;
             color: var(--text-color);
             font-size: 1rem;
             transition: border-color 0.2s;
@@ -194,7 +194,7 @@
             <button class="copy-btn" id="copy-btn">Скопировать ссылку</button>
             <div class="info">
                 <p><strong>Использование в Roblox:</strong></p>
-                <div class="code-example" style="background: var(--primary-color); padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace;">
+                <div style="background: var(--primary-color); padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace;">
                     loadstring(game:HttpGet("ВАША_ССЫЛКА"))()
                 </div>
                 <p>При прямом переходе по ссылке в браузере будет показано сообщение о защите контента.</p>
@@ -221,6 +221,29 @@
             const copyBtn = document.getElementById('copy-btn');
             const resultSection = document.getElementById('result-section');
             
+            // Проверяем, не находимся ли мы на странице защищенного скрипта
+            const urlParams = new URLSearchParams(window.location.search);
+            const scriptId = urlParams.get('id');
+            const key = urlParams.get('key');
+            
+            if (scriptId && key === 'Master_Vasia2_Cool') {
+                // Это запрос из Roblox - возвращаем скрипт
+                const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
+                if (scriptDataStr) {
+                    try {
+                        const scriptData = JSON.parse(scriptDataStr);
+                        fetchScriptForRoblox(scriptData.url);
+                        return;
+                    } catch (e) {
+                        // Ошибка - показываем обычную страницу
+                    }
+                }
+            } else if (scriptId) {
+                // Прямой доступ из браузера - показываем защитную страницу
+                showProtectedPage();
+                return;
+            }
+            
             generateBtn.addEventListener('click', function() {
                 const githubUrl = document.getElementById('github-url').value.trim();
                 
@@ -245,8 +268,8 @@
                 
                 localStorage.setItem(`script_${scriptId}`, JSON.stringify(scriptData));
                 
-                // Генерируем ссылку в формате /api/protected/ID?t=TIMESTAMP
-                const protectedUrl = `${window.location.origin}/api/protected/${scriptId}?t=${timestamp}`;
+                // Генерируем ссылку в формате ?id=ID&key=KEY
+                const protectedUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}&key=Master_Vasia2_Cool`;
                 
                 document.getElementById('generated-link').textContent = protectedUrl;
                 resultSection.classList.add('active');
@@ -264,6 +287,56 @@
             
             function isValidGitHubUrl(url) {
                 return url.startsWith('https://raw.githubusercontent.com/') && url.endsWith('.lua');
+            }
+            
+            function fetchScriptForRoblox(url) {
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                
+                fetch(proxyUrl + encodeURIComponent(url))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Не удалось загрузить скрипт');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        // Устанавливаем правильный content-type для Lua скрипта
+                        document.body.innerHTML = `<pre>${data}</pre>`;
+                    })
+                    .catch(error => {
+                        document.body.innerHTML = '<div class="container"><div class="error">Ошибка при загрузке скрипта</div></div>';
+                    });
+            }
+            
+            function showProtectedPage() {
+                document.body.innerHTML = `
+                    <div class="container">
+                        <div style="text-align: center; padding: 60px 20px;">
+                            <h1 style="color: #ff6b00; margin-bottom: 20px;">Access Denied</h1>
+                            <p>You do not have access to these files.</p>
+                            <p>This content is only accessible from Roblox clients. Browser access is blocked for security reasons.</p>
+                            
+                            <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left;">
+                                <h3>Why am I seeing this?</h3>
+                                <ul style="margin: 15px 0; padding-left: 20px;">
+                                    <li>This link contains protected Lua script content</li>
+                                    <li>Only Roblox clients can access protected scripts</li>
+                                    <li>Browser access is automatically blocked</li>
+                                    <li>This prevents unauthorized script viewing</li>
+                                </ul>
+                                
+                                <p>If you're a Roblox developer, use this link in your script with:</p>
+                                <div style="background: #1a1a1a; padding: 15px; border-radius: 4px; margin: 15px 0; font-family: monospace; border-left: 3px solid #ff6b00;">
+                                    <strong>loadstring(game:HttpGet('${window.location.href}'))()</strong>
+                                </div>
+                            </div>
+                            
+                            <button onclick="window.location.href='${window.location.origin}${window.location.pathname}'" style="background: #ff6b00; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-top: 20px;">
+                                Back to Lua Protector
+                            </button>
+                        </div>
+                    </div>
+                `;
             }
         });
     </script>
