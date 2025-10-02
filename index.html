@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Script Generator</title>
+    <title>Lua Script Protector</title>
     <style>
         :root {
-            --primary-color: #2d333b;
-            --secondary-color: #22272e;
-            --accent-color: #347d39;
-            --text-color: #cdd9e5;
-            --border-color: #444c56;
+            --primary-color: #1a1a1a;
+            --secondary-color: #2d2d2d;
+            --accent-color: #ff6b00;
+            --text-color: #e0e0e0;
+            --border-color: #444;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
             background-color: var(--primary-color);
             color: var(--text-color);
             line-height: 1.6;
-            padding: 20px;
+            padding: 0;
             min-height: 100vh;
         }
         
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px;
         }
         
         header {
@@ -45,6 +45,9 @@
             font-size: 2.5rem;
             margin-bottom: 10px;
             color: #fff;
+            background: linear-gradient(45deg, #ff6b00, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .description {
@@ -70,7 +73,7 @@
             font-weight: 600;
         }
         
-        input[type="text"], input[type="password"] {
+        input[type="text"] {
             width: 100%;
             padding: 12px 15px;
             background-color: var(--primary-color);
@@ -81,13 +84,13 @@
             transition: border-color 0.2s;
         }
         
-        input[type="text"]:focus, input[type="password"]:focus {
+        input[type="text"]:focus {
             outline: none;
             border-color: var(--accent-color);
         }
         
         button {
-            background-color: var(--accent-color);
+            background: linear-gradient(45deg, #ff6b00, #ff8c00);
             color: white;
             border: none;
             padding: 12px 25px;
@@ -95,13 +98,13 @@
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            transition: background-color 0.2s;
+            transition: transform 0.2s;
             display: block;
             width: 100%;
         }
         
         button:hover {
-            background-color: #46954a;
+            transform: translateY(-2px);
         }
         
         .result-section {
@@ -128,6 +131,7 @@
             margin-bottom: 20px;
             word-break: break-all;
             border: 1px solid var(--border-color);
+            font-family: 'Courier New', monospace;
         }
         
         .copy-btn {
@@ -137,73 +141,34 @@
         }
         
         .info {
-            background-color: rgba(65, 132, 228, 0.1);
-            color: #539bf5;
-            padding: 10px 15px;
+            background-color: rgba(255, 107, 0, 0.1);
+            color: #ff8c00;
+            padding: 15px;
             border-radius: 6px;
             margin-top: 15px;
-            border: 1px solid rgba(65, 132, 228, 0.4);
+            border: 1px solid rgba(255, 107, 0, 0.4);
         }
         
-        .view-section {
+        .protected-content {
+            text-align: center;
+            padding: 60px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .protected-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ff6b00;
+        }
+        
+        .code-example {
             background-color: var(--secondary-color);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-        
-        .view-section.active {
-            display: block;
-        }
-        
-        .code-container {
-            background-color: var(--primary-color);
+            padding: 15px;
             border-radius: 6px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 500px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-        
-        pre {
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-        
-        .error {
-            color: #f85149;
-            background-color: rgba(248, 81, 73, 0.1);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid rgba(248, 81, 73, 0.4);
-        }
-        
-        .success {
-            color: #3fb950;
-            background-color: rgba(63, 185, 80, 0.1);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid rgba(63, 185, 80, 0.4);
-        }
-        
-        .inject-section {
-            background-color: var(--secondary-color);
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: none;
-            margin-top: 20px;
-        }
-        
-        .inject-section.active {
-            display: block;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            text-align: left;
         }
         
         footer {
@@ -217,15 +182,19 @@
         
         @media (max-width: 600px) {
             .container {
-                padding: 10px;
+                padding: 20px 10px;
             }
             
             h1 {
                 font-size: 2rem;
             }
             
-            .input-section, .result-section, .view-section, .inject-section {
+            .input-section, .result-section {
                 padding: 15px;
+            }
+            
+            .protected-content {
+                padding: 30px 15px;
             }
         }
     </style>
@@ -233,16 +202,16 @@
 <body>
     <div class="container">
         <header>
-            <h1>GitHub Script Generator</h1>
-            <p class="description">Создавайте защищенные ссылки на ваши .lua и .txt файлы с GitHub</p>
+            <h1>Lua Script Protector</h1>
+            <p class="description">Защитите ваши Lua скрипты и создавайте безопасные ссылки для Roblox</p>
         </header>
         
         <section class="input-section">
             <div class="input-group">
-                <label for="github-url">Введите ссылку на ваш .lua или .txt файл на GitHub:</label>
+                <label for="github-url">Введите ссылку на ваш .lua файл на GitHub:</label>
                 <input type="text" id="github-url" placeholder="https://raw.githubusercontent.com/username/repo/main/script.lua">
             </div>
-            <button id="generate-btn">Сгенерировать ссылку</button>
+            <button id="generate-btn">Сгенерировать защищенную ссылку</button>
         </section>
         
         <section class="result-section" id="result-section">
@@ -250,33 +219,16 @@
             <div class="generated-link" id="generated-link"></div>
             <button class="copy-btn" id="copy-btn">Скопировать ссылку</button>
             <div class="info">
-                <p>Для просмотра исходного кода по этой ссылке потребуется ввести ключ доступа.</p>
-            </div>
-        </section>
-        
-        <section class="view-section" id="view-section">
-            <h2 class="result-title">Просмотр исходного кода</h2>
-            <div class="input-group">
-                <label for="access-key">Введите ключ доступа для просмотра исходного кода:</label>
-                <input type="password" id="access-key" placeholder="Введите ключ доступа">
-            </div>
-            <button id="view-source-btn">Показать исходный код</button>
-            <div class="code-container" id="code-container">
-                <pre id="source-code"></pre>
-            </div>
-            
-            <section class="inject-section" id="inject-section">
-                <h2 class="result-title">Ссылка для инжекта:</h2>
-                <div class="generated-link" id="inject-link"></div>
-                <button class="copy-btn" id="copy-inject-btn">Скопировать ссылку для инжекта</button>
-                <div class="info">
-                    <p>Используйте эту ссылку для инжекта скрипта. Ссылка действительна в течение 24 часов.</p>
+                <p><strong>Использование в Roblox:</strong></p>
+                <div class="code-example">
+                    loadstring(game:HttpGet("ВАША_ССЫЛКА"))()
                 </div>
-            </section>
+                <p>При прямом переходе по ссылке в браузере будет показано сообщение о защите контента.</p>
+            </div>
         </section>
         
         <footer>
-            <p>GitHub Script Generator © 2025</p>
+            <p>Lua Script Protector © 2023</p>
         </footer>
     </div>
 
@@ -294,66 +246,104 @@
             return result;
         };
         
+        // Проверяем, является ли запрос из Roblox
+        const isRobloxRequest = () => {
+            const userAgent = navigator.userAgent;
+            return userAgent.includes('Roblox') || 
+                   document.referrer.includes('roblox.com') ||
+                   window.location.search.includes('roblox=true');
+        };
+        
+        // Функция для отображения защищенной страницы
+        const showProtectedPage = () => {
+            document.body.innerHTML = `
+                <div class="container">
+                    <div class="protected-content">
+                        <h1 class="protected-title">Access Denied</h1>
+                        <p>You do not have access to these files.</p>
+                        <p>This content is only accessible from Roblox clients. Browser access is blocked for security reasons.</p>
+                        
+                        <div class="info" style="margin-top: 30px;">
+                            <h3>Why am I seeing this?</h3>
+                            <ul style="text-align: left; margin: 15px 0;">
+                                <li>This link contains protected Lua script content</li>
+                                <li>Only Roblox clients can access protected scripts</li>
+                                <li>Browser access is automatically blocked</li>
+                                <li>This prevents unauthorized script viewing</li>
+                            </ul>
+                            
+                            <p>If you're a Roblox developer, use this link in your script with:</p>
+                            <div class="code-example">
+                                <strong>loadstring(game:HttpGet('${window.location.href}'))()</strong>
+                            </div>
+                        </div>
+                        
+                        <button onclick="window.location.href='${window.location.origin}${window.location.pathname}'" style="margin-top: 20px;">
+                            Back to Lua Protector
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+        
         document.addEventListener('DOMContentLoaded', function() {
             const generateBtn = document.getElementById('generate-btn');
             const copyBtn = document.getElementById('copy-btn');
-            const viewSourceBtn = document.getElementById('view-source-btn');
-            const copyInjectBtn = document.getElementById('copy-inject-btn');
             const resultSection = document.getElementById('result-section');
-            const viewSection = document.getElementById('view-section');
-            const injectSection = document.getElementById('inject-section');
-            const codeContainer = document.getElementById('code-container');
             
             const SECRET_KEY = getSecretKey();
             
             const urlParams = new URLSearchParams(window.location.search);
             const scriptId = urlParams.get('id');
-            const token = urlParams.get('token');
+            const key = urlParams.get('key');
             
-            if (scriptId && token) {
-                const authData = localStorage.getItem(`auth_${scriptId}`);
-                if (authData) {
-                    try {
-                        const auth = JSON.parse(authData);
-                        if (auth.token === token && Date.now() - auth.timestamp < 24 * 60 * 60 * 1000) {
-                            const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
-                            if (scriptDataStr) {
-                                try {
-                                    const scriptData = JSON.parse(scriptDataStr);
-                                    fetchScriptForInjection(scriptData.url);
-                                    return;
-                                } catch (e) {
-                                }
-                            }
-                        }
-                    } catch (e) {
-                    }
-                }
+            // Если это запрос на защищенный контент
+            if (window.location.pathname.includes('/api/protected/')) {
+                const pathParts = window.location.pathname.split('/');
+                const protectedId = pathParts[pathParts.length - 1];
                 
-                document.body.innerHTML = '<div class="container"><div class="error">Доступ запрещен. Неверный или просроченный токен.</div></div>';
+                if (isRobloxRequest() || key === SECRET_KEY) {
+                    // Это запрос из Roblox - возвращаем скрипт
+                    const scriptDataStr = localStorage.getItem(`script_${protectedId}`);
+                    if (scriptDataStr) {
+                        try {
+                            const scriptData = JSON.parse(scriptDataStr);
+                            fetchScriptForRoblox(scriptData.url);
+                            return;
+                        } catch (e) {
+                            // Ошибка
+                        }
+                    }
+                    document.body.innerHTML = '<div class="container"><div class="error">Script not found</div></div>';
+                } else {
+                    // Прямой доступ из браузера - показываем защитную страницу
+                    showProtectedPage();
+                }
                 return;
             }
             
+            // Обычная страница генератора
             if (scriptId) {
                 document.querySelector('.input-section').style.display = 'none';
-                viewSection.classList.add('active');
-                viewSection.setAttribute('data-script-id', scriptId);
+                showProtectedPage();
+                return;
             }
             
             generateBtn.addEventListener('click', function() {
                 const githubUrl = document.getElementById('github-url').value.trim();
                 
                 if (!githubUrl) {
-                    showError('Пожалуйста, введите ссылку на GitHub', resultSection);
+                    showError('Пожалуйста, введите ссылку на GitHub');
                     return;
                 }
                 
                 if (!isValidGitHubUrl(githubUrl)) {
-                    showError('Пожалуйста, введите корректную ссылку на raw файл GitHub', resultSection);
+                    showError('Пожалуйста, введите корректную ссылку на raw файл GitHub');
                     return;
                 }
                 
                 const scriptId = generateId();
+                const timestamp = Date.now();
                 
                 const scriptData = {
                     url: githubUrl,
@@ -362,7 +352,8 @@
                 
                 localStorage.setItem(`script_${scriptId}`, JSON.stringify(scriptData));
                 
-                const protectedUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}`;
+                // Генерируем ссылку в формате /api/protected/ID?t=TIMESTAMP
+                const protectedUrl = `${window.location.origin}/api/protected/${scriptId}?t=${timestamp}`;
                 
                 document.getElementById('generated-link').textContent = protectedUrl;
                 resultSection.classList.add('active');
@@ -372,76 +363,26 @@
             copyBtn.addEventListener('click', function() {
                 const linkText = document.getElementById('generated-link').textContent;
                 navigator.clipboard.writeText(linkText).then(function() {
-                    showSuccess('Ссылка скопирована в буфер обмена!', resultSection);
+                    showSuccess('Ссылка скопирована в буфер обмена!');
                 }, function() {
-                    showError('Не удалось скопировать ссылку', resultSection);
+                    showError('Не удалось скопировать ссылку');
                 });
             });
-            
-            viewSourceBtn.addEventListener('click', function() {
-                const accessKey = document.getElementById('access-key').value.trim();
-                const scriptId = viewSection.getAttribute('data-script-id');
-                
-                if (!accessKey) {
-                    showError('Пожалуйста, введите ключ доступа', viewSection);
-                    return;
-                }
-                
-                if (accessKey !== SECRET_KEY) {
-                    showError('Неверный ключ доступа', viewSection);
-                    return;
-                }
-                
-                const scriptDataStr = localStorage.getItem(`script_${scriptId}`);
-                
-                if (!scriptDataStr) {
-                    showError('Скрипт не найден или срок его действия истек', viewSection);
-                    return;
-                }
-                
-                try {
-                    const scriptData = JSON.parse(scriptDataStr);
-                    
-                    const token = generateToken();
-                    const authData = {
-                        token: token,
-                        timestamp: Date.now()
-                    };
-                    localStorage.setItem(`auth_${scriptId}`, JSON.stringify(authData));
-                    
-                    const injectUrl = `${window.location.origin}${window.location.pathname}?id=${scriptId}&token=${token}`;
-                    document.getElementById('inject-link').textContent = injectUrl;
-                    injectSection.classList.add('active');
-                    
-                    fetchScriptSource(scriptData.url);
-                } catch (e) {
-                    showError('Ошибка при загрузке данных скрипта', viewSection);
-                }
-            });
-            
-            copyInjectBtn.addEventListener('click', function() {
-                const linkText = document.getElementById('inject-link').textContent;
-                navigator.clipboard.writeText(linkText).then(function() {
-                    showSuccess('Ссылка для инжекта скопирована!', injectSection);
-                }, function() {
-                    showError('Не удалось скопировать ссылку', injectSection);
-                });
-            });
-            
-            function generateToken() {
-                return 'token_' + Math.random().toString(36).substr(2, 16) + '_' + Date.now().toString(36);
-            }
             
             function isValidGitHubUrl(url) {
-                return url.startsWith('https://raw.githubusercontent.com/') && 
-                       (url.endsWith('.lua') || url.endsWith('.txt'));
+                return url.startsWith('https://raw.githubusercontent.com/') && url.endsWith('.lua');
             }
             
             function generateId() {
-                return 'script_' + Math.random().toString(36).substr(2, 9);
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < 12; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
             }
             
-            function fetchScriptForInjection(url) {
+            function fetchScriptForRoblox(url) {
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
                 
                 fetch(proxyUrl + encodeURIComponent(url))
@@ -452,66 +393,21 @@
                         return response.text();
                     })
                     .then(data => {
-                        document.body.innerHTML = `<pre>${data}</pre>`;
+                        // Устанавливаем правильный content-type для Lua скрипта
+                        document.contentType = 'text/plain';
+                        document.body.textContent = data;
                     })
                     .catch(error => {
-                        document.body.innerHTML = '<div class="container"><div class="error">Ошибка при загрузке скрипта: ' + error.message + '</div></div>';
+                        document.body.innerHTML = '<div class="container"><div class="error">Ошибка при загрузке скрипта</div></div>';
                     });
             }
             
-            function fetchScriptSource(url) {
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                
-                fetch(proxyUrl + encodeURIComponent(url))
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Не удалось загрузить скрипт');
-                        }
-                        return response.text();
-                    })
-                    .then(data => {
-                        document.getElementById('source-code').textContent = data;
-                        codeContainer.style.display = 'block';
-                        showSuccess('Исходный код успешно загружен', viewSection);
-                    })
-                    .catch(error => {
-                        showError('Ошибка при загрузке скрипта: ' + error.message, viewSection);
-                    });
+            function showError(message) {
+                alert(message);
             }
             
-            function showError(message, section) {
-                removeMessages(section);
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error';
-                errorDiv.textContent = message;
-                section.appendChild(errorDiv);
-                setTimeout(() => { 
-                    if (errorDiv.parentNode) {
-                        errorDiv.parentNode.removeChild(errorDiv);
-                    }
-                }, 5000);
-            }
-            
-            function showSuccess(message, section) {
-                removeMessages(section);
-                const successDiv = document.createElement('div');
-                successDiv.className = 'success';
-                successDiv.textContent = message;
-                section.appendChild(successDiv);
-                setTimeout(() => { 
-                    if (successDiv.parentNode) {
-                        successDiv.parentNode.removeChild(successDiv);
-                    }
-                }, 5000);
-            }
-            
-            function removeMessages(section) {
-                const messages = section.querySelectorAll('.error, .success');
-                messages.forEach(message => {
-                    if (message.parentNode) {
-                        message.parentNode.removeChild(message);
-                    }
-                });
+            function showSuccess(message) {
+                alert(message);
             }
         });
     </script>
