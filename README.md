@@ -1,42 +1,24 @@
-# GitHub Script Generator
+# Luarmor-like starter (GitHub-ready)
 
-## Описание
-Инструмент для создания защищенных ссылок на .lua и .txt файлы с GitHub. Сгенерированные ссылки требуют ввода ключа для доступа к исходному коду и инжекту.
+This repository is an educational starter for a Lua obfuscation + key validation service.
+**Not production-ready. Use responsibly and legally.**
 
-## Установка
-1. Сохраните файл как `index.html`
-2. Откройте его в браузере
+## Quick start (local)
+1. Open terminal.
+2. `cd server && npm install`
+3. `node index.js`
+4. Server runs on http://localhost:3000
 
-## Использование
+## API
+- `POST /api/generate-key` -> create a test key
+- `POST /api/validate-key` (JSON `{ "key": "..." }`) -> validate key
+- `POST /api/obfuscate` (multipart form: field `script`) -> returns obfuscated lua file
 
-### Для создателей скриптов:
-1. Введите прямую ссылку на raw файл GitHub (.lua или .txt)
-2. Нажмите "Сгенерировать ссылку"
-3. Скопируйте полученную защищенную ссылку
-4. Поделитесь ссылкой с другими
+## Deploy
+- Use GitHub Actions workflow in `.github/workflows/deploy.yml` (example for Heroku).
+- Add secrets: `HEROKU_API_KEY`, `HEROKU_APP_NAME`, `HEROKU_EMAIL`.
 
-### Для просмотра и инжекта скриптов:
-1. Перейдите по защищенной ссылке
-2. Введите ключ доступа
-3. Нажмите "Показать исходный код"
-4. После успешной авторизации появится ссылка для инжекта
-5. Используйте ссылку для инжекта в вашем инжекторе
+## Warnings
+- This obfuscator is demonstrational only.
+- I will not help create malware, exploits or tools to bypass protections.
 
-## Особенности
-- Защита исходного кода паролем
-- Отдельная ссылка для инжекта после авторизации
-- Токены действительны в течение 24 часов
-- Поддержка файлов .lua и .txt
-- Автоматическое копирование ссылок
-- Адаптивный дизайн
-
-## Формат ссылок
-- Защищенная ссылка: `ваш-сайт.com/index.html?id=script_abc123`
-- Ссылка для инжекта: `ваш-сайт.com/index.html?id=script_abc123&token=token_xyz`
-
-## Техническая информация
-- Ключ доступа защищен в коде
-- Данные хранятся в localStorage браузера
-- Токены для инжекта сохраняются в localStorage
-- Используется CORS прокси для загрузки файлов
-- Совместимость с современными браузерами
