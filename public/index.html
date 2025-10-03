@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Luarmor-like — Обфускатор</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Luarmor-like — Обфускатор</h1>
+    <section class="card">
+      <h2>Ключи</h2>
+      <div class="row">
+        <button id="generateKey">Сгенерировать ключ</button>
+        <input id="generatedKey" readonly placeholder="Новый ключ появится здесь">
+      </div>
+      <div class="row">
+        <input id="checkKeyInput" placeholder="Введите ключ для проверки">
+        <button id="checkKeyBtn">Проверить ключ</button>
+        <span id="checkKeyResult"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Обфускация скрипта</h2>
+      <form id="obfForm">
+        <label>Выберите Lua-файл (.lua)</label>
+        <input type="file" id="scriptFile" accept=".lua">
+        <div class="row">
+          <button type="button" id="obfuscateBtn">Обфусцировать и скачать</button>
+        </div>
+        <div id="status"></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Примеры</h2>
+      <a href="/sample.lua" download>Скачать sample.lua</a>
+      <a href="/loader.lua" download>Скачать loader.lua</a>
+    </section>
+
+    <footer>Учебная реализация — не используйте для вредоносных целей.</footer>
+  </main>
+  <script src="/script.js"></script>
+</body>
+</html>
