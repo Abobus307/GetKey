@@ -1,7 +1,4 @@
-// server/index.js
-// Express server — obfuscation -> сохраняем оригинал в data/obf/<id>.lua
-// и возвращаем "wrapper" lua, который при выполнении запрашивает у сервера реальный скрипт
-
+// server/index.js (updated) — включает автоматический static-serve для public/
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
@@ -28,20 +25,48 @@ function genId(len = 12) {
   return crypto.randomBytes(Math.ceil(len/2)).toString('hex').slice(0, len);
 }
 
+/* ------------------ Static files (auto-detect public dir) ------------------ */
+// Try server/public then ../public (repo root)
+let publicDir = path.join(__dirname, 'public');
+if (!fs.existsSync(publicDir)) {
+  const up = path.join(__dirname, '..', 'public');
+  if (fs.existsSync(up)) publicDir = up;
+}
+// If found, serve it
+if (fs.existsSync(publicDir)) {
+  console.log('[static] Serving public files from:', publicDir);
+  app.use(express.static(publicDir));
+  // Fallback: serve index.html on unknown GET (helpful for SPA)
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(publicDir, 'index.html'));
+  });
+  app.get('*', (req, res, next) => {
+    // If request accepts html, serve index.html (SPA fallback)
+    if (req.accepts('html')) {
+      const i = path.join(publicDir, 'index.html');
+      if (fs.existsSync(i)) return res.sendFile(i);
+    }
+    next();
+  });
+} else {
+  console.log('[static] public dir not found. No static files served.');
+}
+
+/* ------------------ API: keys / obfuscation / retrieval ------------------ */
+
 /**
- * 1) Генерация ключа — вернёт key и id (можно добавить owner, uses, expiry)
+ * 1) Генерация ключа
  */
 app.post('/api/generate-key', (req, res) => {
   const keys = readKeys();
   const key = 'K-' + Math.random().toString(36).slice(2, 12).toUpperCase();
-  // добавим поле usesLeft для контроля раздачи / ограничения
-  keys.keys.push({ key, created: Date.now(), active: true, usesLeft: null /* null = неограниченно */ });
+  keys.keys.push({ key, created: Date.now(), active: true, usesLeft: null });
   writeKeys(keys);
   res.json({ ok: true, key });
 });
 
 /**
- * 2) Валидация ключа (простая)
+ * 2) Валидация ключа
  */
 app.post('/api/validate-key', (req, res) => {
   const { key } = req.body || {};
@@ -52,36 +77,26 @@ app.post('/api/validate-key', (req, res) => {
 });
 
 /**
- * 3) Обфускация + сохранение оригинала:
- *    - сохраняем оригинал в server/data/obf/<id>.lua
- *    - возвращаем клиенту wrapper.lua, который при выполнении сделает POST /api/retrieve-script
- *      с { id, key } и получит обратно base64(script) — после чего выполнит его.
- *
- * Это значит: чтобы скрипт выполнился на клиенте, требуется валидный ключ и доступ к серверу.
+ * 3) Обфускация + сохранение оригинала => отдаём wrapper
  */
 app.post('/api/obfuscate', upload.single('script'), (req, res) => {
   if (!req.file) return res.status(400).json({ ok: false, error: 'no file' });
   const src = fs.readFileSync(req.file.path, 'utf8');
   fs.unlinkSync(req.file.path);
 
-  // OPTIONAL: вшиваем водяную метку/идентификатор в исходник (чтобы можно было отследить утечь)
   const watermark = `-- watermark:${genId(8)}\n`;
   const srcWithWatermark = watermark + src;
 
-  // Сохраняем оригинал (можно применять шифрование на диске, но для демо оставим plain)
   const id = genId(14);
   const outPath = path.join(OBF_DIR, id + '.lua');
   fs.writeFileSync(outPath, srcWithWatermark, 'utf8');
 
-  // Дополнительно: сделаем лёгкую локальную обфускацию для самой обёртки (wrapper даст минимум инфы)
-  // Но не обфусцируем оригинал — он будет доставляться по запросу при исполнении.
-  const serverBase = (process.env.SERVER_BASE_URL || '').replace(/\/$/, ''); // например https://example.com
-  // wrapper: минимальный lua код, который POST'ит { id, key } и получает base64(script), выполняет
+  const serverBase = (process.env.SERVER_BASE_URL || '').replace(/\/$/, '');
   const wrapper = `
 -- AUTO-GENERATED WRAPPER (demo protection)
 local HttpService = game:GetService('HttpService')
 local id = "${id}"
-local server = "${serverBase}" or ("http://YOUR_SERVER") -- замените на ваш URL (или задайте env SERVER_BASE_URL)
+local server = "${serverBase}" or ("http://YOUR_SERVER")
 local function fetch_and_run(key)
   local ok, res = pcall(function()
     return HttpService:PostAsync(server..'/api/retrieve-script', HttpService:JSONEncode({ id = id, key = key }), Enum.HttpContentType.ApplicationJson)
@@ -93,17 +108,15 @@ local function fetch_and_run(key)
   if not data.ok or not data.script then
     error('invalid response from server')
   end
-  -- script is base64 encoded
   local b64 = data.script
   local function b64dec(s)
     local chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     local t = {}
-    local n=0
     for i=1,#s,4 do
-      local a = string.find(chars, s:sub(i,i), 1, true) or 0
-      local b = string.find(chars, s:sub(i+1,i+1), 1, true) or 0
-      local c = string.find(chars, s:sub(i+2,i+2), 1, true) or 0
-      local d = string.find(chars, s:sub(i+3,i+3), 1, true) or 0
+      local a = (string.find(chars, s:sub(i,i), 1, true) or 0)
+      local b = (string.find(chars, s:sub(i+1,i+1), 1, true) or 0)
+      local c = (string.find(chars, s:sub(i+2,i+2), 1, true) or 0)
+      local d = (string.find(chars, s:sub(i+3,i+3), 1, true) or 0)
       local num = (a-1)<<18 | (b-1)<<12 | (c-1)<<6 | (d-1)
       local c1 = (num >> 16) & 0xFF
       local c2 = (num >> 8) & 0xFF
@@ -119,42 +132,26 @@ local function fetch_and_run(key)
   if not f then error('load error: '..tostring(e)) end
   return f()
 end
-
--- Example usage:
--- local key = 'ВАШ_КЛЮЧ'
--- fetch_and_run(key)
-
-return {
-  fetch_and_run = fetch_and_run,
-  __id = id
-}
+return { fetch_and_run = fetch_and_run, __id = id }
 `;
 
-  // небольшая локальная "обфускация" обертки (minify)
   const obfWrapper = obfuscateLua(wrapper);
-
-  // Отдаём wrapper.lua клиенту в ответе (content-disposition attachment)
   res.setHeader('Content-Disposition', `attachment; filename=wrapper_${id}.lua`);
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   res.send(obfWrapper);
 });
 
 /**
- * 4) Endpoint: retrieve-script
- *    Приходит: { id, key }
- *    Сервер проверяет ключ и возвращает base64(original_script) если валиден.
- *    Можно добавить: usesLeft--, IP/HWID привязку, TTL, logging и т.д.
+ * 4) retrieve-script
  */
 app.post('/api/retrieve-script', (req, res) => {
   const { id, key } = req.body || {};
   if (!id || !key) return res.status(400).json({ ok: false, error: 'id/key required' });
 
-  // validate key
   const keys = readKeys();
   const found = keys.keys.find(k => k.key === key && k.active);
   if (!found) return res.json({ ok: false, error: 'invalid key' });
 
-  // Optional: enforce usesLeft
   if (found.usesLeft !== null) {
     if (found.usesLeft <= 0) return res.json({ ok: false, error: 'key exhausted' });
     found.usesLeft = found.usesLeft - 1;
@@ -166,15 +163,11 @@ app.post('/api/retrieve-script', (req, res) => {
   const script = fs.readFileSync(filePath, 'utf8');
   const b64 = Buffer.from(script, 'utf8').toString('base64');
 
-  // Logging: можно логировать время, IP, user-agent
   console.log(`[serve] id=${id} key=${key} ip=${req.ip} time=${new Date().toISOString()}`);
-
   res.json({ ok: true, script: b64 });
 });
 
-/**
- * 5) Admin: list keys (demo) — в продакшене защитить доступ
- */
+/* demo admin (protect in prod) */
 app.get('/api/_list-keys-demo-only', (req, res) => {
   res.json(readKeys());
 });
