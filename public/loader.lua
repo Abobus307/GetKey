@@ -1,0 +1,5 @@
+-- loader.lua (example usage of wrapper)
+-- After you download wrapper_<id>.lua, require it as module and call fetch_and_run(key)
+-- Example:
+-- local wrapper = require(script.WrapperModule)
+-- wrapper.fetch_and_run('ВАШ_КЛЮЧ')
