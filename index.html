@@ -1,434 +1,603 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Free Key Generator — настройки + redirect при байпасе</title>
+<title>Advanced Client Protection — Stages</title>
 <style>
+  /* --- Базовый стиль (чисто и нейтрально) --- */
   *{box-sizing:border-box;margin:0;padding:0}
-  body{min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial, sans-serif;background:linear-gradient(-45deg,#0f0c29,#302b63,#24243e);color:#fff;overflow:hidden}
-  .card{width:900px;max-width:96%;padding:28px;border-radius:14px;background:rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,0.6);position:relative;text-align:center}
-  .settings-btn{position:fixed;right:18px;top:18px;z-index:50;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:8px 12px;border-radius:10px;cursor:pointer;backdrop-filter:blur(8px);color:#fff}
-  .settings-btn:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.3)}
-  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);z-index:100}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(-45deg,#0f0c29,#302b63,#24243e);font-family:Inter,Arial, sans-serif;color:#fff}
+  .app{width:920px;max-width:96%;padding:28px;border-radius:12px;background:rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(0,0,0,0.6);position:relative}
+  .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .title{font-weight:700;font-size:18px}
+  .settings-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;cursor:pointer}
+  .progress{margin-bottom:16px}
+  .progress .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .bar{height:14px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff6b6b,#ff8e53);transition:width .45s}
+  .steps{display:flex;gap:10px;margin-top:10px;justify-content:center}
+  .dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.12)}
+  .dot.done{background:linear-gradient(90deg,#8ceb8e,#2ecc71)}
+  .dot.sus{background:#f4a261}
+  .btn{display:inline-flex;align-items:center;gap:12px;padding:18px 48px;border-radius:60px;background:linear-gradient(45deg,#ff6b6b,#ff8e53);color:#fff;font-weight:700;text-transform:uppercase;cursor:pointer;border:none}
+  .btn[disabled]{opacity:.6;cursor:not-allowed}
+  .status{margin-top:12px;color:rgba(255,255,255,0.85)}
+  .debug{margin-top:14px;background:rgba(0,0,0,0.12);padding:10px;border-radius:8px;font-size:13px;color:rgba(255,255,255,0.9);max-height:220px;overflow:auto}
+  /* modal */
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:999}
   .modal.open{display:flex}
-  .modal-card{width:760px;max-width:94%;background:#0e0b1a;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 20px 60px rgba(0,0,0,0.6);color:#fff}
-  .modal-card h3{margin-bottom:8px}
-  .field{margin:8px 0;display:flex;gap:10px;align-items:center}
-  .field label{width:180px;font-size:14px;color:rgba(255,255,255,0.85)}
-  .field input[type="text"], .field input[type="number"], .field select{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:#fff}
-  .field small{display:block;color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px}
-  .links-list{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+  .card{width:760px;max-width:94%;background:#0f0c1a;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+  .field{display:flex;gap:10px;align-items:center;margin:8px 0}
+  .field label{width:180px;color:rgba(255,255,255,0.9)}
+  .field input[type=text], .field input[type=number], .field select{flex:1;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:#fff}
+  .links-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
   .link-row{display:flex;gap:8px}
-  .link-row input{flex:1}
-  .btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-  .btn{padding:8px 14px;border-radius:10px;border:none;cursor:pointer}
-  .btn.save{background:linear-gradient(90deg,#38bdf8,#7c3aed);color:#fff}
-  .btn.reset{background:rgba(255,255,255,0.06);color:#fff}
-  .btn.close{background:#ff6b6b;color:#fff}
-  .progress-wrap{margin-bottom:18px;text-align:left}
-  .progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .stage-label{font-weight:700}
-  .progress-bar{width:100%;height:14px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;position:relative}
-  .progress-bar>.fill{height:100%;width:0%;background:linear-gradient(90deg,#ff6b6b,#ff8e53);transition:width .45s ease}
-  .steps-row{display:flex;gap:10px;margin-top:10px;justify-content:center}
-  .step-dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.12)}
-  .step-dot.done{background:linear-gradient(90deg,#8ceb8e,#2ecc71)}
-  .step-dot.sus{background:#f4a261}
-  .main-btn{padding:20px 56px;border-radius:60px;background:linear-gradient(45deg,#ff6b6b,#ff8e53);color:white;font-weight:700;text-transform:uppercase;display:inline-flex;align-items:center;gap:12px;cursor:pointer;user-select:none;box-shadow:0 10px 30px rgba(255,107,107,0.35);transition:transform .35s, box-shadow .35s}
-  .main-btn:hover{transform:translateY(-6px) scale(1.03)}
-  .main-btn[disabled]{opacity:.6;cursor:not-allowed;transform:none}
-  .status{margin-top:12px;font-size:14px;color:rgba(255,255,255,0.85)}
-  .metrics{margin-top:14px;text-align:left;font-size:13px;color:rgba(255,255,255,0.85);background:rgba(0,0,0,0.12);padding:10px;border-radius:8px;max-height:200px;overflow:auto}
-  .small{font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px}
+  .controls{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  .controls button{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+  .btn-primary{background:linear-gradient(90deg,#38bdf8,#7c3aed);color:#fff}
+  .btn-danger{background:#ff6b6b;color:#fff}
+  /* strict challenge UI */
+  .challenge{margin-top:12px;display:flex;gap:12px;justify-content:center;align-items:center}
+  .zone{width:120px;height:36px;border-radius:8px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center}
+  .zone.active{box-shadow:0 6px 18px rgba(0,0,0,0.4);background:linear-gradient(90deg,#ffd166,#ef476f)}
+  .slider-wrap{display:flex;gap:8px;align-items:center}
+  .slider{width:220px;height:10px;background:rgba(255,255,255,0.06);border-radius:8px;position:relative}
+  .thumb{position:absolute;top:-7px;left:0;width:24px;height:24px;border-radius:50%;background:#fff}
+  .small{font-size:13px;color:rgba(255,255,255,0.7);margin-top:8px}
 </style>
 </head>
 <body>
-  <button class="settings-btn" id="openSettings">⚙️ Настройки</button>
-
-  <div class="modal" id="modal">
-    <div class="modal-card" role="dialog" aria-modal="true">
-      <h3>Настройки этапов и поведение при байпасе</h3>
-
-      <div class="field">
-        <label for="totalStages">Число этапов</label>
-        <select id="totalStagesSelect">
-          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-        </select>
-      </div>
-
-      <div id="linksContainer" class="links-list"></div>
-
-      <div class="field">
-        <label for="bypassUrl">Ссылка при подозрении (страница с ключом)</label>
-        <input id="bypassUrl" type="text" placeholder="https://site.with/key-page.html" />
-      </div>
-
-      <div class="field">
-        <label for="bypassAuto">Авто-редирект при подозрении</label>
-        <select id="bypassAuto">
-          <option value="1">Да — сразу открыть предупреждение/ссылку</option>
-          <option value="0">Нет — показать предупреждение локально</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="saveLocal">Сохранить локально</label>
-        <select id="saveLocal">
-          <option value="1">Да</option><option value="0">Нет</option>
-        </select>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn reset" id="resetDefaults">Сбросить по умолчанию</button>
-        <button class="btn close" id="closeModal">Закрыть</button>
-        <button class="btn save" id="saveSettingsBtn">Сохранить</button>
-      </div>
-
-      <p class="small">При обнаружении обхода пользователь будет перенаправлен на страницу предупреждения с указанием причины и ссылкой на страницу получения ключа.</p>
+  <div class="app" id="app">
+    <div class="top-row">
+      <div class="title">Free Key — Защита (клиент)</div>
+      <button class="settings-btn" id="openSettings">⚙️ Настройки</button>
     </div>
+
+    <div class="progress">
+      <div class="meta"><div>Этап <span id="curStage">1</span> из <span id="totalStages">3</span></div><div id="stageFlag">Ожидание</div></div>
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="steps" id="steps"></div>
+    </div>
+
+    <div style="text-align:center">
+      <button class="btn" id="startBtn">Начать этап</button>
+    </div>
+
+    <div class="status" id="status">Статус: готов</div>
+
+    <div class="challenge" id="challengeUI" style="display:none">
+      <div class="zone" data-i="0">ЗОНА 1</div>
+      <div class="zone" data-i="1">ЗОНА 2</div>
+      <div class="zone" data-i="2">ЗОНА 3</div>
+      <div class="slider-wrap" id="sliderWrap" style="display:none">
+        <div class="slider" id="slider"><div class="thumb" id="thumb"></div></div>
+      </div>
+    </div>
+
+    <div class="debug" id="debug">
+      <div><b>Метрики</b></div>
+      <pre id="debugPre" style="white-space:pre-wrap"></pre>
+    </div>
+
+    <div class="small">Подсказка: включай строгий режим в настройках, если хочешь усложнить обход.</div>
   </div>
 
-  <div class="card" id="app">
-    <div class="progress-wrap">
-      <div class="progress-top">
-        <div class="stage-label">Этап <span id="curStage">1</span> из <span id="totalStagesDisplay">3</span></div>
-        <div id="stageStateLabel">Ожидание</div>
+  <!-- Settings modal -->
+  <div class="modal" id="modal">
+    <div class="card">
+      <h3>Настройки защиты</h3>
+      <div class="field">
+        <label>Число этапов</label>
+        <select id="cfgStages"><option>1</option><option selected>2</option><option>3</option></select>
       </div>
-      <div class="progress-bar" aria-hidden="true">
-        <div class="fill" id="progressFill"></div>
+
+      <div id="linksBox" class="links-list"></div>
+
+      <div class="field">
+        <label>Мин. сек. на этап (через запятую)</label>
+        <input type="text" id="cfgMinTimes" placeholder="5,7,8"/>
       </div>
-      <div class="steps-row" id="stepsRow"></div>
+
+      <div class="field">
+        <label>Строгий режим</label>
+        <select id="cfgStrict"><option value="0">Выкл</option><option value="1">Вкл</option></select>
+      </div>
+
+      <div class="field">
+        <label>Ссылка при подозрении</label>
+        <input type="text" id="cfgBypass" placeholder="https://example.com/get-key"/>
+      </div>
+
+      <div class="field">
+        <label>Авто-редирект при подозрении</label>
+        <select id="cfgAuto"><option value="1">Да</option><option value="0">Нет</option></select>
+      </div>
+
+      <div class="controls">
+        <button id="resetBtn">Сброс</button>
+        <button id="closeBtn">Закрыть</button>
+        <button class="btn-primary" id="saveBtn">Сохранить</button>
+      </div>
+      <p class="small">Изменения сохраняются в браузере. Strict Mode требует выполнения мини-задания (труднее эмулировать).</p>
     </div>
-
-    <a id="mainButton" class="main-btn" role="button" href="#" target="_blank" rel="noopener">
-      <span id="btnText">Начать этап</span>
-    </a>
-
-    <div class="status" id="status">Статус: не начинали</div>
-
-    <div class="metrics" id="metricsBox">
-      <div><b>Метрики (локально)</b></div>
-      <pre id="metricsContent" style="white-space:pre-wrap"></pre>
-    </div>
-
-    <div class="small">Клиентские проверки усложняют обход, но не дают абсолютной защиты. Этот режим даёт автоматический редирект при подозрении.</div>
   </div>
 
 <script>
-/* ---------- Defaults ---------- */
-const DEFAULT_CONFIG = {
-  totalStages: 3,
-  links: ["https://example.com/step1", "https://example.com/step2", "https://example.com/step3"],
-  minSecondsPerStage: [5,7,8],
-  bypassUrl: "https://example.com/get-key", // по умолчанию — где можно "получить ключ"
-  bypassAuto: true,
-  saveToLocal: true,
-  localKey: "fkgen_config_v3"
+/* =========================
+   Конфигурация / defaults
+   ========================= */
+const DEFAULT = {
+  stages: 2,
+  links: ["https://example.com/step1","https://example.com/step2","https://example.com/step3"],
+  minTimes: [5,7,8],
+  strictMode: false,
+  bypassUrl: "https://example.com/get-key",
+  autoBypass: true,
+  storageKey: "adv_protect_cfg_v1"
 };
 
-/* ---------- Runtime config ---------- */
-let CONFIG = { ...DEFAULT_CONFIG };
+/* Загружаем конфиг из localStorage или берем дефолт */
+let CFG = {...DEFAULT};
+try{
+  const raw = localStorage.getItem(DEFAULT.storageKey);
+  if(raw){
+    const parsed = JSON.parse(raw);
+    CFG = Object.assign(CFG, parsed);
+    // ensure arrays sizes
+    if(!Array.isArray(CFG.links)) CFG.links = DEFAULT.links.slice();
+    if(!Array.isArray(CFG.minTimes)) CFG.minTimes = DEFAULT.minTimes.slice();
+  }
+}catch(e){ console.warn("cfg load err", e); }
 
-/* ---------- State ---------- */
+/* =========================
+   Runtime state
+   ========================= */
 const state = {
-  curStage: 0,
+  cur: 0,
   inProgress: false,
   awaitingReturn: false,
-  stageStartTs: null,
-  mouseMoves: [],
-  clicks: 0, keys: 0, touch:0, focusChanges:0, visibilityChanges:0,
-  devtoolsDetected:false, tamperDetected:false, debuggerPaused:false,
-  bypassRedirected:false
+  startTs: 0,
+  mouse: [],
+  clicks: 0,
+  keys: 0,
+  focusChanges: 0,
+  visibilityChanges: 0,
+  devtools: false,
+  tamper: false,
+  debuggerPaused: false,
+  integrityFail: false,
+  bypassShown: false,
+  strictProgress: [false,false,false] // for zones
 };
 
-/* ---------- UI refs ---------- */
-const openSettingsBtn = document.getElementById('openSettings');
+/* =========================
+   UI refs
+   ========================= */
+const openSettings = document.getElementById('openSettings');
 const modal = document.getElementById('modal');
-const closeModalBtn = document.getElementById('closeModal');
-const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-const resetDefaultsBtn = document.getElementById('resetDefaults');
-const totalStagesSelect = document.getElementById('totalStagesSelect');
-const linksContainer = document.getElementById('linksContainer');
-const saveLocalSelect = document.getElementById('saveLocal');
-const bypassUrlInput = document.getElementById('bypassUrl');
-const bypassAutoSelect = document.getElementById('bypassAuto');
+const saveBtn = document.getElementById('saveBtn');
+const closeBtn = document.getElementById('closeBtn');
+const resetBtn = document.getElementById('resetBtn');
+const cfgStages = document.getElementById('cfgStages');
+const linksBox = document.getElementById('linksBox');
+const cfgMinTimes = document.getElementById('cfgMinTimes');
+const cfgStrict = document.getElementById('cfgStrict');
+const cfgBypass = document.getElementById('cfgBypass');
+const cfgAuto = document.getElementById('cfgAuto');
 
-const curStageEl = document.getElementById("curStage");
-const totalStagesDisplay = document.getElementById("totalStagesDisplay");
-const progressFill = document.getElementById("progressFill");
-const stepsRow = document.getElementById("stepsRow");
-const btn = document.getElementById("mainButton");
-const btnText = document.getElementById("btnText");
-const statusEl = document.getElementById("status");
-const stageStateLabel = document.getElementById("stageStateLabel");
-const metricsContent = document.getElementById("metricsContent");
+const curStageEl = document.getElementById('curStage');
+const totalStagesEl = document.getElementById('totalStages');
+const barFill = document.getElementById('barFill');
+const stepsEl = document.getElementById('steps');
+const startBtn = document.getElementById('startBtn');
+const status = document.getElementById('status');
+const stageFlag = document.getElementById('stageFlag');
+const debugPre = document.getElementById('debugPre');
+const challengeUI = document.getElementById('challengeUI');
+const zoneEls = Array.from(document.querySelectorAll('.zone'));
+const sliderWrap = document.getElementById('sliderWrap');
+const slider = document.getElementById('slider');
+const thumb = document.getElementById('thumb');
 
-/* ---------- Storage helpers ---------- */
-function loadConfigFromStorage(){
-  try {
-    const raw = localStorage.getItem(DEFAULT_CONFIG.localKey);
-    if (!raw) return false;
-    const parsed = JSON.parse(raw);
-    if (typeof parsed.totalStages === 'number' && Array.isArray(parsed.links)) {
-      CONFIG = { ...DEFAULT_CONFIG, ...parsed };
-      return true;
-    }
-  } catch(e){}
+/* =========================
+   Utility helpers
+   ========================= */
+function saveCfg(){ try{ localStorage.setItem(DEFAULT.storageKey, JSON.stringify(CFG)); }catch(e){} }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+/* =========================
+   Init UI
+   ========================= */
+function buildLinksInputs(n){
+  linksBox.innerHTML = "";
+  for(let i=0;i<n;i++){
+    const div = document.createElement('div'); div.className='link-row';
+    const inp = document.createElement('input'); inp.type='text'; inp.value = CFG.links[i] || ""; inp.placeholder = "https://...";
+    const time = document.createElement('input'); time.type='number'; time.min='1'; time.value = CFG.minTimes[i] || DEFAULT.minTimes[i] || 5;
+    div.appendChild(inp); div.appendChild(time);
+    linksBox.appendChild(div);
+  }
+}
+function populateSettings(){
+  cfgStages.value = String(CFG.stages);
+  cfgMinTimes.value = (CFG.minTimes.slice(0,CFG.stages).join(','));
+  cfgStrict.value = CFG.strictMode ? '1':'0';
+  cfgBypass.value = CFG.bypassUrl;
+  cfgAuto.value = CFG.autoBypass ? '1':'0';
+  buildLinksInputs(CFG.stages);
+}
+function renderProgress(){
+  totalStagesEl.textContent = CFG.stages;
+  stepsEl.innerHTML = "";
+  for(let i=0;i<CFG.stages;i++){
+    const d = document.createElement('div'); d.className='dot'; if(i<state.cur) d.classList.add('done');
+    stepsEl.appendChild(d);
+  }
+  curStageEl.textContent = Math.min(state.cur+1, CFG.stages);
+  const pct = Math.round((state.cur / CFG.stages)*100);
+  barFill.style.width = pct + '%';
+}
+populateSettings(); renderProgress();
+
+/* =========================
+   Integrity / checksum of functions & DOM snapshot
+   ========================= */
+const integrity = {
+  funcs: {},
+  domSnapshot: null,
+  computeStrHash(s){
+    let h=0; for(let i=0;i<s.length;i++){ h = ((h<<5)-h) + s.charCodeAt(i); h |= 0; } return h;
+  },
+  store(){
+    // keep key functions stringified
+    const names = ['onMouse','onClick','onKey','onWindowFocus','startStage','evaluateHuman'];
+    names.forEach(n=>{
+      try{ integrity.funcs[n] = integrity.computeStrHash(window[n].toString()); }catch(e){}
+    });
+    integrity.domSnapshot = document.getElementById('app').outerHTML.length;
+  },
+  check(){
+    try{
+      for(const k in integrity.funcs){
+        if(!window[k]) return integrityFail('func_missing_'+k);
+        const h = integrity.computeStrHash(window[k].toString());
+        if(h !== integrity.funcs[k]) return integrityFail('func_changed_'+k);
+      }
+      const curLen = document.getElementById('app').outerHTML.length;
+      if(Math.abs(curLen - integrity.domSnapshot) > 500) return integrityFail('dom_changed');
+    }catch(e){ return integrityFail('check_error'); }
+    return true;
+  }
+};
+function integrityFail(reason){
+  state.integrityFail = true;
+  triggerBypass('integrity_fail_'+reason);
   return false;
 }
-function saveConfigToStorage(){
-  if (!CONFIG.saveToLocal) { localStorage.removeItem(DEFAULT_CONFIG.localKey); return; }
-  try { localStorage.setItem(DEFAULT_CONFIG.localKey, JSON.stringify(CONFIG)); } catch(e){}
-}
 
-/* ---------- Settings UI ---------- */
-function openSettings(){
-  populateSettingsForm();
-  modal.classList.add('open');
-}
-function closeSettings(){ modal.classList.remove('open'); }
-function populateSettingsForm(){
-  totalStagesSelect.value = String(CONFIG.totalStages || 1);
-  saveLocalSelect.value = CONFIG.saveToLocal ? "1" : "0";
-  bypassUrlInput.value = CONFIG.bypassUrl || "";
-  bypassAutoSelect.value = CONFIG.bypassAuto ? "1" : "0";
-  renderLinkInputs(CONFIG.totalStages);
-}
-function renderLinkInputs(n){
-  linksContainer.innerHTML = "";
-  for (let i=0;i<n;i++){
-    const div = document.createElement('div'); div.className='link-row';
-    const linkInput = document.createElement('input'); linkInput.type='text';
-    linkInput.placeholder = `Ссылка для этапа ${i+1}`; linkInput.value = CONFIG.links[i]||"";
-    linkInput.dataset.index = i;
-    const timeInput = document.createElement('input'); timeInput.type='number'; timeInput.min='1'; timeInput.style.width='110px';
-    timeInput.value = CONFIG.minSecondsPerStage[i] || DEFAULT_CONFIG.minSecondsPerStage[i] || 5;
-    timeInput.dataset.index = i;
-    div.appendChild(linkInput); div.appendChild(timeInput);
-    linksContainer.appendChild(div);
+/* =========================
+   DevTools / Debugger detection
+   ========================= */
+(function detectDevtoolsAndDebug(){
+  // window size heuristic
+  setInterval(()=>{
+    const wd = Math.abs(window.outerWidth - window.innerWidth);
+    const hd = Math.abs(window.outerHeight - window.innerHeight);
+    if(wd>160 || hd>160) state.devtools = true;
+  },1200);
+
+  // RAF pause detection (debugger pausing causes long gaps)
+  let lastRaf = performance.now();
+  function rafLoop(ts){
+    if(ts - lastRaf > 250) state.debuggerPaused = true;
+    lastRaf = ts;
+    requestAnimationFrame(rafLoop);
   }
-}
-function saveSettingsFromForm(){
-  const n = parseInt(totalStagesSelect.value,10);
-  CONFIG.totalStages = Math.max(1, Math.min(3, n));
-  CONFIG.links = []; CONFIG.minSecondsPerStage = [];
-  const rows = linksContainer.querySelectorAll('.link-row');
-  rows.forEach((row, idx)=>{
-    const link = row.querySelector('input[type="text"]').value.trim();
-    const t = parseInt(row.querySelector('input[type="number"]').value,10) || DEFAULT_CONFIG.minSecondsPerStage[idx] || 5;
-    CONFIG.links.push(link || "#"); CONFIG.minSecondsPerStage.push(Math.max(1,t));
-  });
-  CONFIG.saveToLocal = saveLocalSelect.value === "1";
-  CONFIG.bypassUrl = (bypassUrlInput.value||"").trim() || DEFAULT_CONFIG.bypassUrl;
-  CONFIG.bypassAuto = bypassAutoSelect.value === "1";
-  saveConfigToStorage();
-  if (state.curStage >= CONFIG.totalStages) state.curStage = Math.max(0, CONFIG.totalStages-1);
-  renderSteps();
-  closeSettings();
-}
-function resetDefaults(){
-  CONFIG = { ...DEFAULT_CONFIG }; saveConfigToStorage(); state.curStage = 0; renderSteps(); closeSettings();
-}
+  requestAnimationFrame(rafLoop);
 
-/* ---------- Progress UI ---------- */
-function renderSteps(){
-  totalStagesDisplay.textContent = CONFIG.totalStages;
-  stepsRow.innerHTML = "";
-  for (let i=0;i<CONFIG.totalStages;i++){
-    const dot=document.createElement('span'); dot.className='step-dot';
-    if (i < state.curStage) dot.classList.add('done');
-    stepsRow.appendChild(dot);
-  }
-  updateProgress();
-}
-function updateProgress(){
-  const percent = Math.round((state.curStage / CONFIG.totalStages) * 100);
-  progressFill.style.width = percent + "%";
-  curStageEl.textContent = Math.min(state.curStage+1, CONFIG.totalStages);
-}
+  // function getter trick
+  try{
+    const o={};
+    Object.defineProperty(o,'x',{get(){ state.devtools = true; return true;}});
+    console.log('%c', o);
+  }catch(e){}
+})();
 
-/* ---------- Interaction & metrics ---------- */
-function onMouseMove(e){ const t=Date.now(); state.mouseMoves.push({x:e.clientX,y:e.clientY,t}); if (state.mouseMoves.length>600) state.mouseMoves.shift(); }
+/* =========================
+   Event handlers & metrics
+   ========================= */
+function onMouse(e){ const t=Date.now(); state.mouse.push({x:e.clientX,y:e.clientY,t}); if(state.mouse.length>1000) state.mouse.shift(); }
 function onClick(){ state.clicks++; }
 function onKey(){ state.keys++; }
-function onTouch(){ state.touch++; }
 function onFocus(){ state.focusChanges++; }
 function onVisibility(){ state.visibilityChanges++; }
 
-function computeAvgMouseSpeed(){ const arr=state.mouseMoves; if (arr.length<2) return 0; let total=0,count=0; for (let i=1;i<arr.length;i++){ const dx=arr[i].x-arr[i-1].x, dy=arr[i].y-arr[i-1].y; const dt=Math.max(1,arr[i].t-arr[i-1].t); total += Math.hypot(dx,dy)/dt; count++; } return count?total/count:0; }
-function countUniquePositions(limit){ const s=new Set(); const arr=state.mouseMoves.slice(-limit); arr.forEach(p=>s.add(`${Math.round(p.x/10)}_${Math.round(p.y/10)}`)); return s.size; }
-function analyzeBehavior(timeMs){ const timeSec=timeMs/1000, mm=state.mouseMoves.length, clicks=state.clicks, keys=state.keys, avgSpeed=computeAvgMouseSpeed(), webdriver=!!navigator.webdriver, uniquePositions=countUniquePositions(100), minReq=CONFIG.minSecondsPerStage[state.curStage]||5; let score=0; if (mm>12) score+=1; if (uniquePositions>8) score+=1; if (clicks>0) score+=0.8; if (keys>0) score+=0.5; if (avgSpeed>0.02 && avgSpeed<3) score+=1; if (timeSec>=minReq) score+=1.2; if (state.devtoolsDetected) score-=5; if (state.tamperDetected) score-=10; if (state.debuggerPaused) score-=8; if (webdriver) score-=10; return {score, mm, uniquePositions, clicks, keys, avgSpeed, timeSec, minReq, webdriver}; }
+function avgSpeed(){
+  const a = state.mouse; if(a.length<2) return 0;
+  let sum=0, c=0;
+  for(let i=1;i<a.length;i++){ const dx=a[i].x-a[i-1].x, dy=a[i].y-a[i-1].y, dt = Math.max(1, a[i].t - a[i-1].t); sum += Math.hypot(dx,dy)/dt; c++; }
+  return c?sum/c:0;
+}
+function uniquePositions(limit=100){
+  const s = new Set(); const a = state.mouse.slice(-limit);
+  a.forEach(p=> s.add(`${Math.round(p.x/20)}_${Math.round(p.y/20)}`));
+  return s.size;
+}
 
-/* ---------- Anti-tamper & devtools detection ---------- */
-(function devtoolsAndDebuggerDetection(){
-  setInterval(()=>{ const wdiff=Math.abs(window.outerWidth-window.innerWidth); const hdiff=Math.abs(window.outerHeight-window.innerHeight); if (wdiff>160 || hdiff>160) state.devtoolsDetected=true; },1000);
-  let last=performance.now();
-  setInterval(()=>{ const now=performance.now(); if (now-last>200) state.debuggerPaused=true; last=now; },100);
-  try { const dev={}; Object.defineProperty(dev,'x',{get(){ state.devtoolsDetected=true; return true; }}); console.log('%c', dev); } catch(e){}
-})();
+/* =========================
+   Evaluation logic
+   ========================= */
+function evaluateHuman(timeMs){
+  const timeSec = timeMs/1000;
+  const mm = state.mouse.length;
+  const clicks = state.clicks;
+  const keys = state.keys;
+  const speed = avgSpeed();
+  const uniq = uniquePositions();
+  let score=0;
+  if(mm>12) score++;
+  if(uniq>6) score++;
+  if(clicks>0) score += 0.7;
+  if(keys>0) score += 0.4;
+  if(speed>0.02 && speed<3) score++;
+  const minReq = (CFG.minTimes && CFG.minTimes[state.cur]) ? CFG.minTimes[state.cur] : DEFAULT.minTimes[state.cur] || 5;
+  if(timeSec >= minReq) score += 1.2;
+  if(state.devtools) score -= 5;
+  if(state.debuggerPaused) score -= 8;
+  if(state.integrityFail) score -= 10;
+  return {score, mm, uniq, clicks, keys, speed, timeSec, minReq};
+}
 
-const mo = new MutationObserver((mut)=>{
-  for(const m of mut){
-    if (m.target && (m.target.id==='mainButton' || (m.target.closest && m.target.closest('#app')===document.getElementById('app')))){
-      if (document.getElementById('mainButton') && document.getElementById('mainButton').innerHTML.indexOf('Начать этап')===-1) state.tamperDetected=true;
+/* =========================
+   Strict challenge: zones sequence OR slider
+   ========================= */
+let activeStrict = false;
+function startStrictUI(){
+  if(!CFG.strictMode) return;
+  activeStrict = true;
+  challengeUI.style.display = 'flex';
+  sliderWrap.style.display = 'none';
+  // reset progress
+  state.strictProgress = [false,false,false];
+  zoneEls.forEach(z=> z.classList.remove('active'));
+  // attach mouse move check for zones — left to right order
+  function zoneCheck(e){
+    const r = zoneEls.map(z=>z.getBoundingClientRect());
+    for(let i=0;i<r.length;i++){
+      if(e.clientX >= r[i].left && e.clientX <= r[i].right && e.clientY >= r[i].top && e.clientY <= r[i].bottom){
+        // require previous done
+        if(i===0 || state.strictProgress[i-1]){
+          state.strictProgress[i]=true; zoneEls[i].classList.add('active');
+        }
+      }
     }
+    // check completion
+    if(state.strictProgress.every(Boolean)){
+      // detach
+      window.removeEventListener('mousemove', zoneCheck);
+      activeStrict = false;
+      challengeUI.style.display = 'none';
+      passStrict();
+    }
+  }
+  window.addEventListener('mousemove', zoneCheck, {passive:true});
+}
+function passStrict(){ /* simply mark stage as ok (called when strict passed) */
+  state.strictPassed = true;
+  status.textContent = 'Strict challenge пройден';
+}
+
+/* Slider variant (not used by default, kept for extensibility) */
+let draggingThumb = false;
+thumb.style.left = '0px';
+thumb.addEventListener('pointerdown', (e)=>{ draggingThumb=true; thumb.setPointerCapture(e.pointerId); });
+window.addEventListener('pointermove', (e)=>{
+  if(!draggingThumb) return;
+  const rect = slider.getBoundingClientRect();
+  let x = clamp(e.clientX - rect.left - (thumb.offsetWidth/2), 0, rect.width - thumb.offsetWidth);
+  thumb.style.left = x + 'px';
+  // progress check
+  if(x >= rect.width - thumb.offsetWidth - 4){
+    draggingThumb = false;
+    status.textContent = 'Слайдер пройден';
+    sliderWrap.style.display = 'none';
+    challengeUI.style.display = 'none';
+    state.strictPassed = true;
   }
 });
-mo.observe(document.getElementById('app'), {attributes:true,childList:true,subtree:true});
+window.addEventListener('pointerup', ()=>{ draggingThumb=false; });
 
-/* ---------- Redirect to warning/key page (built-in) ---------- */
-function openBypassWarning(reason){
-  if (state.bypassRedirected) return; // только один раз за сессию
-  state.bypassRedirected = true;
-
-  // Собираем данные причины (коротко)
-  const reasonText = encodeURIComponent(reason || 'Подозрительное поведение');
-  const keyLink = encodeURIComponent(CONFIG.bypassUrl || DEFAULT_CONFIG.bypassUrl);
-
-  // Создаём HTML-страницу в data-URL с сообщением и ссылкой на получение ключа
-  const warningHtml = `
-    <!doctype html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Подозрение на обход — получение ключа</title>
-      <style>
-        body{font-family:Arial, sans-serif;background:linear-gradient(180deg,#111,#2b2340);color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
-        .box{max-width:720px;padding:28px;border-radius:12px;background:rgba(255,255,255,0.04);text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.6)}
-        h1{margin-bottom:8px}
-        p{color:#ffd;line-height:1.4}
-        .reason{margin-top:10px;color:#f0b; font-weight:700}
-        .actions{margin-top:18px;display:flex;gap:12px;justify-content:center}
-        .btn{padding:12px 18px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
-        .btn.key{background:linear-gradient(90deg,#38bdf8,#7c3aed);color:#fff;text-decoration:none}
-        .btn.back{background:rgba(255,255,255,0.06);color:#fff}
-      </style>
-    </head>
-    <body>
-      <div class="box">
-        <h1>Внимание</h1>
-        <p>Обнаружено подозрительное поведение — возможно, вы пытались обойти требуемые этапы.<br>Чтобы получить ключ и инструкции, перейдите по кнопке "Получить ключ".</p>
-        <div class="reason">Причина: ${decodeURIComponent(reasonText)}</div>
-        <div class="actions">
-          <a class="btn key" href="${decodeURIComponent(keyLink)}" target="_blank" rel="noopener">Получить ключ</a>
-          <button class="btn back" onclick="window.close()">Закрыть</button>
-        </div>
-      </div>
-    </body>
-    </html>
-  `.trim();
-
-  // Открываем предупреждение в новой вкладке (data URL)
-  const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(warningHtml);
-  window.open(dataUrl, '_blank', 'noopener');
-}
-
-/* ---------- Stage handling ---------- */
+/* =========================
+   Start/finish stage behavior
+   ========================= */
 function startStage(){
-  if (state.inProgress || state.awaitingReturn) return;
-  if (state.curStage >= CONFIG.totalStages){ statusEl.textContent = "Все этапы завершены"; return; }
-  state.inProgress=true; state.awaitingReturn=true; state.stageStartTs=Date.now();
-  state.mouseMoves=[]; state.clicks=0; state.keys=0; state.touch=0; state.focusChanges=0; state.visibilityChanges=0;
-  stageStateLabel.textContent = `Этап ${state.curStage+1}: открыт внешний ресурс`;
-  statusEl.textContent = "Открылось окно этапа — вернись на вкладку и дождись оценки";
-  btnText.textContent = "Этап начат...";
-  const url = CONFIG.links[state.curStage] || "#";
-  window.open(url, "_blank", "noopener,noreferrer");
+  if(state.inProgress || state.awaitingReturn) return;
+  if(state.cur >= CFG.stages){ status.textContent = 'Все этапы завершены'; return; }
+
+  // integrity store first-run
+  integrity.store();
+
+  state.inProgress = true;
+  state.awaitingReturn = true;
+  state.startTs = Date.now();
+  state.mouse = []; state.clicks=0; state.keys=0; state.focusChanges=0; state.visibilityChanges=0;
+  state.strictPassed = false; state.integrityFail = false;
+
+  status.textContent = `Этап ${state.cur+1} запущен — откройте ссылку в новой вкладке`;
+  stageFlag.textContent = `Этап ${state.cur+1}: открыт ресурс`;
+
+  // optionally start strict challenge UI
+  if(CFG.strictMode) startStrictUI();
+
+  // open link
+  const url = CFG.links[state.cur] || '#';
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-function onWindowFocus(){
-  if (!state.awaitingReturn) { state.focusChanges++; return; }
-  const now = Date.now();
-  const timeSpent = now - state.stageStartTs;
-  const analysis = analyzeBehavior(timeSpent);
-  const passed = (analysis.score >= 2.5) && !analysis.webdriver && !state.tamperDetected && !state.devtoolsDetected && !state.debuggerPaused && analysis.timeSec >= analysis.minReq;
+/* when user returns (focus) */
+async function onWindowFocus(){
+  if(!state.awaitingReturn){ state.focusChanges++; return; }
+  const now = Date.now(); const elapsed = now - state.startTs;
+  // first, integrity check
+  integrity.check();
 
-  if (passed){
-    const dot = stepsRow.children[state.curStage]; if (dot) dot.classList.add('done');
-    state.curStage++;
-    saveConfigToStorage();
-    statusEl.textContent = `Этап пройден честно — ${Math.round(timeSpent/1000)} с.`;
-    stageStateLabel.textContent = `Этап ${Math.min(state.curStage, CONFIG.totalStages)}: пройден`;
-    btnText.textContent = state.curStage >= CONFIG.totalStages ? "Завершено" : "Начать этап";
+  // compute analysis
+  const res = evaluateHuman(elapsed);
+  // if strict required and not passed — consider suspicious
+  if(CFG.strictMode && !state.strictPassed) res.score -= 5;
+
+  // decide threshold
+  const passed = res.score >= 2.5 && !state.devtools && !state.debuggerPaused && !state.integrityFail;
+
+  if(passed){
+    // mark step done
+    const dot = stepsEl.children[state.cur];
+    if(dot) dot.classList.add('done');
+    state.cur++;
+    saveCfg();
+    status.textContent = `Этап ${state.cur} пройден честно (${Math.round(elapsed/1000)} с)`;
+    stageFlag.textContent = `Этап ${state.cur}: пройден`;
+    startBtn.textContent = state.cur >= CFG.stages ? 'Завершено' : 'Начать этап';
   } else {
-    const dot = stepsRow.children[state.curStage]; if (dot) dot.classList.add('sus');
-    statusEl.innerHTML = `<span style="color:#ff6b6b;font-weight:700">Подозрение: обход или неподходящее поведение.</span> ${Math.round(timeSpent/1000)} с.`;
-    stageStateLabel.textContent = `Этап ${state.curStage+1}: подозрительный`;
-    btnText.textContent = "Повторить этап";
-
-    // Открываем предупреждение/редирект при подозрении
-    const reason = `stage_suspicious_score_${analysis.score.toFixed(2)}`;
-    if (CONFIG.bypassAuto) {
-      // автоматическое открытие warning page с кнопкой на ключ (открывается в новой вкладке)
-      openBypassWarning(reason);
-    } else {
-      // если авто-редирект отключён — всё равно показываем предупреждение в новой вкладке
-      openBypassWarning(reason);
-    }
+    const dot = stepsEl.children[state.cur];
+    if(dot) dot.classList.add('sus');
+    status.innerHTML = `<span style="color:#ff6b6b;font-weight:700">Подозрение на обход</span> — ${Math.round(elapsed/1000)} с`;
+    stageFlag.textContent = `Этап ${state.cur+1}: подозрение`;
+    startBtn.textContent = 'Повторить этап';
+    // trigger bypass UI
+    triggerBypass(`susp_score_${(res.score||0).toFixed(2)}`);
   }
 
-  metricsContent.textContent = JSON.stringify({analysis, devtools:state.devtoolsDetected, tamper:state.tamperDetected, debuggerPaused:state.debuggerPaused}, null, 2);
-  state.inProgress=false; state.awaitingReturn=false;
-  updateProgress();
+  // update debug
+  debugPre.textContent = JSON.stringify({res, devtools:state.devtools, debugPaused:state.debuggerPaused, integrityFail:state.integrityFail}, null, 2);
+
+  state.inProgress=false;
+  state.awaitingReturn=false;
+  renderProgress();
 }
 
-/* ---------- Auto-redirect on tamper/devtools/debug pause ---------- */
-setInterval(()=>{
-  if ((state.tamperDetected || state.devtoolsDetected || state.debuggerPaused) && !state.bypassRedirected) {
-    // сократим причину для показа
-    let reason = state.tamperDetected ? 'tamper_detected' : (state.devtoolsDetected ? 'devtools_open' : 'debugger_paused');
-    if (CONFIG.bypassAuto) {
-      // авто: сразу открыть warning+ссылку
-      openBypassWarning(reason);
-      // блокируем кнопку чтобы не продолжали игру
-      btn.setAttribute('disabled','');
-      btnText.textContent = "Заблокировано — вмешательство";
-      statusEl.textContent = "Обнаружено вмешательство; открыта страница с инструкциями.";
-    } else {
-      // не авто — просто показать предупреждение окно
-      openBypassWarning(reason);
+/* =========================
+   Bypass / Warning page logic (data-URL)
+   ========================= */
+function triggerBypass(reason){
+  if(state.bypassShown) return;
+  state.bypassShown = true;
+  // prepare page with reason and link
+  const reasonEnc = encodeURIComponent(reason);
+  const linkEnc = encodeURIComponent(CFG.bypassUrl || DEFAULT.bypassUrl);
+  const html = `
+    <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Подозрение на обход</title>
+    <style>body{font-family:Arial, sans-serif;background:#0f0c1a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+      .box{max-width:720px;padding:28px;border-radius:12px;background:rgba(255,255,255,0.03);text-align:center}
+      .btn{display:inline-block;padding:12px 18px;border-radius:10px;background:linear-gradient(90deg,#38bdf8,#7c3aed);color:#fff;text-decoration:none;margin-top:14px}
+      .close{display:inline-block;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;margin-left:8px}
+    </style></head><body><div class="box">
+    <h1>Внимание</h1>
+    <p>Обнаружено подозрительное поведение: <b>${decodeURIComponent(reasonEnc)}</b></p>
+    <p>Если вы не пытались обойти систему и хотите получить ключ — нажмите «Получить ключ».</p>
+    <a class="btn" href="${decodeURIComponent(linkEnc)}" target="_blank" rel="noopener">Получить ключ</a>
+    <button class="close" onclick="window.close()">Закрыть</button>
+    </div></body></html>
+  `.trim();
+  const data = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  if(CFG.autoBypass) window.open(data,'_blank','noopener'); else window.open(data,'_blank','noopener');
+  // lock UI
+  startBtn.setAttribute('disabled','');
+  startBtn.textContent = 'Заблокировано';
+}
+
+/* =========================
+   Periodic integrity/checks & tamper detection
+   ========================= */
+(function periodicChecks(){
+  // store initial prototypes to detect overrides
+  const protoHashes = {
+    addEventListener: Function.prototype.addEventListener.toString().length,
+    fetch: window.fetch ? window.fetch.toString().length : 0
+  };
+  integrity.store();
+  setInterval(()=>{
+    // check prototypes
+    try{
+      if(Function.prototype.addEventListener.toString().length !== protoHashes.addEventListener) state.tamper = true;
+      if(window.fetch && window.fetch.toString().length !== protoHashes.fetch) state.tamper = true;
+    }catch(e){}
+    // integrity
+    integrity.check();
+    // if tamper/integrity fail -> trigger bypass
+    if(state.tamper || state.integrityFail) triggerBypass('tamper_or_integrity');
+    // self-heal: if UI removed -> reload
+    if(!document.getElementById('app')) location.reload();
+  }, 900);
+})();
+
+/* =========================
+   Attach events
+   ========================= */
+window.addEventListener('mousemove', onMouse, {passive:true});
+window.addEventListener('mousedown', onClick);
+window.addEventListener('keydown', onKey);
+window.addEventListener('focus', onWindowFocus);
+window.addEventListener('visibilitychange', onVisibility);
+
+startBtn.addEventListener('click', (e)=>{
+  e.preventDefault();
+  startStage();
+});
+
+/* settings UI actions */
+openSettings.addEventListener('click', ()=>{ populateSettings(); modal.classList.add('open'); });
+closeBtn.addEventListener('click', ()=>{ modal.classList.remove('open'); });
+resetBtn.addEventListener('click', ()=>{ if(confirm('Сбросить настройки к дефолту?')){ CFG={...DEFAULT}; saveCfg(); populateSettings(); renderProgress(); modal.classList.remove('open'); }});
+
+saveBtn.addEventListener('click', ()=>{
+  try{
+    const n = clamp(parseInt(cfgStages.value,10)||2,1,3);
+    CFG.stages = n;
+    // read links/time rows
+    const rows = Array.from(linksBox.querySelectorAll('.link-row'));
+    const links = []; const times = [];
+    if(rows.length === 0) buildLinksInputs(n);
+    const inputs = linksBox.querySelectorAll('input');
+    for(let i=0;i<n;i++){
+      const link = inputs[i*2] ? inputs[i*2].value.trim() : (DEFAULT.links[i]||'#');
+      const t = parseInt(inputs[i*2+1].value,10) || (DEFAULT.minTimes[i] || 5);
+      links.push(link || '#'); times.push(Math.max(1,t));
     }
+    CFG.links = links;
+    CFG.minTimes = times;
+    CFG.minTimes = CFG.minTimes.slice(0,CFG.stages);
+    // other simple fields
+    CFG.strictMode = cfgStrict.value === '1';
+    CFG.bypassUrl = cfgBypass.value.trim() || DEFAULT.bypassUrl;
+    CFG.autoBypass = cfgAuto.value === '1';
+    saveCfg();
+    modal.classList.remove('open');
+    renderProgress();
+    status.textContent = 'Настройки сохранены';
+  }catch(err){
+    console.error(err); alert('Ошибка сохранения настроек');
   }
-}, 600);
+});
 
-/* ---------- init ---------- */
-function init(){
-  loadConfigFromStorage();
-  renderSteps();
+/* initial populate (links inputs depend on config) */
+buildLinksInputs(CFG.stages);
 
-  openSettingsBtn.addEventListener('click', openSettings);
-  closeModalBtn.addEventListener('click', closeSettings);
-  saveSettingsBtn.addEventListener('click', saveSettingsFromForm);
-  resetDefaultsBtn.addEventListener('click', ()=>{ if(confirm('Сбросить настройки к значениям по умолчанию?')) resetDefaults(); });
-  totalStagesSelect.addEventListener('change', ()=> renderLinkInputs(parseInt(totalStagesSelect.value,10)));
+/* debug refresh */
+setInterval(()=> {
+  debugPre.textContent = JSON.stringify({
+    cur: state.cur,
+    inProgress: state.inProgress,
+    devtools: state.devtools,
+    debuggerPaused: state.debuggerPaused,
+    tamper: state.tamper,
+    integrityFail: state.integrityFail,
+    metrics: {mouse: state.mouse.length, clicks: state.clicks, keys: state.keys}
+  }, null, 2);
+}, 700);
 
-  btn.addEventListener('click', (e)=>{ e.preventDefault(); startStage(); });
-  window.addEventListener('mousemove', onMouseMove, {passive:true});
-  window.addEventListener('mousedown', onClick);
-  window.addEventListener('keydown', onKey);
-  window.addEventListener('touchstart', onTouch, {passive:true});
-  window.addEventListener('focus', onWindowFocus);
-  window.addEventListener('blur', onFocus);
-  document.addEventListener('visibilitychange', onVisibility);
-
-  setInterval(()=> {
-    metricsContent.textContent = JSON.stringify({
-      stage: state.curStage+1,
-      mouseMoves: state.mouseMoves.length,
-      clicks: state.clicks,
-      keys: state.keys,
-      focusChanges: state.focusChanges,
-      visibilityChanges: state.visibilityChanges,
-      devtools: state.devtoolsDetected,
-      tamper: state.tamperDetected,
-      debuggerPaused: state.debuggerPaused,
-      bypassRedirected: state.bypassRedirected
-    }, null, 2);
-  }, 700);
-}
-init();
 </script>
 </body>
 </html>
