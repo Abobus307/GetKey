@@ -1,364 +1,402 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ключи для доступа</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Free Key Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      position: relative;
-    }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
 
-    /* Анимированный фон */
-    .bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #1a2a6c, #3a7bd5);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      z-index: -2;
-    }
+        /* Анимированные звезды */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
 
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: starFall linear infinite;
+            opacity: 0;
+        }
 
-    /* Плавающие элементы */
-    .floating {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-      animation: float 15s infinite ease-in-out;
-      z-index: -1;
-    }
+        .star::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            filter: blur(2px);
+        }
 
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0); }
-      25% { transform: translate(20px, 20px); }
-      50% { transform: translate(-20px, 20px); }
-      75% { transform: translate(-20px, -20px); }
-    }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    .container {
-      text-align: center;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      max-width: 500px;
-      width: 90%;
-      z-index: 1;
-      position: relative;
-    }
+        @keyframes starFall {
+            0% {
+                transform: translateY(-100px) translateX(0) rotate(45deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) translateX(100px) rotate(45deg);
+                opacity: 0;
+            }
+        }
 
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
 
-    .btn {
-      display: inline-block;
-      padding: 15px 40px;
-      margin: 15px;
-      font-size: 1.2em;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
+        /* --------------------
+           КНОПКА: улучшенная версия (фиксим мерцание)
+           -------------------- */
+        .main-btn {
+            padding: 25px 60px;
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
 
-    .btn-free {
-      background: #4CAF50;
-      color: white;
-    }
+            /* вместо transition: all — явные свойства (меньше перерисовок) */
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        box-shadow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        background 0.35s ease,
+                        color 0.35s ease;
 
-    .btn-free:hover {
-      background: #45a049;
-      transform: scale(1.05);
-    }
+            /* GPU-промоция и сглаживание, чтобы избежать лагов/мерцания */
+            will-change: transform, box-shadow, opacity;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateY(0) scale(1) translateZ(0);
 
-    .btn-paid {
-      background: #FF9800;
-      color: white;
-    }
+            box-shadow:
+                0 10px 30px rgba(255, 107, 107, 0.4),
+                0 0 0 0 rgba(255, 107, 107, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden; /* нужно для ::before shimmer */
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center;
+        }
 
-    .btn-paid:hover {
-      background: #e68900;
-      transform: scale(1.05);
-    }
+        /* запретить псевдоэлементам перехватывать курсор (хотя обычно они не перехватывают) */
+        .main-btn::before,
+        .main-btn::after {
+            pointer-events: none;
+        }
 
-    /* Языковый выбор */
-    .lang-selector {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+        .main-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.7s ease;
+        }
 
-    .lang-btn {
-      padding: 15px 30px;
-      font-size: 1.2em;
-      background: #6f42c1;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+        .main-btn:hover::before {
+            left: 100%;
+        }
 
-    .lang-btn:hover {
-      background: #5a32a3;
-    }
+        .main-btn::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 70px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
 
-    /* Шапка с кнопкой смены языка */
-    .header {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
+        /* чуть меньше подъёма (чтобы курсор не "вылетал" с края) и быстрый откат */
+        .main-btn:hover {
+            transform: translateY(-6px) scale(1.04) translateZ(0);
+            box-shadow:
+                0 15px 40px rgba(255, 107, 107, 0.6),
+                0 0 0 12px rgba(255, 107, 107, 0.08);
+            background: linear-gradient(45deg, #ff8e53, #ff6b6b);
+            color: white;
+        }
 
-    .lang-switch {
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 10px;
-      padding: 8px 15px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.3s;
-    }
+        .main-btn:hover::after {
+            opacity: 1;
+        }
 
-    .lang-switch:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
+        .main-btn:active {
+            transform: translateY(-3px) scale(1.02) translateZ(0);
+            transition-duration: 0.12s;
+        }
 
-    /* Модальное окно */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-    }
+        /* остальной интерфейс (без изменений критичных) */
+        .lang-container {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 3;
+            text-align: center;
+        }
 
-    .modal-content {
-      background: linear-gradient(135deg, #2c3e50, #1a2a6c);
-      margin: 15% auto;
-      padding: 30px;
-      border-radius: 15px;
-      width: 80%;
-      max-width: 500px;
-      color: white;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
+        .lang-switcher {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 35px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
 
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+        .lang-switcher:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
 
-    .close:hover {
-      color: white;
-    }
+        .flag {
+            width: 32px;
+            height: 24px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s ease;
+        }
 
-    .payment-form {
-      margin-top: 20px;
-    }
+        .lang-switcher:hover .flag {
+            transform: scale(1.1);
+        }
 
-    .payment-form input, .payment-form button {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: none;
-      font-size: 1em;
-    }
+        .lang-text {
+            font-weight: bold;
+            color: white;
+            font-size: 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+        }
 
-    .payment-form button {
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
+        .translate-text {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+        }
 
-    .payment-form button:hover {
-      background: #45a049;
-    }
-  </style>
+        .text-transition {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.4s ease;
+        }
+
+        .text-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .decoration {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 1;
+        }
+
+        .decoration-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+            animation: rotate 20s linear infinite;
+        }
+
+        .decoration-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            right: -50px;
+            animation: rotate 15s linear infinite reverse;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeInUp 1s ease-out;
+        }
+    </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
 
-  <!-- Анимированный фон -->
-  <div class="bg"></div>
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
 
-  <!-- Плавающие элементы -->
-  <div class="floating" style="width: 150px; height: 150px; top: 10%; left: 10%;"></div>
-  <div class="floating" style="width: 100px; height: 100px; top: 70%; left: 80%;"></div>
-  <div class="floating" style="width: 200px; height: 200px; top: 40%; left: 50%;"></div>
-
-  <!-- Шапка с кнопкой смены языка -->
-  <div id="header" class="header" style="display:none;">
-    <button class="lang-switch" onclick="toggleLanguage()">RU/EN</button>
-  </div>
-
-  <div id="lang-section" class="container">
-    <h1 id="lang-title">Выберите язык / Choose Language</h1>
-    <div class="lang-selector">
-      <button class="lang-btn" onclick="setLanguage('ru')">Русский</button>
-      <button class="lang-btn" onclick="setLanguage('en')">English</button>
+    <div class="lang-container">
+        <div class="lang-switcher" id="langSwitcher">
+            <img src="https://flagcdn.com/w40/us.png" alt="English" class="flag" id="flag">
+            <span class="lang-text text-visible" id="langText">EN</span>
+        </div>
+        <div class="translate-text text-visible" id="translateText">Translate</div>
     </div>
-  </div>
 
-  <div id="main-section" class="container" style="display:none;">
-    <h1 id="main-title">Получить Ключ</h1>
-    <!-- Текст кнопок устанавливается через JavaScript -->
-    <button class="btn btn-free" onclick="openFreeLink()" id="free-btn"></button>
-    <button class="btn btn-paid" onclick="openModal()" id="paid-btn"></button>
-  </div>
-
-  <!-- Модальное окно -->
-  <div id="paymentModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2 id="modal-title">Купить платный ключ</h2>
-      <p id="modal-desc">Введите данные для оплаты:</p>
-      <div class="payment-form">
-        <input type="text" id="name" placeholder="Имя / Name" required />
-        <input type="email" id="email" placeholder="Email" required />
-        <input type="text" id="card" placeholder="Номер карты / Card Number" required />
-        <button id="pay-btn">Оплатить / Pay</button>
-      </div>
+    <div class="container">
+        <a href="https://example.com" class="main-btn" id="mainButton" target="_blank">
+            <span class="btn-text text-visible" id="btnText">GET FREE KEY</span>
+        </a>
     </div>
-  </div>
 
-  <script>
-    // Укажи сюда ссылку для "Get Free Key"
-    const FREE_LINK = "https://example.com";
+    <script>
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 50;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const left = Math.random() * 100;
+                const delay = Math.random() * 10;
+                const duration = Math.random() * 3 + 2;
+                const size = Math.random() * 2 + 1;
+                star.style.left = `${left}%`;
+                star.style.animationDelay = `${delay}s`;
+                star.style.animationDuration = `${duration}s`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                starsContainer.appendChild(star);
+            }
+        }
 
-    // Тексты на русском и английском
-    const translations = {
-      ru: {
-        mainTitle: "Получить Ключ",
-        freeBtn: "Get Free Key",
-        paidBtn: "Get Paid Key",
-        modalTitle: "Купить платный ключ",
-        modalDesc: "Введите данные для оплаты:",
-        namePlaceholder: "Имя",
-        emailPlaceholder: "Email",
-        cardPlaceholder: "Номер карты",
-        payBtn: "Оплатить",
-        langTitle: "Выберите язык / Choose Language",
-        switchLang: "EN",
-        currentLang: "ru"
-      },
-      en: {
-        mainTitle: "Get Key",
-        freeBtn: "Get Free Key",
-        paidBtn: "Get Paid Key",
-        modalTitle: "Buy Premium Key",
-        modalDesc: "Enter payment details:",
-        namePlaceholder: "Name",
-        emailPlaceholder: "Email",
-        cardPlaceholder: "Card Number",
-        payBtn: "Pay",
-        langTitle: "Choose Language / Выберите язык",
-        switchLang: "RU",
-        currentLang: "en"
-      }
-    };
+        const langSwitcher = document.getElementById('langSwitcher');
+        const langText = document.getElementById('langText');
+        const flag = document.getElementById('flag');
+        const mainButton = document.getElementById('mainButton');
+        const btnText = document.getElementById('btnText');
+        const translateText = document.getElementById('translateText');
 
-    function setLanguage(lang) {
-      localStorage.setItem('lang', lang);
-      document.documentElement.lang = lang;
-      updateTexts(lang);
-      document.getElementById('lang-section').style.display = 'none';
-      document.getElementById('main-section').style.display = 'block';
-      document.getElementById('header').style.display = 'block'; // Показываем шапку
-    }
+        let currentLang = 'en';
 
-    function updateTexts(lang) {
-      const t = translations[lang];
-      document.getElementById('main-title').textContent = t.mainTitle;
-      document.getElementById('free-btn').textContent = t.freeBtn; // Обновление текста кнопки
-      document.getElementById('paid-btn').textContent = t.paidBtn; // Обновление текста кнопки
-      document.getElementById('modal-title').textContent = t.modalTitle;
-      document.getElementById('modal-desc').textContent = t.modalDesc;
-      document.getElementById('name').placeholder = t.namePlaceholder;
-      document.getElementById('email').placeholder = t.emailPlaceholder;
-      document.getElementById('card').placeholder = t.cardPlaceholder;
-      document.getElementById('pay-btn').textContent = t.payBtn;
-      document.getElementById('lang-title').textContent = t.langTitle;
-      document.querySelector('.lang-switch').textContent = t.switchLang;
-    }
+        const translations = {
+            ru: {
+                button: "ПОЛУЧИТЬ КЛЮЧ",
+                lang: "RU",
+                flag: "https://flagcdn.com/w40/ru.png",
+                translateText: "Переводчик"
+            },
+            en: {
+                button: "GET FREE KEY",
+                lang: "EN",
+                flag: "https://flagcdn.com/w40/us.png",
+                translateText: "Translate"
+            }
+        };
 
-    function toggleLanguage() {
-      const currentLang = localStorage.getItem('lang') || 'ru';
-      const newLang = currentLang === 'ru' ? 'en' : 'ru';
-      setLanguage(newLang);
-    }
+        langSwitcher.addEventListener('click', () => {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            updateLanguage();
+            langSwitcher.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                langSwitcher.style.transform = '';
+            }, 150);
+        });
 
-    function openFreeLink() {
-      window.open(FREE_LINK, '_blank');
-    }
+        function updateLanguage() {
+            btnText.classList.remove('text-visible');
+            btnText.classList.add('text-transition');
 
-    function openModal() {
-      document.getElementById('paymentModal').style.display = 'block';
-    }
+            langText.classList.remove('text-visible');
+            langText.classList.add('text-transition');
 
-    function closeModal() {
-      document.getElementById('paymentModal').style.display = 'none';
-    }
+            translateText.classList.remove('text-visible');
+            translateText.classList.add('text-transition');
 
-    window.onclick = function(event) {
-      const modal = document.getElementById('paymentModal');
-      if (event.target === modal) {
-        closeModal();
-      }
-    }
+            flag.style.opacity = '0';
+            flag.style.transform = 'scale(0.8)';
 
-    // Проверяем язык при загрузке
-    window.onload = function() {
-      const savedLang = localStorage.getItem('lang');
-      if (savedLang) {
-        document.getElementById('lang-section').style.display = 'none';
-        document.getElementById('main-section').style.display = 'block';
-        document.getElementById('header').style.display = 'block';
-        updateTexts(savedLang);
-      } else {
-        document.getElementById('lang-section').style.display = 'block';
-        document.getElementById('main-section').style.display = 'none';
-        document.getElementById('header').style.display = 'none';
-      }
-    };
-  </script>
+            setTimeout(() => {
+                btnText.textContent = translations[currentLang].button;
+                langText.textContent = translations[currentLang].lang;
+                translateText.textContent = translations[currentLang].translateText;
+                flag.src = translations[currentLang].flag;
+                document.documentElement.lang = currentLang;
 
+                btnText.classList.remove('text-transition');
+                btnText.classList.add('text-visible');
+
+                langText.classList.remove('text-transition');
+                langText.classList.add('text-visible');
+
+                translateText.classList.remove('text-transition');
+                translateText.classList.add('text-visible');
+
+                flag.style.opacity = '1';
+                flag.style.transform = 'scale(1)';
+            }, 400);
+        }
+
+        createStars();
+    </script>
 </body>
 </html>
