@@ -239,8 +239,9 @@
 
   <div id="main-section" class="container" style="display:none;">
     <h1 id="main-title">Получить Ключ</h1>
-    <button class="btn btn-free" onclick="openFreeLink()" id="free-btn">Get Free Key</button>
-    <button class="btn btn-paid" onclick="openModal()" id="paid-btn">Get Paid Key</button>
+    <!-- Текст кнопок теперь устанавливается через JavaScript -->
+    <button class="btn btn-free" onclick="openFreeLink()" id="free-btn"></button>
+    <button class="btn btn-paid" onclick="openModal()" id="paid-btn"></button>
   </div>
 
   <!-- Модальное окно -->
@@ -306,8 +307,8 @@
     function updateTexts(lang) {
       const t = translations[lang];
       document.getElementById('main-title').textContent = t.mainTitle;
-      document.getElementById('free-btn').textContent = t.freeBtn;
-      document.getElementById('paid-btn').textContent = t.paidBtn;
+      document.getElementById('free-btn').textContent = t.freeBtn; // Обновляем текст кнопки
+      document.getElementById('paid-btn').textContent = t.paidBtn; // Обновляем текст кнопки
       document.getElementById('modal-title').textContent = t.modalTitle;
       document.getElementById('modal-desc').textContent = t.modalDesc;
       document.getElementById('name').placeholder = t.namePlaceholder;
