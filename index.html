@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ключи для доступа</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      position: relative;
+    }
+
+    /* Анимированный фон */
+    .bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #1a2a6c, #3a7bd5);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      z-index: -2;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Плавающие элементы */
+    .floating {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      animation: float 15s infinite ease-in-out;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(20px, 20px); }
+      50% { transform: translate(-20px, 20px); }
+      75% { transform: translate(-20px, -20px); }
+    }
+
+    .container {
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      max-width: 500px;
+      width: 90%;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 15px 40px;
+      margin: 15px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .btn-free {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .btn-free:hover {
+      background: #45a049;
+      transform: scale(1.05);
+    }
+
+    .btn-paid {
+      background: #FF9800;
+      color: white;
+    }
+
+    .btn-paid:hover {
+      background: #e68900;
+      transform: scale(1.05);
+    }
+
+    /* Языковый выбор */
+    .lang-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .lang-btn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: #6f42c1;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .lang-btn:hover {
+      background: #5a32a3;
+    }
+
+    /* Модальное окно */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+      margin: 15% auto;
+      padding: 30px;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 500px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: white;
+    }
+
+    .payment-form {
+      margin-top: 20px;
+    }
+
+    .payment-form input, .payment-form button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 1em;
+    }
+
+    .payment-form button {
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    .payment-form button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Анимированный фон -->
+  <div class="bg"></div>
+
+  <!-- Плавающие элементы -->
+  <div class="floating" style="width: 150px; height: 150px; top: 10%; left: 10%;"></div>
+  <div class="floating" style="width: 100px; height: 100px; top: 70%; left: 80%;"></div>
+  <div class="floating" style="width: 200px; height: 200px; top: 40%; left: 50%;"></div>
+
+  <div id="lang-section" class="container">
+    <h1 id="lang-title">Выберите язык / Choose Language</h1>
+    <div class="lang-selector">
+      <button class="lang-btn" onclick="setLanguage('ru')">Русский</button>
+      <button class="lang-btn" onclick="setLanguage('en')">English</button>
+    </div>
+  </div>
+
+  <div id="main-section" class="container" style="display:none;">
+    <h1 id="main-title">Получить Ключ</h1>
+    <button class="btn btn-free" onclick="openFreeLink()" id="free-btn">Get Free Key</button>
+    <button class="btn btn-paid" onclick="openModal()" id="paid-btn">Get Paid Key</button>
+  </div>
+
+  <!-- Модальное окно -->
+  <div id="paymentModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modal-title">Купить платный ключ</h2>
+      <p id="modal-desc">Введите данные для оплаты:</p>
+      <div class="payment-form">
+        <input type="text" id="name" placeholder="Имя / Name" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="text" id="card" placeholder="Номер карты / Card Number" required />
+        <button id="pay-btn">Оплатить / Pay</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Укажи сюда ссылку для "Get Free Key"
+    const FREE_LINK = "https://example.com";
+
+    // Тексты на русском и английском
+    const translations = {
+      ru: {
+        mainTitle: "Получить Ключ",
+        freeBtn: "Get Free Key",
+        paidBtn: "Get Paid Key",
+        modalTitle: "Купить платный ключ",
+        modalDesc: "Введите данные для оплаты:",
+        namePlaceholder: "Имя",
+        emailPlaceholder: "Email",
+        cardPlaceholder: "Номер карты",
+        payBtn: "Оплатить",
+        langTitle: "Выберите язык / Choose Language"
+      },
+      en: {
+        mainTitle: "Get Key",
+        freeBtn: "Get Free Key",
+        paidBtn: "Get Paid Key",
+        modalTitle: "Buy Premium Key",
+        modalDesc: "Enter payment details:",
+        namePlaceholder: "Name",
+        emailPlaceholder: "Email",
+        cardPlaceholder: "Card Number",
+        payBtn: "Pay",
+        langTitle: "Choose Language / Выберите язык"
+      }
+    };
+
+    function setLanguage(lang) {
+      localStorage.setItem('lang', lang);
+      document.documentElement.lang = lang;
+      updateTexts(lang);
+      document.getElementById('lang-section').style.display = 'none';
+      document.getElementById('main-section').style.display = 'block';
+    }
+
+    function updateTexts(lang) {
+      const t = translations[lang];
+      document.getElementById('main-title').textContent = t.mainTitle;
+      document.getElementById('free-btn').textContent = t.freeBtn;
+      document.getElementById('paid-btn').textContent = t.paidBtn;
+      document.getElementById('modal-title').textContent = t.modalTitle;
+      document.getElementById('modal-desc').textContent = t.modalDesc;
+      document.getElementById('name').placeholder = t.namePlaceholder;
+      document.getElementById('email').placeholder = t.emailPlaceholder;
+      document.getElementById('card').placeholder = t.cardPlaceholder;
+      document.getElementById('pay-btn').textContent = t.payBtn;
+      document.getElementById('lang-title').textContent = t.langTitle;
+    }
+
+    function openFreeLink() {
+      window.open(FREE_LINK, '_blank');
+    }
+
+    function openModal() {
+      document.getElementById('paymentModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('paymentModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('paymentModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+
+    // Проверяем язык при загрузке
+    window.onload = function() {
+      const savedLang = localStorage.getItem('lang');
+      if (savedLang) {
+        document.getElementById('lang-section').style.display = 'none';
+        document.getElementById('main-section').style.display = 'block';
+        updateTexts(savedLang);
+      } else {
+        document.getElementById('lang-section').style.display = 'block';
+        document.getElementById('main-section').style.display = 'none';
+      }
+    };
+  </script>
+
+</body>
+</html>
