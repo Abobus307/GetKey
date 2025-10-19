@@ -239,7 +239,6 @@
 
   <div id="main-section" class="container" style="display:none;">
     <h1 id="main-title">Получить Ключ</h1>
-    <!-- Текст кнопок теперь устанавливается через JavaScript -->
     <button class="btn btn-free" onclick="openFreeLink()" id="free-btn"></button>
     <button class="btn btn-paid" onclick="openModal()" id="paid-btn"></button>
   </div>
@@ -296,6 +295,7 @@
     };
 
     function setLanguage(lang) {
+      console.log("Установка языка:", lang); // Лог для отладки
       localStorage.setItem('lang', lang);
       document.documentElement.lang = lang;
       updateTexts(lang);
@@ -305,10 +305,12 @@
     }
 
     function updateTexts(lang) {
+      console.log("Обновление текстов на:", lang); // Лог для отладки
+
       const t = translations[lang];
       document.getElementById('main-title').textContent = t.mainTitle;
-      document.getElementById('free-btn').textContent = t.freeBtn; // Обновляем текст кнопки
-      document.getElementById('paid-btn').textContent = t.paidBtn; // Обновляем текст кнопки
+      document.getElementById('free-btn').textContent = t.freeBtn;
+      document.getElementById('paid-btn').textContent = t.paidBtn;
       document.getElementById('modal-title').textContent = t.modalTitle;
       document.getElementById('modal-desc').textContent = t.modalDesc;
       document.getElementById('name').placeholder = t.namePlaceholder;
@@ -316,12 +318,18 @@
       document.getElementById('card').placeholder = t.cardPlaceholder;
       document.getElementById('pay-btn').textContent = t.payBtn;
       document.getElementById('lang-title').textContent = t.langTitle;
-      document.querySelector('.lang-switch').textContent = t.switchLang; // Обновляем текст кнопки
+      document.querySelector('.lang-switch').textContent = t.switchLang;
+
+      console.log("Текст кнопок обновлён:", {
+        free: document.getElementById('free-btn').textContent,
+        paid: document.getElementById('paid-btn').textContent
+      });
     }
 
     function toggleLanguage() {
       const currentLang = localStorage.getItem('lang') || 'ru';
       const newLang = currentLang === 'ru' ? 'en' : 'ru';
+      console.log("Переключение языка:", currentLang, "->", newLang);
       setLanguage(newLang);
     }
 
@@ -348,11 +356,13 @@
     window.onload = function() {
       const savedLang = localStorage.getItem('lang');
       if (savedLang) {
+        console.log("Загружаем сохранённый язык:", savedLang);
         document.getElementById('lang-section').style.display = 'none';
         document.getElementById('main-section').style.display = 'block';
         document.getElementById('header').style.display = 'block';
         updateTexts(savedLang);
       } else {
+        console.log("Язык не найден, показываем выбор");
         document.getElementById('lang-section').style.display = 'block';
         document.getElementById('main-section').style.display = 'none';
         document.getElementById('header').style.display = 'none';
