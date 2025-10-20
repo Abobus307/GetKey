@@ -24,7 +24,6 @@
             position: relative;
         }
 
-        /* Анимированные звезды */
         .stars {
             position: absolute;
             top: 0;
@@ -84,9 +83,6 @@
             z-index: 2;
         }
 
-        /* --------------------
-           КНОПКА: улучшенная версия (фиксим мерцание)
-           -------------------- */
         .main-btn {
             padding: 25px 60px;
             font-size: 28px;
@@ -97,13 +93,11 @@
             border-radius: 60px;
             cursor: pointer;
 
-            /* вместо transition: all — явные свойства (меньше перерисовок) */
             transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                         box-shadow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                         background 0.35s ease,
                         color 0.35s ease;
 
-            /* GPU-промоция и сглаживание, чтобы избежать лагов/мерцания */
             will-change: transform, box-shadow, opacity;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
@@ -116,7 +110,7 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             position: relative;
-            overflow: hidden; /* нужно для ::before shimmer */
+            overflow: hidden;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -124,7 +118,6 @@
             transform-origin: center;
         }
 
-        /* запретить псевдоэлементам перехватывать курсор (хотя обычно они не перехватывают) */
         .main-btn::before,
         .main-btn::after {
             pointer-events: none;
@@ -158,7 +151,6 @@
             transition: opacity 0.25s ease;
         }
 
-        /* чуть меньше подъёма (чтобы курсор не "вылетал" с края) и быстрый откат */
         .main-btn:hover {
             transform: translateY(-6px) scale(1.04) translateZ(0);
             box-shadow:
@@ -177,7 +169,6 @@
             transition-duration: 0.12s;
         }
 
-        /* остальной интерфейс (без изменений критичных) */
         .lang-container {
             position: fixed;
             top: 30px;
