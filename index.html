@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Get Key</title>
+    <title>Discord Server</title>
     <style>
         * {
             margin: 0;
@@ -87,7 +87,7 @@
             padding: 25px 60px;
             font-size: 28px;
             font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            background: linear-gradient(45deg, #5865F2, #7289DA);
             color: white;
             border: none;
             border-radius: 60px;
@@ -105,8 +105,8 @@
             transform: translateY(0) scale(1) translateZ(0);
 
             box-shadow:
-                0 10px 30px rgba(255, 107, 107, 0.4),
-                0 0 0 0 rgba(255, 107, 107, 0.7);
+                0 10px 30px rgba(88, 101, 242, 0.4),
+                0 0 0 0 rgba(88, 101, 242, 0.7);
             text-transform: uppercase;
             letter-spacing: 2px;
             position: relative;
@@ -154,9 +154,9 @@
         .main-btn:hover {
             transform: translateY(-6px) scale(1.04) translateZ(0);
             box-shadow:
-                0 15px 40px rgba(255, 107, 107, 0.6),
-                0 0 0 12px rgba(255, 107, 107, 0.08);
-            background: linear-gradient(45deg, #ff8e53, #ff6b6b);
+                0 15px 40px rgba(88, 101, 242, 0.6),
+                0 0 0 12px rgba(88, 101, 242, 0.08);
+            background: linear-gradient(45deg, #7289DA, #5865F2);
             color: white;
         }
 
@@ -214,9 +214,7 @@
         }
 
         .settings-icon {
-            width: 24px;
-            height: 24px;
-            filter: invert(1);
+            font-size: 20px;
             transition: all 0.4s ease;
         }
 
@@ -294,7 +292,6 @@
             animation: fadeInUp 1s ease-out;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -344,7 +341,7 @@
             padding: 15px 30px;
             border: none;
             border-radius: 10px;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            background: linear-gradient(45deg, #5865F2, #7289DA);
             color: white;
             font-weight: bold;
             cursor: pointer;
@@ -354,7 +351,7 @@
 
         .modal-content button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
         }
 
         #specialLinkContainer {
@@ -363,7 +360,7 @@
         }
 
         #specialLink {
-            color: #ff8e53;
+            color: #7289DA;
             word-break: break-all;
             display: block;
             margin: 10px 0;
@@ -386,10 +383,7 @@
 
     <div class="settings-container">
         <div class="settings-btn" id="settingsButton">
-            <svg class="settings-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M19.4 15C19.2669 15.3031 19.1337 15.6062 19.0006 15.9094C18.9147 16.1073 18.8288 16.3052 18.7429 16.5031C18.657 16.701 18.5711 16.8989 18.4852 17.0968C18.2863 17.5485 18.0874 18.0002 17.8885 18.4519L17.655 19H6.345L6.11154 18.4519C5.91261 18.0002 5.71368 17.5485 5.51475 17.0968C5.42884 16.8989 5.34293 16.701 5.25702 16.5031C5.17111 16.3052 5.0852 16.1073 4.99929 15.9094C4.86616 15.6062 4.73303 15.3031 4.5999 15C4.46677 14.6969 4.33364 14.3938 4.20051 14.0906C4.1146 13.8927 4.02869 13.6948 3.94278 13.4969C3.85687 13.299 3.77096 13.1011 3.68505 12.9032C3.48612 12.4515 3.28719 11.9998 3.08826 11.5481L2.8548 11H21.1452L20.9117 11.5481C20.7128 11.9998 20.5139 12.4515 20.3149 12.9032C20.229 13.1011 20.1431 13.299 20.0572 13.4969C19.9713 13.6948 19.8854 13.8927 19.7995 14.0906C19.6664 14.3938 19.5332 14.6969 19.4001 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="settings-icon">⚙</span>
             <span class="settings-text text-visible" id="settingsText">Settings</span>
         </div>
     </div>
@@ -404,11 +398,10 @@
 
     <div class="container">
         <button class="main-btn" id="mainButton">
-            <span class="btn-text text-visible" id="btnText">GET FREE KEY</span>
+            <span class="btn-text text-visible" id="btnText">DISCORD SERVER</span>
         </button>
     </div>
 
-    <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h2 id="modalTitle">Create Special Link</h2>
@@ -464,7 +457,7 @@
 
         const translations = {
             ru: {
-                button: "ПОЛУЧИТЬ КЛЮЧ",
+                button: "ДИСКОРД СЕРВЕР",
                 lang: "RU",
                 flag: "https://flagcdn.com/w40/ru.png",
                 translateText: "Переводчик",
@@ -479,7 +472,7 @@
                 noUrl: "Сначала создайте особенную ссылку в настройках"
             },
             en: {
-                button: "GET FREE KEY",
+                button: "DISCORD SERVER",
                 lang: "EN",
                 flag: "https://flagcdn.com/w40/us.png",
                 translateText: "Translate",
@@ -495,11 +488,9 @@
             }
         };
 
-        // Check if this is a special link page
         const urlParams = new URLSearchParams(window.location.search);
         const targetUrl = urlParams.get('target');
 
-        // If this is a special link page, set up the button to redirect
         if (targetUrl) {
             try {
                 const decodedUrl = atob(targetUrl);
@@ -507,14 +498,11 @@
                     window.open(decodedUrl, '_blank');
                 });
                 
-                // Hide settings button on special link pages
                 document.querySelector('.settings-container').style.display = 'none';
             } catch (e) {
                 console.error('Invalid target URL');
             }
         } else {
-            // This is the main page with settings
-            // Settings modal functionality
             settingsButton.addEventListener('click', () => {
                 settingsModal.style.display = 'flex';
                 specialLinkContainer.style.display = 'none';
@@ -528,17 +516,14 @@
             createLinkBtn.addEventListener('click', () => {
                 const userUrl = urlInput.value.trim();
                 if (userUrl) {
-                    // Add https:// if not present
                     let formattedUrl = userUrl;
                     if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
                         formattedUrl = 'https://' + formattedUrl;
                     }
                     
-                    // Create special URL that includes the target as a parameter
-                    const currentUrl = window.location.href.split('?')[0]; // Remove any existing parameters
+                    const currentUrl = window.location.href.split('?')[0];
                     const specialRedirectUrl = `${currentUrl}?target=${btoa(formattedUrl)}`;
                     
-                    // Show the special link
                     specialLink.href = specialRedirectUrl;
                     specialLink.textContent = specialRedirectUrl;
                     specialLinkContainer.style.display = 'block';
@@ -558,7 +543,6 @@
                 });
             });
 
-            // Main button functionality for the main page
             mainButton.addEventListener('click', () => {
                 const message = translations[currentLang].noUrl;
                 alert(message);
@@ -566,7 +550,6 @@
             });
         }
 
-        // Language switching
         langSwitcher.addEventListener('click', () => {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
             updateLanguage();
@@ -627,7 +610,6 @@
             }, 400);
         }
 
-        // Initialize
         createStars();
     </script>
 </body>
