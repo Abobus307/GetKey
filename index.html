@@ -294,6 +294,7 @@
             animation: fadeInUp 1s ease-out;
         }
 
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -392,19 +393,19 @@
     </div>
 
     <div class="container">
-        <a href="https://example.com" class="main-btn" id="mainButton" target="_blank">
+        <button class="main-btn" id="mainButton">
             <span class="btn-text text-visible" id="btnText">GET FREE KEY</span>
-        </a>
+        </button>
     </div>
 
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <h2 id="modalTitle">Create Special Link</h2>
+            <h2 id="modalTitle">Set Target URL</h2>
             <input type="text" id="urlInput" placeholder="Enter your URL here">
-            <button id="createLinkBtn">Create Link</button>
-            <div id="generatedLinkContainer">
-                <p>Your special link:</p>
-                <a id="generatedLink" href="#" target="_blank"></a>
+            <button id="saveUrlBtn">Save URL</button>
+            <div id="savedUrlContainer">
+                <p>Current URL:</p>
+                <span id="currentUrl">Not set</span>
             </div>
             <button id="closeModal">Close</button>
         </div>
@@ -440,13 +441,14 @@
         const settingsText = document.getElementById('settingsText');
         const settingsModal = document.getElementById('settingsModal');
         const urlInput = document.getElementById('urlInput');
-        const createLinkBtn = document.getElementById('createLinkBtn');
-        const generatedLinkContainer = document.getElementById('generatedLinkContainer');
-        const generatedLink = document.getElementById('generatedLink');
+        const saveUrlBtn = document.getElementById('saveUrlBtn');
+        const savedUrlContainer = document.getElementById('savedUrlContainer');
+        const currentUrl = document.getElementById('currentUrl');
         const closeModal = document.getElementById('closeModal');
         const modalTitle = document.getElementById('modalTitle');
 
         let currentLang = 'en';
+        let targetUrl = '';
 
         const translations = {
             ru: {
@@ -455,11 +457,12 @@
                 flag: "https://flagcdn.com/w40/ru.png",
                 translateText: "Переводчик",
                 settings: "Настройки",
-                modalTitle: "Создать специальную ссылку",
+                modalTitle: "Установить целевую ссылку",
                 urlPlaceholder: "Введите вашу ссылку здесь",
-                createLink: "Создать ссылку",
+                saveUrl: "Сохранить ссылку",
                 close: "Закрыть",
-                generatedLinkText: "Ваша специальная ссылка:"
+                currentUrl: "Текущая ссылка:",
+                notSet: "Не установлена"
             },
             en: {
                 button: "GET FREE KEY",
@@ -467,42 +470,65 @@
                 flag: "https://flagcdn.com/w40/us.png",
                 translateText: "Translate",
                 settings: "Settings",
-                modalTitle: "Create Special Link",
+                modalTitle: "Set Target URL",
                 urlPlaceholder: "Enter your URL here",
-                createLink: "Create Link",
+                saveUrl: "Save URL",
                 close: "Close",
-                generatedLinkText: "Your special link:"
+                currentUrl: "Current URL:",
+                notSet: "Not set"
             }
         };
 
+        function loadSavedUrl() {
+            const savedUrl = localStorage.getItem('targetUrl');
+            if (savedUrl) {
+                targetUrl = savedUrl;
+                currentUrl.textContent = savedUrl;
+                currentUrl.style.color = '#ff8e53';
+            } else {
+                currentUrl.textContent = translations[currentLang].notSet;
+                currentUrl.style.color = 'rgba(255,255,255,0.6)';
+            }
+        }
+
         settingsButton.addEventListener('click', () => {
             settingsModal.style.display = 'flex';
+            loadSavedUrl();
         });
 
         closeModal.addEventListener('click', () => {
             settingsModal.style.display = 'none';
         });
 
-        createLinkBtn.addEventListener('click', () => {
+        saveUrlBtn.addEventListener('click', () => {
             const userUrl = urlInput.value.trim();
             if (userUrl) {
-                const specialLink = `${window.location.origin}${window.location.pathname}?redirect=${btoa(userUrl)}`;
-                generatedLink.href = specialLink;
-                generatedLink.textContent = specialLink;
-                generatedLinkContainer.style.display = 'block';
+                let formattedUrl = userUrl;
+                if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+                    formattedUrl = 'https://' + formattedUrl;
+                }
+                
+                targetUrl = formattedUrl;
+                localStorage.setItem('targetUrl', formattedUrl);
+                currentUrl.textContent = formattedUrl;
+                currentUrl.style.color = '#ff8e53';
+                urlInput.value = '';
+                
+                alert(currentLang === 'ru' ? 'Ссылка сохранена!' : 'URL saved!');
             }
         });
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectUrl = urlParams.get('redirect');
-        if (redirectUrl) {
-            try {
-                const decodedUrl = atob(redirectUrl);
-                window.location.href = decodedUrl;
-            } catch (e) {
-                console.error('Invalid redirect URL');
+        mainButton.addEventListener('click', () => {
+            if (targetUrl) {
+                window.open(targetUrl, '_blank');
+            } else {
+                const message = currentLang === 'ru' 
+                    ? 'Сначала установите ссылку в настройках' 
+                    : 'Please set a URL in settings first';
+                alert(message);
+                settingsModal.style.display = 'flex';
             }
-        }
+        });
 
         langSwitcher.addEventListener('click', () => {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
@@ -537,11 +563,12 @@
                 flag.src = translations[currentLang].flag;
                 modalTitle.textContent = translations[currentLang].modalTitle;
                 urlInput.placeholder = translations[currentLang].urlPlaceholder;
-                createLinkBtn.textContent = translations[currentLang].createLink;
+                saveUrlBtn.textContent = translations[currentLang].saveUrl;
                 closeModal.textContent = translations[currentLang].close;
+                savedUrlContainer.querySelector('p').textContent = translations[currentLang].currentUrl;
                 
-                if (generatedLinkContainer.style.display === 'block') {
-                    generatedLinkContainer.querySelector('p').textContent = translations[currentLang].generatedLinkText;
+                if (!targetUrl) {
+                    currentUrl.textContent = translations[currentLang].notSet;
                 }
 
                 document.documentElement.lang = currentLang;
@@ -564,6 +591,7 @@
         }
 
         createStars();
+        loadSavedUrl();
     </script>
 </body>
 </html>
