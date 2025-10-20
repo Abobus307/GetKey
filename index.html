@@ -458,6 +458,7 @@
         const translations = {
             ru: {
                 button: "ДИСКОРД СЕРВЕР",
+                specialButton: "ПОЛУЧИТЬ КЛЮЧ",
                 lang: "RU",
                 flag: "https://flagcdn.com/w40/ru.png",
                 translateText: "Переводчик",
@@ -473,6 +474,7 @@
             },
             en: {
                 button: "DISCORD SERVER",
+                specialButton: "GET FREE KEY",
                 lang: "EN",
                 flag: "https://flagcdn.com/w40/us.png",
                 translateText: "Translate",
@@ -499,6 +501,8 @@
                 });
                 
                 document.querySelector('.settings-container').style.display = 'none';
+                
+                btnText.textContent = currentLang === 'ru' ? "ПОЛУЧИТЬ КЛЮЧ" : "GET FREE KEY";
             } catch (e) {
                 console.error('Invalid target URL');
             }
@@ -574,7 +578,12 @@
             flag.style.transform = 'scale(0.8)';
 
             setTimeout(() => {
-                btnText.textContent = translations[currentLang].button;
+                if (targetUrl) {
+                    btnText.textContent = translations[currentLang].specialButton;
+                } else {
+                    btnText.textContent = translations[currentLang].button;
+                }
+                
                 langText.textContent = translations[currentLang].lang;
                 translateText.textContent = translations[currentLang].translateText;
                 settingsText.textContent = translations[currentLang].settings;
