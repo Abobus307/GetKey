@@ -375,6 +375,10 @@
             background: linear-gradient(45deg, #4CAF50, #45a049) !important;
             margin-top: 10px;
         }
+
+        .copy-btn.copied {
+            background: linear-gradient(45deg, #2196F3, #0b7dda) !important;
+        }
     </style>
 </head>
 <body>
@@ -414,7 +418,7 @@
             <button id="createLinkBtn">Create Special Link</button>
             <div id="specialLinkContainer">
                 <p>Your special link:</p>
-                <a id="specialLink" href="#" target="_blank"></a>
+                <a id="specialLink" href="#" target="_blank" rel="noopener noreferrer"></a>
                 <button class="copy-btn" id="copyLinkBtn">Copy Link</button>
             </div>
             <button id="closeModal">Close</button>
@@ -504,7 +508,12 @@
         settingsButton.addEventListener('click', () => {
             settingsModal.style.display = 'flex';
             specialLinkContainer.style.display = 'none';
-            urlInput.value = '';
+            urlInput.value = targetUrl || '';
+            if (targetUrl) {
+                specialLink.href = targetUrl;
+                specialLink.textContent = targetUrl;
+                specialLinkContainer.style.display = 'block';
+            }
         });
 
         closeModal.addEventListener('click', () => {
@@ -518,51 +527,42 @@
                 if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
                     formattedUrl = 'https://' + formattedUrl;
                 }
-                
-                const specialRedirectUrl = `${window.location.origin}${window.location.pathname}?redirect=${btoa(formattedUrl)}`;
-                
-                specialLink.href = specialRedirectUrl;
-                specialLink.textContent = specialRedirectUrl;
+
+                specialLink.href = formattedUrl;
+                specialLink.textContent = formattedUrl;
                 specialLinkContainer.style.display = 'block';
                 
-                targetUrl = specialRedirectUrl;
-                localStorage.setItem('targetUrl', specialRedirectUrl);
+                targetUrl = formattedUrl;
+                localStorage.setItem('targetUrl', formattedUrl);
             }
         });
 
         copyLinkBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(specialLink.href).then(() => {
+            const textToCopy = specialLink.href || '';
+            if (!textToCopy) return;
+            navigator.clipboard.writeText(textToCopy).then(() => {
                 const originalText = copyLinkBtn.textContent;
                 copyLinkBtn.textContent = translations[currentLang].copied;
-                copyLinkBtn.style.background = 'linear-gradient(45deg, #2196F3, #0b7dda) !important';
-                
+                copyLinkBtn.classList.add('copied');
+
                 setTimeout(() => {
                     copyLinkBtn.textContent = translations[currentLang].copyLink;
-                    copyLinkBtn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049) !important';
+                    copyLinkBtn.classList.remove('copied');
                 }, 2000);
+            }).catch(err => {
+                console.error('Copy failed', err);
             });
         });
 
         mainButton.addEventListener('click', () => {
             if (targetUrl) {
-                window.open(targetUrl, '_blank');
+                window.open(targetUrl, '_blank', 'noopener');
             } else {
                 const message = translations[currentLang].noUrl;
                 alert(message);
                 settingsModal.style.display = 'flex';
             }
         });
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectUrl = urlParams.get('redirect');
-        if (redirectUrl) {
-            try {
-                const decodedUrl = atob(redirectUrl);
-                window.location.href = decodedUrl;
-            } catch (e) {
-                console.error('Invalid redirect URL');
-            }
-        }
 
         langSwitcher.addEventListener('click', () => {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
