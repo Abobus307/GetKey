@@ -503,6 +503,10 @@
                 console.error('Invalid target URL');
             }
         } else {
+            mainButton.addEventListener('click', () => {
+                window.open('https://discord.gg/K2A32jnZaA', '_blank');
+            });
+
             settingsButton.addEventListener('click', () => {
                 settingsModal.style.display = 'flex';
                 specialLinkContainer.style.display = 'none';
@@ -541,12 +545,6 @@
                         copyLinkBtn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049) !important';
                     }, 2000);
                 });
-            });
-
-            mainButton.addEventListener('click', () => {
-                const message = translations[currentLang].noUrl;
-                alert(message);
-                settingsModal.style.display = 'flex';
             });
         }
 
