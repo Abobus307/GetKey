@@ -294,6 +294,7 @@
             animation: fadeInUp 1s ease-out;
         }
 
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -375,10 +376,6 @@
             background: linear-gradient(45deg, #4CAF50, #45a049) !important;
             margin-top: 10px;
         }
-
-        .copy-btn.copied {
-            background: linear-gradient(45deg, #2196F3, #0b7dda) !important;
-        }
     </style>
 </head>
 <body>
@@ -411,6 +408,7 @@
         </button>
     </div>
 
+    <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h2 id="modalTitle">Create Special Link</h2>
@@ -418,7 +416,7 @@
             <button id="createLinkBtn">Create Special Link</button>
             <div id="specialLinkContainer">
                 <p>Your special link:</p>
-                <a id="specialLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+                <a id="specialLink" href="#" target="_blank"></a>
                 <button class="copy-btn" id="copyLinkBtn">Copy Link</button>
             </div>
             <button id="closeModal">Close</button>
@@ -463,7 +461,6 @@
         const modalTitle = document.getElementById('modalTitle');
 
         let currentLang = 'en';
-        let targetUrl = '';
 
         const translations = {
             ru: {
@@ -498,72 +495,78 @@
             }
         };
 
-        function loadSavedUrl() {
-            const savedUrl = localStorage.getItem('targetUrl');
-            if (savedUrl) {
-                targetUrl = savedUrl;
-            }
-        }
+        // Check if this is a special link page
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUrl = urlParams.get('target');
 
-        settingsButton.addEventListener('click', () => {
-            settingsModal.style.display = 'flex';
-            specialLinkContainer.style.display = 'none';
-            urlInput.value = targetUrl || '';
-            if (targetUrl) {
-                specialLink.href = targetUrl;
-                specialLink.textContent = targetUrl;
-                specialLinkContainer.style.display = 'block';
-            }
-        });
-
-        closeModal.addEventListener('click', () => {
-            settingsModal.style.display = 'none';
-        });
-
-        createLinkBtn.addEventListener('click', () => {
-            const userUrl = urlInput.value.trim();
-            if (userUrl) {
-                let formattedUrl = userUrl;
-                if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
-                    formattedUrl = 'https://' + formattedUrl;
-                }
-
-                specialLink.href = formattedUrl;
-                specialLink.textContent = formattedUrl;
-                specialLinkContainer.style.display = 'block';
+        // If this is a special link page, set up the button to redirect
+        if (targetUrl) {
+            try {
+                const decodedUrl = atob(targetUrl);
+                mainButton.addEventListener('click', () => {
+                    window.open(decodedUrl, '_blank');
+                });
                 
-                targetUrl = formattedUrl;
-                localStorage.setItem('targetUrl', formattedUrl);
+                // Hide settings button on special link pages
+                document.querySelector('.settings-container').style.display = 'none';
+            } catch (e) {
+                console.error('Invalid target URL');
             }
-        });
-
-        copyLinkBtn.addEventListener('click', () => {
-            const textToCopy = specialLink.href || '';
-            if (!textToCopy) return;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const originalText = copyLinkBtn.textContent;
-                copyLinkBtn.textContent = translations[currentLang].copied;
-                copyLinkBtn.classList.add('copied');
-
-                setTimeout(() => {
-                    copyLinkBtn.textContent = translations[currentLang].copyLink;
-                    copyLinkBtn.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                console.error('Copy failed', err);
+        } else {
+            // This is the main page with settings
+            // Settings modal functionality
+            settingsButton.addEventListener('click', () => {
+                settingsModal.style.display = 'flex';
+                specialLinkContainer.style.display = 'none';
+                urlInput.value = '';
             });
-        });
 
-        mainButton.addEventListener('click', () => {
-            if (targetUrl) {
-                window.open(targetUrl, '_blank', 'noopener');
-            } else {
+            closeModal.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+            });
+
+            createLinkBtn.addEventListener('click', () => {
+                const userUrl = urlInput.value.trim();
+                if (userUrl) {
+                    // Add https:// if not present
+                    let formattedUrl = userUrl;
+                    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+                        formattedUrl = 'https://' + formattedUrl;
+                    }
+                    
+                    // Create special URL that includes the target as a parameter
+                    const currentUrl = window.location.href.split('?')[0]; // Remove any existing parameters
+                    const specialRedirectUrl = `${currentUrl}?target=${btoa(formattedUrl)}`;
+                    
+                    // Show the special link
+                    specialLink.href = specialRedirectUrl;
+                    specialLink.textContent = specialRedirectUrl;
+                    specialLinkContainer.style.display = 'block';
+                }
+            });
+
+            copyLinkBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(specialLink.href).then(() => {
+                    const originalText = copyLinkBtn.textContent;
+                    copyLinkBtn.textContent = translations[currentLang].copied;
+                    copyLinkBtn.style.background = 'linear-gradient(45deg, #2196F3, #0b7dda) !important';
+                    
+                    setTimeout(() => {
+                        copyLinkBtn.textContent = translations[currentLang].copyLink;
+                        copyLinkBtn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049) !important';
+                    }, 2000);
+                });
+            });
+
+            // Main button functionality for the main page
+            mainButton.addEventListener('click', () => {
                 const message = translations[currentLang].noUrl;
                 alert(message);
                 settingsModal.style.display = 'flex';
-            }
-        });
+            });
+        }
 
+        // Language switching
         langSwitcher.addEventListener('click', () => {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
             updateLanguage();
@@ -599,8 +602,11 @@
                 urlInput.placeholder = translations[currentLang].urlPlaceholder;
                 createLinkBtn.textContent = translations[currentLang].createLink;
                 closeModal.textContent = translations[currentLang].close;
-                specialLinkContainer.querySelector('p').textContent = translations[currentLang].specialLinkText;
-                copyLinkBtn.textContent = translations[currentLang].copyLink;
+                
+                if (specialLinkContainer.style.display === 'block') {
+                    specialLinkContainer.querySelector('p').textContent = translations[currentLang].specialLinkText;
+                    copyLinkBtn.textContent = translations[currentLang].copyLink;
+                }
 
                 document.documentElement.lang = currentLang;
 
@@ -621,8 +627,8 @@
             }, 400);
         }
 
+        // Initialize
         createStars();
-        loadSavedUrl();
     </script>
 </body>
 </html>
