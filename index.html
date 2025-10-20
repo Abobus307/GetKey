@@ -294,7 +294,6 @@
             animation: fadeInUp 1s ease-out;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -357,14 +356,24 @@
             box-shadow: 0 5px 15px rgba(255,107,107,0.4);
         }
 
-        #generatedLinkContainer {
+        #specialLinkContainer {
             margin-top: 20px;
             display: none;
         }
 
-        #generatedLink {
+        #specialLink {
             color: #ff8e53;
             word-break: break-all;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049) !important;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -400,12 +409,13 @@
 
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <h2 id="modalTitle">Set Target URL</h2>
+            <h2 id="modalTitle">Create Special Link</h2>
             <input type="text" id="urlInput" placeholder="Enter your URL here">
-            <button id="saveUrlBtn">Save URL</button>
-            <div id="savedUrlContainer">
-                <p>Current URL:</p>
-                <span id="currentUrl">Not set</span>
+            <button id="createLinkBtn">Create Special Link</button>
+            <div id="specialLinkContainer">
+                <p>Your special link:</p>
+                <a id="specialLink" href="#" target="_blank"></a>
+                <button class="copy-btn" id="copyLinkBtn">Copy Link</button>
             </div>
             <button id="closeModal">Close</button>
         </div>
@@ -441,9 +451,10 @@
         const settingsText = document.getElementById('settingsText');
         const settingsModal = document.getElementById('settingsModal');
         const urlInput = document.getElementById('urlInput');
-        const saveUrlBtn = document.getElementById('saveUrlBtn');
-        const savedUrlContainer = document.getElementById('savedUrlContainer');
-        const currentUrl = document.getElementById('currentUrl');
+        const createLinkBtn = document.getElementById('createLinkBtn');
+        const specialLinkContainer = document.getElementById('specialLinkContainer');
+        const specialLink = document.getElementById('specialLink');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
         const closeModal = document.getElementById('closeModal');
         const modalTitle = document.getElementById('modalTitle');
 
@@ -457,12 +468,14 @@
                 flag: "https://flagcdn.com/w40/ru.png",
                 translateText: "Переводчик",
                 settings: "Настройки",
-                modalTitle: "Установить целевую ссылку",
+                modalTitle: "Создать особенную ссылку",
                 urlPlaceholder: "Введите вашу ссылку здесь",
-                saveUrl: "Сохранить ссылку",
+                createLink: "Создать особенную ссылку",
                 close: "Закрыть",
-                currentUrl: "Текущая ссылка:",
-                notSet: "Не установлена"
+                specialLinkText: "Ваша особенная ссылка:",
+                copyLink: "Копировать ссылку",
+                copied: "Скопировано!",
+                noUrl: "Сначала создайте особенную ссылку в настройках"
             },
             en: {
                 button: "GET FREE KEY",
@@ -470,12 +483,14 @@
                 flag: "https://flagcdn.com/w40/us.png",
                 translateText: "Translate",
                 settings: "Settings",
-                modalTitle: "Set Target URL",
+                modalTitle: "Create Special Link",
                 urlPlaceholder: "Enter your URL here",
-                saveUrl: "Save URL",
+                createLink: "Create Special Link",
                 close: "Close",
-                currentUrl: "Current URL:",
-                notSet: "Not set"
+                specialLinkText: "Your special link:",
+                copyLink: "Copy Link",
+                copied: "Copied!",
+                noUrl: "Please create a special link in settings first"
             }
         };
 
@@ -483,24 +498,20 @@
             const savedUrl = localStorage.getItem('targetUrl');
             if (savedUrl) {
                 targetUrl = savedUrl;
-                currentUrl.textContent = savedUrl;
-                currentUrl.style.color = '#ff8e53';
-            } else {
-                currentUrl.textContent = translations[currentLang].notSet;
-                currentUrl.style.color = 'rgba(255,255,255,0.6)';
             }
         }
 
         settingsButton.addEventListener('click', () => {
             settingsModal.style.display = 'flex';
-            loadSavedUrl();
+            specialLinkContainer.style.display = 'none';
+            urlInput.value = '';
         });
 
         closeModal.addEventListener('click', () => {
             settingsModal.style.display = 'none';
         });
 
-        saveUrlBtn.addEventListener('click', () => {
+        createLinkBtn.addEventListener('click', () => {
             const userUrl = urlInput.value.trim();
             if (userUrl) {
                 let formattedUrl = userUrl;
@@ -508,27 +519,50 @@
                     formattedUrl = 'https://' + formattedUrl;
                 }
                 
-                targetUrl = formattedUrl;
-                localStorage.setItem('targetUrl', formattedUrl);
-                currentUrl.textContent = formattedUrl;
-                currentUrl.style.color = '#ff8e53';
-                urlInput.value = '';
+                const specialRedirectUrl = `${window.location.origin}${window.location.pathname}?redirect=${btoa(formattedUrl)}`;
                 
-                alert(currentLang === 'ru' ? 'Ссылка сохранена!' : 'URL saved!');
+                specialLink.href = specialRedirectUrl;
+                specialLink.textContent = specialRedirectUrl;
+                specialLinkContainer.style.display = 'block';
+                
+                targetUrl = specialRedirectUrl;
+                localStorage.setItem('targetUrl', specialRedirectUrl);
             }
+        });
+
+        copyLinkBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(specialLink.href).then(() => {
+                const originalText = copyLinkBtn.textContent;
+                copyLinkBtn.textContent = translations[currentLang].copied;
+                copyLinkBtn.style.background = 'linear-gradient(45deg, #2196F3, #0b7dda) !important';
+                
+                setTimeout(() => {
+                    copyLinkBtn.textContent = translations[currentLang].copyLink;
+                    copyLinkBtn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049) !important';
+                }, 2000);
+            });
         });
 
         mainButton.addEventListener('click', () => {
             if (targetUrl) {
                 window.open(targetUrl, '_blank');
             } else {
-                const message = currentLang === 'ru' 
-                    ? 'Сначала установите ссылку в настройках' 
-                    : 'Please set a URL in settings first';
+                const message = translations[currentLang].noUrl;
                 alert(message);
                 settingsModal.style.display = 'flex';
             }
         });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        if (redirectUrl) {
+            try {
+                const decodedUrl = atob(redirectUrl);
+                window.location.href = decodedUrl;
+            } catch (e) {
+                console.error('Invalid redirect URL');
+            }
+        }
 
         langSwitcher.addEventListener('click', () => {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
@@ -563,13 +597,10 @@
                 flag.src = translations[currentLang].flag;
                 modalTitle.textContent = translations[currentLang].modalTitle;
                 urlInput.placeholder = translations[currentLang].urlPlaceholder;
-                saveUrlBtn.textContent = translations[currentLang].saveUrl;
+                createLinkBtn.textContent = translations[currentLang].createLink;
                 closeModal.textContent = translations[currentLang].close;
-                savedUrlContainer.querySelector('p').textContent = translations[currentLang].currentUrl;
-                
-                if (!targetUrl) {
-                    currentUrl.textContent = translations[currentLang].notSet;
-                }
+                specialLinkContainer.querySelector('p').textContent = translations[currentLang].specialLinkText;
+                copyLinkBtn.textContent = translations[currentLang].copyLink;
 
                 document.documentElement.lang = currentLang;
 
