@@ -177,7 +177,15 @@
             text-align: center;
         }
 
-        .lang-switcher {
+        .settings-container {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 3;
+            text-align: center;
+        }
+
+        .lang-switcher, .settings-btn {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
             border-radius: 35px;
@@ -191,7 +199,7 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .lang-switcher:hover {
+        .lang-switcher:hover, .settings-btn:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
@@ -205,11 +213,18 @@
             transition: all 0.4s ease;
         }
 
-        .lang-switcher:hover .flag {
+        .settings-icon {
+            width: 24px;
+            height: 24px;
+            filter: invert(1);
+            transition: all 0.4s ease;
+        }
+
+        .lang-switcher:hover .flag, .settings-btn:hover .settings-icon {
             transform: scale(1.1);
         }
 
-        .lang-text {
+        .lang-text, .settings-text {
             font-weight: bold;
             color: white;
             font-size: 16px;
@@ -278,6 +293,78 @@
         .container {
             animation: fadeInUp 1s ease-out;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        .modal-content input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .modal-content button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 5px;
+        }
+
+        .modal-content button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+        }
+
+        #generatedLinkContainer {
+            margin-top: 20px;
+            display: none;
+        }
+
+        #generatedLink {
+            color: #ff8e53;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
@@ -285,6 +372,16 @@
 
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
+
+    <div class="settings-container">
+        <div class="settings-btn" id="settingsButton">
+            <svg class="settings-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19.4 15C19.2669 15.3031 19.1337 15.6062 19.0006 15.9094C18.9147 16.1073 18.8288 16.3052 18.7429 16.5031C18.657 16.701 18.5711 16.8989 18.4852 17.0968C18.2863 17.5485 18.0874 18.0002 17.8885 18.4519L17.655 19H6.345L6.11154 18.4519C5.91261 18.0002 5.71368 17.5485 5.51475 17.0968C5.42884 16.8989 5.34293 16.701 5.25702 16.5031C5.17111 16.3052 5.0852 16.1073 4.99929 15.9094C4.86616 15.6062 4.73303 15.3031 4.5999 15C4.46677 14.6969 4.33364 14.3938 4.20051 14.0906C4.1146 13.8927 4.02869 13.6948 3.94278 13.4969C3.85687 13.299 3.77096 13.1011 3.68505 12.9032C3.48612 12.4515 3.28719 11.9998 3.08826 11.5481L2.8548 11H21.1452L20.9117 11.5481C20.7128 11.9998 20.5139 12.4515 20.3149 12.9032C20.229 13.1011 20.1431 13.299 20.0572 13.4969C19.9713 13.6948 19.8854 13.8927 19.7995 14.0906C19.6664 14.3938 19.5332 14.6969 19.4001 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="settings-text text-visible" id="settingsText">Settings</span>
+        </div>
+    </div>
 
     <div class="lang-container">
         <div class="lang-switcher" id="langSwitcher">
@@ -298,6 +395,19 @@
         <a href="https://example.com" class="main-btn" id="mainButton" target="_blank">
             <span class="btn-text text-visible" id="btnText">GET FREE KEY</span>
         </a>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Create Special Link</h2>
+            <input type="text" id="urlInput" placeholder="Enter your URL here">
+            <button id="createLinkBtn">Create Link</button>
+            <div id="generatedLinkContainer">
+                <p>Your special link:</p>
+                <a id="generatedLink" href="#" target="_blank"></a>
+            </div>
+            <button id="closeModal">Close</button>
+        </div>
     </div>
 
     <script>
@@ -326,6 +436,15 @@
         const mainButton = document.getElementById('mainButton');
         const btnText = document.getElementById('btnText');
         const translateText = document.getElementById('translateText');
+        const settingsButton = document.getElementById('settingsButton');
+        const settingsText = document.getElementById('settingsText');
+        const settingsModal = document.getElementById('settingsModal');
+        const urlInput = document.getElementById('urlInput');
+        const createLinkBtn = document.getElementById('createLinkBtn');
+        const generatedLinkContainer = document.getElementById('generatedLinkContainer');
+        const generatedLink = document.getElementById('generatedLink');
+        const closeModal = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
 
         let currentLang = 'en';
 
@@ -334,15 +453,56 @@
                 button: "ПОЛУЧИТЬ КЛЮЧ",
                 lang: "RU",
                 flag: "https://flagcdn.com/w40/ru.png",
-                translateText: "Переводчик"
+                translateText: "Переводчик",
+                settings: "Настройки",
+                modalTitle: "Создать специальную ссылку",
+                urlPlaceholder: "Введите вашу ссылку здесь",
+                createLink: "Создать ссылку",
+                close: "Закрыть",
+                generatedLinkText: "Ваша специальная ссылка:"
             },
             en: {
                 button: "GET FREE KEY",
                 lang: "EN",
                 flag: "https://flagcdn.com/w40/us.png",
-                translateText: "Translate"
+                translateText: "Translate",
+                settings: "Settings",
+                modalTitle: "Create Special Link",
+                urlPlaceholder: "Enter your URL here",
+                createLink: "Create Link",
+                close: "Close",
+                generatedLinkText: "Your special link:"
             }
         };
+
+        settingsButton.addEventListener('click', () => {
+            settingsModal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+
+        createLinkBtn.addEventListener('click', () => {
+            const userUrl = urlInput.value.trim();
+            if (userUrl) {
+                const specialLink = `${window.location.origin}${window.location.pathname}?redirect=${btoa(userUrl)}`;
+                generatedLink.href = specialLink;
+                generatedLink.textContent = specialLink;
+                generatedLinkContainer.style.display = 'block';
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        if (redirectUrl) {
+            try {
+                const decodedUrl = atob(redirectUrl);
+                window.location.href = decodedUrl;
+            } catch (e) {
+                console.error('Invalid redirect URL');
+            }
+        }
 
         langSwitcher.addEventListener('click', () => {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
@@ -363,6 +523,9 @@
             translateText.classList.remove('text-visible');
             translateText.classList.add('text-transition');
 
+            settingsText.classList.remove('text-visible');
+            settingsText.classList.add('text-transition');
+
             flag.style.opacity = '0';
             flag.style.transform = 'scale(0.8)';
 
@@ -370,7 +533,17 @@
                 btnText.textContent = translations[currentLang].button;
                 langText.textContent = translations[currentLang].lang;
                 translateText.textContent = translations[currentLang].translateText;
+                settingsText.textContent = translations[currentLang].settings;
                 flag.src = translations[currentLang].flag;
+                modalTitle.textContent = translations[currentLang].modalTitle;
+                urlInput.placeholder = translations[currentLang].urlPlaceholder;
+                createLinkBtn.textContent = translations[currentLang].createLink;
+                closeModal.textContent = translations[currentLang].close;
+                
+                if (generatedLinkContainer.style.display === 'block') {
+                    generatedLinkContainer.querySelector('p').textContent = translations[currentLang].generatedLinkText;
+                }
+
                 document.documentElement.lang = currentLang;
 
                 btnText.classList.remove('text-transition');
@@ -381,6 +554,9 @@
 
                 translateText.classList.remove('text-transition');
                 translateText.classList.add('text-visible');
+
+                settingsText.classList.remove('text-transition');
+                settingsText.classList.add('text-visible');
 
                 flag.style.opacity = '1';
                 flag.style.transform = 'scale(1)';
