@@ -109,8 +109,10 @@ class MultiStageAuth {
             version: "1.0",
             stages: stages,
             created: new Date().toISOString(),
-            // Добавляем уникальный ID для каждой конфигурации
-            uniqueId: this.generateUniqueId()
+            // Уникальный ID для каждой конфигурации
+            uniqueId: this.generateUniqueId(),
+            // Секретный ключ для верификации
+            secret: this.generateSecret()
         };
 
         // Исправляем кодирование для поддержки Unicode
@@ -143,6 +145,16 @@ class MultiStageAuth {
         return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
     }
 
+    generateSecret() {
+        // Генерируем секретный ключ для верификации
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let secret = '';
+        for (let i = 0; i < 32; i++) {
+            secret += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return secret;
+    }
+
     loadExecutionConfig(params) {
         try {
             const base64Config = params.get('config');
@@ -159,6 +171,9 @@ class MultiStageAuth {
             this.completedKey = localStorage.getItem(keyStorageKey);
             this.keyGeneratedAt = localStorage.getItem(timeStorageKey);
 
+            // Проверяем, есть ли параметры завершения этапа в URL
+            this.checkCompletionParams(params);
+
             this.renderExecutionStages();
             this.updateProgress();
 
@@ -172,6 +187,42 @@ class MultiStageAuth {
         }
     }
 
+    checkCompletionParams(params) {
+        // Проверяем параметры завершения этапа
+        if (params.has('complete') && params.has('stage') && params.has('token')) {
+            const stageId = parseInt(params.get('stage'));
+            const token = params.get('token');
+            
+            // Проверяем валидность токена
+            if (this.verifyToken(stageId, token)) {
+                this.markStageCompleted(stageId);
+                
+                // Очищаем URL от параметров завершения
+                const newUrl = window.location.origin + window.location.pathname + 
+                              window.location.hash.split('&')[0];
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        }
+    }
+
+    verifyToken(stageId, token) {
+        // Проверяем токен на основе stageId и секрета конфигурации
+        const expectedToken = this.generateToken(stageId);
+        return token === expectedToken;
+    }
+
+    generateToken(stageId) {
+        // Генерируем токен для этапа на основе stageId и секрета
+        const data = `${stageId}-${this.config.secret}-${this.config.uniqueId}`;
+        let hash = 0;
+        for (let i = 0; i < data.length; i++) {
+            const char = data.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return Math.abs(hash).toString(36).substring(0, 8);
+    }
+
     renderExecutionStages() {
         const container = document.getElementById('stages-list');
         container.innerHTML = '';
@@ -180,6 +231,9 @@ class MultiStageAuth {
             const isCompleted = this.progress.includes(stage.id);
             const isCurrent = !isCompleted && 
                 (this.progress.length === 0 || stage.id === Math.max(...this.progress) + 1);
+
+            // Генерируем URL с токеном для автоматического подтверждения
+            const completionUrl = this.generateCompletionUrl(stage.id);
 
             const stageHTML = `
                 <div class="stage-execution ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}">
@@ -190,14 +244,19 @@ class MultiStageAuth {
                         </div>
                     </div>
                     ${stage.description ? `<div class="stage-description">${stage.description}</div>` : ''}
+                    <div class="stage-info">
+                        <strong>URL для подтверждения:</strong>
+                        <div class="completion-url">${completionUrl}</div>
+                        <small>Используйте этот URL на целевом сайте для автоматического подтверждения</small>
+                    </div>
                     <div class="stage-actions">
                         <button class="btn-primary stage-open-btn" data-stage="${stage.id}" 
                                 ${isCompleted ? 'disabled' : ''}>
                             📎 Перейти к заданию
                         </button>
-                        <button class="btn-secondary stage-complete-btn" data-stage="${stage.id}" 
+                        <button class="btn-secondary stage-manual-btn" data-stage="${stage.id}" 
                                 ${isCompleted ? 'disabled' : ''}>
-                            ✅ Я выполнил задание
+                            ✅ Подтвердить вручную
                         </button>
                     </div>
                     ${!isCompleted ? `<div class="stage-timer" id="timer-${stage.id}"></div>` : ''}
@@ -214,12 +273,20 @@ class MultiStageAuth {
             });
         });
 
-        document.querySelectorAll('.stage-complete-btn').forEach(btn => {
+        document.querySelectorAll('.stage-manual-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const stageId = parseInt(e.target.dataset.stage);
                 this.markStageCompleted(stageId);
             });
         });
+    }
+
+    generateCompletionUrl(stageId) {
+        // Генерируем URL для автоматического подтверждения этапа
+        const token = this.generateToken(stageId);
+        const currentUrl = new URL(window.location);
+        currentUrl.hash = `${window.location.hash.split('&')[0]}&complete=true&stage=${stageId}&token=${token}`;
+        return currentUrl.toString();
     }
 
     openStage(stageId) {
@@ -240,10 +307,73 @@ class MultiStageAuth {
             // Запускаем таймер
             this.startStageTimer(stageId);
             
-            // Открываем в новой вкладке
-            window.open(stage.url, '_blank');
+            // Показываем инструкцию
+            this.showStageInstructions(stageId);
             
-            this.showNotification(`Этап ${stageId} открыт. Вернитесь после выполнения задания.`);
+            this.showNotification(`Этап ${stageId} открыт. Используйте URL подтверждения на целевом сайте.`);
+        }
+    }
+
+    showStageInstructions(stageId) {
+        const completionUrl = this.generateCompletionUrl(stageId);
+        const instructions = `
+            <div class="instructions">
+                <h3>Инструкция для этапа ${stageId}</h3>
+                <p>Для автоматического подтверждения выполнения:</p>
+                <ol>
+                    <li>Перейдите на сайт задания</li>
+                    <li>После выполнения задания, разместите где-нибудь на сайте ссылку:</li>
+                    <div class="completion-url-box">
+                        <input type="text" value="${completionUrl}" readonly>
+                        <button onclick="navigator.clipboard.writeText('${completionUrl}')">Копировать</button>
+                    </div>
+                    <li>Или настройте редирект на этот URL после успешного выполнения</li>
+                    <li>Или просто перейдите по этой ссылке после выполнения</li>
+                </ol>
+                <p><em>Если автоматическое подтверждение не работает, используйте кнопку "Подтвердить вручную"</em></p>
+            </div>
+        `;
+        
+        // Показываем модальное окно с инструкциями
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Инструкция для этапа ${stageId}</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-content">
+                    <p>Для автоматического подтверждения выполнения:</p>
+                    <ol>
+                        <li>Перейдите на сайт задания</li>
+                        <li>После выполнения задания, разместите где-нибудь на сайте ссылку:</li>
+                        <div class="completion-url-box">
+                            <input type="text" value="${completionUrl}" readonly>
+                            <button class="btn-secondary" onclick="navigator.clipboard.writeText('${completionUrl}'); auth.showNotification('URL скопирован!')">Копировать</button>
+                        </div>
+                        <li>Или настройте редирект на этот URL после успешного выполнения</li>
+                        <li>Или просто перейдите по этой ссылке после выполнения</li>
+                    </ol>
+                    <p><em>Если автоматическое подтверждение не работает, используйте кнопку "Подтвердить вручную"</em></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="this.closest('.modal-overlay').remove()">Понятно</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Обработчик закрытия модального окна
+        modal.querySelector('.modal-close').addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        // Открываем сайт этапа
+        const stage = this.config.stages.find(s => s.id === stageId);
+        if (stage) {
+            window.open(stage.url, '_blank');
         }
     }
 
@@ -261,11 +391,6 @@ class MultiStageAuth {
             timerElement.textContent = `⏱️ Прошло времени: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             timerElement.style.color = elapsed > 300 ? '#dc3545' : '#6c757d'; // Красный после 5 минут
             
-            // Автоматическая проверка каждые 30 секунд
-            if (elapsed > 0 && elapsed % 30 === 0) {
-                this.checkSingleStageReturn(stageId);
-            }
-            
         }, 1000);
 
         // Сохраняем ID таймера для очистки
@@ -273,39 +398,8 @@ class MultiStageAuth {
     }
 
     checkStagesReturn() {
-        // Проверяем все открытые этапы
-        this.openedStages.forEach(stageId => {
-            this.checkSingleStageReturn(stageId);
-        });
-    }
-
-    checkSingleStageReturn(stageId) {
-        const stageData = localStorage.getItem(`stage_${this.config.uniqueId}_${stageId}`);
-        if (!stageData) return;
-
-        const data = JSON.parse(stageData);
-        const openedAt = new Date(data.openedAt);
-        const now = new Date();
-        const timeDiff = (now - openedAt) / 1000; // разница в секундах
-
-        // Если прошло больше 10 секунд, предлагаем отметить как выполненное
-        if (timeDiff > 10 && !this.progress.includes(stageId)) {
-            const timerElement = document.getElementById(`timer-${stageId}`);
-            if (timerElement && !timerElement.querySelector('.btn-auto-complete')) {
-                const autoCompleteBtn = document.createElement('button');
-                autoCompleteBtn.className = 'btn-auto-complete';
-                autoCompleteBtn.dataset.stage = stageId;
-                autoCompleteBtn.textContent = '✅ Автоматически завершить';
-                
-                autoCompleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const stageId = parseInt(e.target.dataset.stage);
-                    this.markStageCompleted(stageId);
-                });
-                
-                timerElement.appendChild(autoCompleteBtn);
-            }
-        }
+        // Эта функция теперь не нужна для автоматического подтверждения,
+        // так как подтверждение происходит через URL параметры
     }
 
     markStageCompleted(stageId) {
