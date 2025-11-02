@@ -237,6 +237,31 @@ h1 {
     font-style: italic;
 }
 
+/* Информация о этапе */
+.stage-info {
+    background: #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 15px 0;
+    border-left: 4px solid #007bff;
+}
+
+.completion-url {
+    font-family: 'Courier New', monospace;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+    word-break: break-all;
+    font-size: 14px;
+    border: 1px solid #dee2e6;
+}
+
+.stage-info small {
+    color: #6c757d;
+    font-style: italic;
+}
+
 .stage-actions {
     display: flex;
     gap: 10px;
@@ -295,6 +320,98 @@ h1 {
     margin-top: 20px;
 }
 
+/* Модальное окно */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-content {
+    padding: 20px;
+}
+
+.modal-content ol {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.modal-content li {
+    margin-bottom: 10px;
+}
+
+.completion-url-box {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.completion-url-box input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    text-align: right;
+}
+
+/* Инструкции */
+.instructions {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 4px solid #28a745;
+}
+
 /* Уведомления */
 .notification {
     position: fixed;
@@ -347,5 +464,240 @@ h1 {
         margin-left: 0;
         margin-top: 5px;
         width: 100%;
+    }
+    
+    /* Адаптивность для модального окна */
+    .modal {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .completion-url-box {
+        flex-direction: column;
+    }
+    
+    .completion-url-box button {
+        width: 100%;
+    }
+    
+    .stage-info {
+        padding: 10px;
+    }
+    
+    .completion-url {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stage-execution {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Состояния кнопок */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+button:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Улучшения для полей ввода */
+input:invalid {
+    border-color: #dc3545;
+}
+
+input:valid {
+    border-color: #28a745;
+}
+
+/* Стили для скроллбара */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Дополнительные стили для улучшения UX */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+/* Стили для успешного состояния */
+.success-checkmark {
+    color: #28a745;
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+/* Стили для предупреждений */
+.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+/* Стили для информации */
+.info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+/* Стили для ошибок */
+.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+/* Стили для подсказок */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Стили для иконок */
+.icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Дополнительные стили для улучшения внешнего вида */
+.stage-execution:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.key-display {
+    animation: pulse 2s infinite;
+}
+
+/* Стили для темной темы (опционально) */
+@media (prefers-color-scheme: dark) {
+    .container {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .stage-item {
+        background: #4a5568;
+        border-color: #718096;
+        color: #e2e8f0;
+    }
+    
+    .stage-execution {
+        background: #4a5568;
+        border-color: #718096;
+        color: #e2e8f0;
+    }
+    
+    .stage-execution.completed {
+        background: #2d5a2d;
+        border-color: #48bb78;
+    }
+    
+    .stage-execution.current {
+        background: #2c5282;
+        border-color: #4299e1;
+    }
+    
+    h1, .stage-title {
+        color: #e2e8f0;
+    }
+    
+    .stage-description {
+        color: #cbd5e0;
+    }
+    
+    input, textarea, select {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+        border-color: #667eea;
     }
 }
