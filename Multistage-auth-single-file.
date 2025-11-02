@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Многоэтапная аутентификация — Настройка и запуск</title>
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui,Arial;margin:0;padding:0}
+    body{background:#f7fafc;color:#111;padding:20px;box-sizing:border-box}
+    .container{max-width:980px;margin:0 auto;background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.08)}
+    h1{font-size:20px;margin:0 0 10px}
+    .row{display:flex;gap:12px;align-items:center}
+    label{font-size:13px}
+    input[type=text], textarea, select{width:100%;padding:8px;border-radius:8px;border:1px solid #e2e8f0}
+    .card{padding:12px;border-radius:10px;border:1px dashed #e6eef6;margin-bottom:12px}
+    .stages{margin-top:12px}
+    .stage{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+    .stage .idx{width:28px;height:28px;border-radius:6px;background:#edf2ff;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:700}
+    button{padding:8px 10px;border-radius:8px;border:0;background:#1e40af;color:#fff;cursor:pointer}
+    button.ghost{background:transparent;color:#1e40af;border:1px solid #c7d2fe}
+    .small{font-size:13px;padding:6px 8px}
+    .muted{color:#64748b;font-size:13px}
+    .flex{display:flex;gap:8px;align-items:center}
+    .linkbox{background:#f1f5f9;padding:8px;border-radius:8px;font-family:monospace}
+    .ok{color:green}
+    .bad{color:red}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    footer{margin-top:12px;font-size:12px;color:#94a3b8}
+    .stage-actions{display:flex;gap:8px}
+    .kbd{background:#111;color:#fff;border-radius:6px;padding:2px 6px;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Многоэтапная аутентификация — Настройка / Выполнение</h1>
+    <p class="muted">Это одиночный HTML-файл для размещения на GitHub Pages. Авто-переключение режимов по наличию <code>config</code> в хеше URL.</p>
+
+    <div id="app"></div>
+    <footer>Сгенерировано: простой фронтенд. Ключи — локальные (генерация на клиенте). Не используйте для критичных задач без серверной проверки.</footer>
+  </div>
+
+<script>
+// --- ВСПОМОГАТЕЛИ ---
+function utf8_to_b64(str){return btoa(unescape(encodeURIComponent(str)));}
+function b64_to_utf8(b64){return decodeURIComponent(escape(atob(b64)));}
+function safeEncodeConfig(obj){return utf8_to_b64(JSON.stringify(obj));}
+function safeDecodeConfig(b64){try{return JSON.parse(b64_to_utf8(b64));}catch(e){return null;}}
+
+function parseHashParams(){
+  const hash = location.hash.replace(/^#/,'');
+  if(!hash) return {};
+  return Object.fromEntries(hash.split('&').map(p=>{const [k,v]=p.split('=');return [k, v?decodeURIComponent(v):'']}));
+}
+function updateHashParams(params){
+  const existing = parseHashParams();
+  const merged = {...existing, ...params};
+  // remove keys with null or empty string
+  Object.keys(merged).forEach(k=>{if(merged[k]===null||merged[k]==='') delete merged[k]});
+  const s = Object.entries(merged).map(([k,v])=>`${k}=${encodeURIComponent(v)}`).join('&');
+  location.hash = s;
+}
+
+function isValidUrl(s){try{const u=new URL(s);return ['http:','https:'].includes(u.protocol);}catch(e){return false}}
+
+async function sha256Hex(message){
+  const enc=new TextEncoder();
+  const data=enc.encode(message);
+  const hash=await crypto.subtle.digest('SHA-256', data);
+  const bytes=new Uint8Array(hash);
+  return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function generateAuthPair(configB64, passedIds){
+  // creates key string and expiry timestamp
+  const payload = configB64 + '|' + (passedIds.join(',')) + '|' + Date.now();
+  const hex = await sha256Hex(payload);
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let chars = '';
+  for(let i=0;i<16;i++){
+    // take two hex digits -> 0..255 -> map to 0..35
+    const byte = parseInt(hex.substr((i*2)%hex.length, 2), 16);
+    chars += alphabet[byte % alphabet.length];
+  }
+  const groups = chars.match(/.{1,4}/g).join('-');
+  const key = 'AUTH-' + groups;
+  const expiry = Date.now() + 12 * 60 * 60 * 1000; // 12 часов
+  return {key, expiry};
+}
+
+// --- UI ---
+const app = document.getElementById('app');
+
+function render(){
+  const params = parseHashParams();
+  if(params.config){
+    showExecutionMode(params);
+  } else {
+    showConfigurationMode();
+  }
+}
+
+// --- Конфигурационный режим (админ) ---
+function showConfigurationMode(){
+  app.innerHTML = `
+    <div class="card">
+      <div class="row"><label>Количество этапов</label><select id="stagesCount"><option>1</option><option selected>2</option><option>3</option></select></div>
+      <div class="stages" id="stagesRoot"></div>
+      <div class="controls">
+        <button id="generate" class="small">Сгенерировать ссылку</button>
+        <button id="preview" class="ghost small">Смотреть как пользователь</button>
+        <button id="clearLocal" class="ghost small">Очистить локальные данные</button>
+      </div>
+    </div>
+    <div id="output"></div>
+  `;
+
+  const stagesRoot = document.getElementById('stagesRoot');
+  const countSel = document.getElementById('stagesCount');
+
+  function buildInputs(n, existing){
+    stagesRoot.innerHTML='';
+    for(let i=1;i<=n;i++){
+      const prev = existing && existing[i-1];
+      const el = document.createElement('div'); el.className='stage';
+      el.innerHTML = `
+        <div class="idx">${i}</div>
+        <div style="flex:1">
+          <label>URL этапа ${i}</label>
+          <input id="url_${i}" type="text" placeholder="https://example.com/task${i}" value="${prev?prev.url:''}" />
+          <label>Описание (опционально)</label>
+          <input id="desc_${i}" type="text" placeholder="Короткое описание" value="${prev?prev.description:''}" />
+          <div id="v_${i}" class="muted"></div>
+        </div>
+      `;
+      stagesRoot.appendChild(el);
+      // live validation
+      const urlIn = document.getElementById(`url_${i}`);
+      const v = document.getElementById(`v_${i}`);
+      urlIn.addEventListener('input', ()=>{v.textContent = isValidUrl(urlIn.value)? 'OK': 'Неверный URL';});
+    }
+  }
+
+  // default build
+  buildInputs(2);
+  countSel.addEventListener('change', ()=>buildInputs(parseInt(countSel.value)));
+
+  document.getElementById('generate').addEventListener('click', ()=>{
+    const n = parseInt(countSel.value);
+    const stages = [];
+    for(let i=1;i<=n;i++){
+      const url = document.getElementById(`url_${i}`).value.trim();
+      const description = document.getElementById(`desc_${i}`).value.trim();
+      if(!isValidUrl(url)){
+        alert('Неверный URL в этапе ' + i + '\nИсправьте и попробуйте снова.');
+        return;
+      }
+      stages.push({id:i, url, description});
+    }
+    const config = {version:'1.0', stages, created: new Date().toISOString()};
+    const b64 = safeEncodeConfig(config);
+    const link = location.origin + location.pathname + '#config=' + encodeURIComponent(b64);
+    const out = document.getElementById('output');
+    out.innerHTML = `
+      <div class="card">
+        <div><strong>Уникальная ссылка</strong></div>
+        <div class="linkbox" id="linkBox">${link}</div>
+        <div class="controls" style="margin-top:8px">
+          <button id="copyLink" class="small">Копировать ссылку</button>
+          <button id="copyShort" class="ghost small">Скопировать только config</button>
+          <button id="openLink" class="small">Открыть в режиме выполнения</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('copyLink').addEventListener('click', ()=>{navigator.clipboard.writeText(link).then(()=>alert('Ссылка скопирована'))});
+    document.getElementById('copyShort').addEventListener('click', ()=>{navigator.clipboard.writeText(b64).then(()=>alert('Config (base64) скопирован'))});
+    document.getElementById('openLink').addEventListener('click', ()=>{ location.href = link });
+  });
+
+  document.getElementById('preview').addEventListener('click', ()=>{
+    // if there is a config in inputs, open a new tab with config param
+    const n = parseInt(countSel.value);
+    const stages = [];
+    for(let i=1;i<=n;i++){
+      const url = document.getElementById(`url_${i}`).value.trim();
+      const description = document.getElementById(`desc_${i}`).value.trim();
+      if(!isValidUrl(url)){
+        alert('Неверный URL в этапе ' + i + '\nИсправьте и попробуйте снова.');
+        return;
+      }
+      stages.push({id:i, url, description});
+    }
+    const config = {version:'1.0', stages, created: new Date().toISOString()};
+    const b64 = safeEncodeConfig(config);
+    const link = location.origin + location.pathname + '#config=' + encodeURIComponent(b64);
+    window.open(link, '_blank');
+  });
+
+  document.getElementById('clearLocal').addEventListener('click', ()=>{
+    if(confirm('Удалить все локальные данные (localStorage) для этого сайта?')){
+      localStorage.clear();
+      alert('Локальные данные удалены');
+    }
+  });
+}
+
+// --- Режим выполнения (пользователь) ---
+async function showExecutionMode(params){
+  const b64 = params.config;
+  const config = safeDecodeConfig(b64);
+  if(!config){
+    app.innerHTML = `<div class="card"><div class="bad">Не удалось декодировать конфигурацию.</div></div>`; return;
+  }
+
+  const storageKey = 'multistage_progress_' + b64;
+  const saved = localStorage.getItem(storageKey);
+  let progress = saved? JSON.parse(saved):[]; // array of completed ids
+
+  // merge with URL progress param if present
+  if(params.progress){
+    const extra = params.progress.split(',').map(x=>parseInt(x)).filter(Boolean);
+    progress = Array.from(new Set([...progress, ...extra]));
+  }
+
+  const existingKey = params.key ? {key: params.key, expiry: params.keyExpiry?parseInt(params.keyExpiry):null, created: params.keyCreated||null} : null;
+
+  app.innerHTML = `
+    <div class="card">
+      <div><strong>Конфигурация (версия ${config.version})</strong> — создана ${new Date(config.created).toLocaleString()}</div>
+      <div class="muted" style="margin-top:6px">Этапов: ${config.stages.length}</div>
+      <div id="stagesList" style="margin-top:12px"></div>
+      <div class="controls" style="margin-top:10px">
+        <button id="generateKey" class="small" ${progress.length === config.stages.length? '':'disabled'}>Сгенерировать ключ</button>
+        <button id="copyLink" class="ghost small">Копировать ссылку с прогрессом</button>
+        <button id="resetProgress" class="ghost small">Сбросить прогресс</button>
+        <button id="viewConfig" class="small">Просмотреть настройки</button>
+      </div>
+      <div id="keyArea" style="margin-top:12px"></div>
+    </div>
+  `;
+
+  const stagesList = document.getElementById('stagesList');
+  function refreshStages(){
+    stagesList.innerHTML='';
+    config.stages.forEach(stage=>{
+      const done = progress.includes(stage.id);
+      const el = document.createElement('div'); el.className='card';
+      el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center';
+      el.innerHTML = `
+        <div>
+          <div style="font-weight:700">Этап ${stage.id} ${stage.description? '— '+stage.description:''}</div>
+          <div class="muted" style="font-family:monospace">${stage.url}</div>
+        </div>
+        <div class="stage-actions">
+          <button class="small" data-open="${stage.id}">Перейти</button>
+          <button class="ghost small" data-toggle="${stage.id}">${done? 'Выполнено ✓':'Выполнено?'}</button>
+        </div>
+      `;
+      stagesList.appendChild(el);
+    });
+    // attach handlers
+    document.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click', (e)=>{
+      const id = parseInt(e.currentTarget.getAttribute('data-open'));
+      const st = config.stages.find(s=>s.id===id);
+      if(st) window.open(st.url, '_blank');
+    }));
+    document.querySelectorAll('[data-toggle]').forEach(btn=>btn.addEventListener('click', (e)=>{
+      const id = parseInt(e.currentTarget.getAttribute('data-toggle'));
+      if(progress.includes(id)){
+        progress = progress.filter(x=>x!==id);
+      } else {
+        progress.push(id);
+        progress.sort((a,b)=>a-b);
+      }
+      localStorage.setItem(storageKey, JSON.stringify(progress));
+      // update URL param 'progress'
+      updateHashParams({config: b64, progress: progress.join(',')});
+      refreshStages();
+      // enable generate button if ready
+      const genBtn = document.getElementById('generateKey'); if(genBtn) genBtn.disabled = !(progress.length === config.stages.length);
+    }));
+
+    // update generate button state
+    const genBtn = document.getElementById('generateKey'); if(genBtn) genBtn.disabled = !(progress.length === config.stages.length);
+  }
+
+  refreshStages();
+
+  document.getElementById('copyLink').addEventListener('click', ()=>{
+    const link = location.origin + location.pathname + '#config=' + encodeURIComponent(b64) + '&progress=' + encodeURIComponent(progress.join(','));
+    navigator.clipboard.writeText(link).then(()=>alert('Ссылка с прогрессом скопирована'));
+  });
+
+  document.getElementById('resetProgress').addEventListener('click', ()=>{
+    if(!confirm('Сбросить прогресс?')) return;
+    progress = [];
+    localStorage.removeItem(storageKey);
+    updateHashParams({config: b64});
+    refreshStages();
+  });
+
+  document.getElementById('viewConfig').addEventListener('click', ()=>{
+    alert(JSON.stringify(config, null, 2));
+  });
+
+  document.getElementById('generateKey').addEventListener('click', async ()=>{
+    if(progress.length !== config.stages.length){ alert('Не все этапы завершены'); return; }
+    const pair = await generateAuthPair(b64, progress);
+    // attach meta to URL
+    updateHashParams({config: b64, progress: progress.join(','), key: pair.key, keyExpiry: pair.expiry, keyCreated: Date.now()});
+    localStorage.setItem(storageKey + '_lastKey', JSON.stringify({key:pair.key, expiry:pair.expiry, created:Date.now()}));
+    renderKeyArea(pair.key, pair.expiry);
+  });
+
+  function renderKeyArea(key, expiry){
+    const ka = document.getElementById('keyArea');
+    const now = Date.now();
+    const valid = expiry && now < expiry;
+    const remainingMs = expiry - now;
+    const hours = Math.floor(remainingMs/3600000); const minutes = Math.floor((remainingMs%3600000)/60000);
+    ka.innerHTML = `
+      <div><strong>Ключ</strong></div>
+      <div class="linkbox">${key}</div>
+      <div class="muted">${valid? 'Действителен еще: '+hours+'ч '+minutes+'м' : 'Ключ просрочен или отсутствует'}</div>
+      <div class="controls" style="margin-top:8px">
+        <button id="copyKey" class="small">Копировать ключ</button>
+        <button id="copyForBot" class="ghost small">Скопировать для бота (формат)</button>
+      </div>
+    `;
+    document.getElementById('copyKey').addEventListener('click', ()=>navigator.clipboard.writeText(key).then(()=>alert('Ключ скопирован')));
+    document.getElementById('copyForBot').addEventListener('click', ()=>navigator.clipboard.writeText(JSON.stringify({key, expiry})).then(()=>alert('Скопировано')));
+  }
+
+  // show existing key if present
+  const last = localStorage.getItem(storageKey + '_lastKey');
+  if(last){
+    try{const obj=JSON.parse(last); if(obj.key) renderKeyArea(obj.key, obj.expiry);}catch(e){}
+  }
+
+  // if URL contains key and expiry, show status
+  if(existingKey && existingKey.key){
+    const expiry = params.keyExpiry?parseInt(params.keyExpiry):null;
+    renderKeyArea(existingKey.key, expiry);
+  }
+}
+
+// initial render
+render();
+
+// re-render on hash change
+window.addEventListener('hashchange', render);
+</script>
+</body>
+</html>
