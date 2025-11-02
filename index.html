@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stage Authentication System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Режим настройки -->
+        <div id="config-mode" class="mode">
+            <div class="container">
+                <h1>Настройка многоэтапной проверки</h1>
+                
+                <div class="stage-config">
+                    <label>Количество этапов:</label>
+                    <select id="stage-count">
+                        <option value="1">1 этап</option>
+                        <option value="2">2 этапа</option>
+                        <option value="3">3 этапа</option>
+                    </select>
+                </div>
+
+                <div id="stages-container">
+                    <!-- Этапы будут генерироваться здесь -->
+                </div>
+
+                <button id="generate-btn" class="btn-primary">Сгенерировать ссылку</button>
+
+                <div id="result-container" class="hidden">
+                    <h3>Ваша ссылка для проверки:</h3>
+                    <div class="link-container">
+                        <input type="text" id="generated-link" readonly>
+                        <button id="copy-link-btn" class="btn-secondary">Копировать</button>
+                    </div>
+                    <div class="qr-container" id="qr-code"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Режим выполнения -->
+        <div id="execution-mode" class="mode hidden">
+            <div class="container">
+                <h1>Прохождение проверки</h1>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">0/0 выполнено</div>
+                </div>
+
+                <div id="stages-list">
+                    <!-- Список этапов будет генерироваться здесь -->
+                </div>
+
+                <div id="key-container" class="hidden">
+                    <h3>✅ Проверка пройдена!</h3>
+                    <div class="key-display">
+                        <span id="auth-key"></span>
+                        <button id="copy-key-btn" class="btn-secondary">Копировать ключ</button>
+                    </div>
+                    <div class="key-info">
+                        <p>Ключ действителен в течение 12 часов</p>
+                        <p id="key-expiry"></p>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="reset-btn" class="btn-outline">Начать заново</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
