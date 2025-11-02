@@ -113,13 +113,29 @@ class MultiStageAuth {
             uniqueId: this.generateUniqueId()
         };
 
-        const base64Config = btoa(JSON.stringify(config));
+        // Исправляем кодирование для поддержки Unicode
+        const base64Config = this.encodeBase64(JSON.stringify(config));
         const link = `${window.location.origin}${window.location.pathname}#config=${base64Config}`;
 
         document.getElementById('generated-link').value = link;
         document.getElementById('result-container').classList.remove('hidden');
         
         this.showNotification('Ссылка успешно сгенерирована!');
+    }
+
+    // Безопасное кодирование Base64 для Unicode
+    encodeBase64(str) {
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, 
+            function toSolidBytes(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+    }
+
+    // Безопасное декодирование Base64 для Unicode
+    decodeBase64(str) {
+        return decodeURIComponent(atob(str).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
     }
 
     generateUniqueId() {
@@ -130,7 +146,7 @@ class MultiStageAuth {
     loadExecutionConfig(params) {
         try {
             const base64Config = params.get('config');
-            const config = JSON.parse(atob(base64Config));
+            const config = JSON.parse(this.decodeBase64(base64Config));
             
             this.config = config;
             
