@@ -108,7 +108,9 @@ class MultiStageAuth {
         const config = {
             version: "1.0",
             stages: stages,
-            created: new Date().toISOString()
+            created: new Date().toISOString(),
+            // Добавляем уникальный ID для каждой конфигурации
+            uniqueId: this.generateUniqueId()
         };
 
         const base64Config = btoa(JSON.stringify(config));
@@ -116,40 +118,13 @@ class MultiStageAuth {
 
         document.getElementById('generated-link').value = link;
         document.getElementById('result-container').classList.remove('hidden');
-
-        // Генерация QR-кода
-        this.generateQRCode(link);
         
         this.showNotification('Ссылка успешно сгенерирована!');
     }
 
-    generateQRCode(text) {
-        const container = document.getElementById('qr-code');
-        container.innerHTML = '';
-        
-        try {
-            // Простая реализация QR-кода без внешних библиотек
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 200;
-            canvas.height = 200;
-            
-            // Очистка canvas
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Простая сетка (в реальном приложении используйте библиотеку QR-кода)
-            ctx.fillStyle = 'black';
-            ctx.font = '16px Arial';
-            ctx.fillText('QR Code', 70, 100);
-            ctx.font = '12px Arial';
-            ctx.fillText('(Generated)', 75, 120);
-            
-            container.appendChild(canvas);
-        } catch (error) {
-            console.warn('QR code generation failed:', error);
-            container.innerHTML = '<p>QR-код недоступен</p>';
-        }
+    generateUniqueId() {
+        // Генерируем уникальный ID на основе timestamp и случайных символов
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
     }
 
     loadExecutionConfig(params) {
@@ -158,9 +133,15 @@ class MultiStageAuth {
             const config = JSON.parse(atob(base64Config));
             
             this.config = config;
-            this.progress = JSON.parse(localStorage.getItem('auth_progress') || '[]');
-            this.completedKey = localStorage.getItem('auth_key');
-            this.keyGeneratedAt = localStorage.getItem('key_generated_at');
+            
+            // Используем uniqueId конфигурации для хранения прогресса
+            const storageKey = `auth_progress_${config.uniqueId}`;
+            const keyStorageKey = `auth_key_${config.uniqueId}`;
+            const timeStorageKey = `key_time_${config.uniqueId}`;
+            
+            this.progress = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            this.completedKey = localStorage.getItem(keyStorageKey);
+            this.keyGeneratedAt = localStorage.getItem(timeStorageKey);
 
             this.renderExecutionStages();
             this.updateProgress();
@@ -228,13 +209,14 @@ class MultiStageAuth {
     openStage(stageId) {
         const stage = this.config.stages.find(s => s.id === stageId);
         if (stage) {
-            // Сохраняем время открытия этапа
+            // Сохраняем время открытия этапа с привязкой к конфигурации
             const stageData = {
                 id: stageId,
                 openedAt: new Date().toISOString(),
-                url: stage.url
+                url: stage.url,
+                configId: this.config.uniqueId
             };
-            localStorage.setItem(`stage_${stageId}`, JSON.stringify(stageData));
+            localStorage.setItem(`stage_${this.config.uniqueId}_${stageId}`, JSON.stringify(stageData));
             
             // Добавляем в отслеживаемые этапы
             this.openedStages.add(stageId);
@@ -282,7 +264,7 @@ class MultiStageAuth {
     }
 
     checkSingleStageReturn(stageId) {
-        const stageData = localStorage.getItem(`stage_${stageId}`);
+        const stageData = localStorage.getItem(`stage_${this.config.uniqueId}_${stageId}`);
         if (!stageData) return;
 
         const data = JSON.parse(stageData);
@@ -293,15 +275,19 @@ class MultiStageAuth {
         // Если прошло больше 10 секунд, предлагаем отметить как выполненное
         if (timeDiff > 10 && !this.progress.includes(stageId)) {
             const timerElement = document.getElementById(`timer-${stageId}`);
-            if (timerElement) {
-                timerElement.innerHTML += ` <button class="btn-auto-complete" data-stage="${stageId}">✅ Автоматически завершить</button>`;
+            if (timerElement && !timerElement.querySelector('.btn-auto-complete')) {
+                const autoCompleteBtn = document.createElement('button');
+                autoCompleteBtn.className = 'btn-auto-complete';
+                autoCompleteBtn.dataset.stage = stageId;
+                autoCompleteBtn.textContent = '✅ Автоматически завершить';
                 
-                // Добавляем обработчик для кнопки автоматического завершения
-                timerElement.querySelector('.btn-auto-complete')?.addEventListener('click', (e) => {
+                autoCompleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const stageId = parseInt(e.target.dataset.stage);
                     this.markStageCompleted(stageId);
                 });
+                
+                timerElement.appendChild(autoCompleteBtn);
             }
         }
     }
@@ -309,7 +295,10 @@ class MultiStageAuth {
     markStageCompleted(stageId) {
         if (!this.progress.includes(stageId)) {
             this.progress.push(stageId);
-            localStorage.setItem('auth_progress', JSON.stringify(this.progress));
+            
+            // Сохраняем прогресс с привязкой к конфигурации
+            const storageKey = `auth_progress_${this.config.uniqueId}`;
+            localStorage.setItem(storageKey, JSON.stringify(this.progress));
             
             // Очищаем таймер
             const timerElement = document.getElementById(`timer-${stageId}`);
@@ -319,7 +308,7 @@ class MultiStageAuth {
             
             // Убираем из отслеживаемых
             this.openedStages.delete(stageId);
-            localStorage.removeItem(`stage_${stageId}`);
+            localStorage.removeItem(`stage_${this.config.uniqueId}_${stageId}`);
             
             this.renderExecutionStages();
             this.updateProgress();
@@ -353,8 +342,12 @@ class MultiStageAuth {
         this.completedKey = `AUTH-${segments.join('-')}`;
         this.keyGeneratedAt = new Date().toISOString();
         
-        localStorage.setItem('auth_key', this.completedKey);
-        localStorage.setItem('key_generated_at', this.keyGeneratedAt);
+        // Сохраняем ключ с привязкой к конфигурации
+        const keyStorageKey = `auth_key_${this.config.uniqueId}`;
+        const timeStorageKey = `key_time_${this.config.uniqueId}`;
+        
+        localStorage.setItem(keyStorageKey, this.completedKey);
+        localStorage.setItem(timeStorageKey, this.keyGeneratedAt);
         
         this.showGeneratedKey();
         this.showNotification('Проверка успешно пройдена! Ключ сгенерирован.');
@@ -405,13 +398,19 @@ class MultiStageAuth {
             if (timerElement && timerElement.dataset.timerId) {
                 clearInterval(parseInt(timerElement.dataset.timerId));
             }
-            localStorage.removeItem(`stage_${stage.id}`);
+            localStorage.removeItem(`stage_${this.config.uniqueId}_${stage.id}`);
         });
         
         this.openedStages.clear();
-        localStorage.removeItem('auth_progress');
-        localStorage.removeItem('auth_key');
-        localStorage.removeItem('key_generated_at');
+        
+        // Очищаем прогресс для этой конфигурации
+        const storageKey = `auth_progress_${this.config.uniqueId}`;
+        const keyStorageKey = `auth_key_${this.config.uniqueId}`;
+        const timeStorageKey = `key_time_${this.config.uniqueId}`;
+        
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(keyStorageKey);
+        localStorage.removeItem(timeStorageKey);
         
         this.progress = [];
         this.completedKey = null;
@@ -457,6 +456,10 @@ class MultiStageAuth {
     }
 
     showNotification(message, isError = false) {
+        // Удаляем старые уведомления
+        const oldNotifications = document.querySelectorAll('.notification');
+        oldNotifications.forEach(notification => notification.remove());
+        
         const notification = document.createElement('div');
         notification.className = `notification ${isError ? 'error' : ''}`;
         notification.textContent = message;
@@ -485,7 +488,7 @@ window.addEventListener('load', () => {
     // Восстанавливаем открытые этапы из localStorage
     if (auth.config && auth.config.stages) {
         auth.config.stages.forEach(stage => {
-            const stageData = localStorage.getItem(`stage_${stage.id}`);
+            const stageData = localStorage.getItem(`stage_${auth.config.uniqueId}_${stage.id}`);
             if (stageData) {
                 auth.openedStages.add(stage.id);
                 auth.startStageTimer(stage.id);
