@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Multi-stage Link Authenticator</title>
+<style>
+  :root{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;--max:880px;}
+  body{margin:0;padding:24px;background:#f6f8fb;color:#0b1220;display:flex;justify-content:center}
+  .wrap{width:100%;max-width:var(--max);background:#fff;border-radius:12px;padding:20px;box-shadow:0 6px 20px rgba(10,20,40,0.08)}
+  h1{margin:0 0 8px;font-size:20px}
+  p.lead{margin:0 0 16px;color:#4b5563}
+  .row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  label{display:block;font-size:13px;margin-bottom:6px;color:#374151}
+  input[type="text"], input[type="url"], textarea, select{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px}
+  button{padding:8px 12px;border-radius:8px;border:0;background:#111827;color:#fff;cursor:pointer}
+  button.ghost{background:transparent;color:#111827;border:1px solid #e5e7eb}
+  .controls{display:flex;gap:8px;align-items:center}
+  .stage{border:1px dashed #e6eef8;padding:12px;border-radius:8px}
+  .small{font-size:12px;color:#6b7280}
+  .muted{color:#6b7280}
+  .generated{word-break:break-all;background:#f3f4f6;padding:10px;border-radius:6px}
+  .stages-list{display:grid;grid-template-columns:1fr;gap:8px}
+  .stage-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .stage-row .meta{flex:1}
+  .actions{display:flex;gap:8px;align-items:center}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px}
+  .ok{color:green}
+  .warn{color:orange}
+  .error{color:red}
+  footer{margin-top:16px;font-size:12px;color:#6b7280}
+  .kbd{background:#111827;color:#fff;padding:4px 6px;border-radius:4px;font-size:12px}
+  .flex{display:flex;gap:8px;align-items:center}
+  .hidden{display:none}
+  .col{flex:1}
+</style>
+</head>
+<body>
+<div class="wrap" role="main">
+  <h1>Multi-stage Link Authenticator</h1>
+  <p class="lead">Создавайте настраиваемые многоэтапные проверки и генерируйте уникальные ссылки для распространения. Поддерживает 1–3 этапа, прогресс в URL/localStorage и генерацию ключей.</p>
+
+  <div id="modeAdmin">
+    <h2>Режим настройки (админ)</h2>
+    <div class="row">
+      <label for="numStages">Количество этапов</label>
+      <select id="numStages">
+        <option value="1">1 этап</option>
+        <option value="2" selected>2 этапа</option>
+        <option value="3">3 этапа</option>
+      </select>
+    </div>
+
+    <div id="stagesConfig" class="stages-list"></div>
+
+    <div class="row controls">
+      <button id="genLinkBtn">Сгенерировать ссылку</button>
+      <button id="previewExec" class="ghost">Предпросмотр (режим выполнения)</button>
+      <div class="col"></div>
+      <button id="resetConfig" class="ghost">Сбросить поля</button>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label>Сгенерированная ссылка</label>
+      <div id="generatedArea" class="generated">—</div>
+      <div style="margin-top:8px;" class="flex">
+        <button id="copyLinkBtn" class="ghost">Копировать ссылку</button>
+        <button id="openLinkBtn" class="ghost">Открыть в новой вкладке</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modeExec" class="hidden">
+    <h2>Режим выполнения (пользователь)</h2>
+    <div id="execInfo" class="small muted"></div>
+
+    <div style="margin-top:8px;">
+      <label>Настроенные этапы</label>
+      <div id="execStages" class="stages-list"></div>
+    </div>
+
+    <div style="margin-top:8px;" class="row">
+      <button id="resetProgressBtn" class="ghost">Сброс прогресса</button>
+      <button id="copyKeyBtn" class="ghost hidden">Копировать ключ</button>
+      <div class="col"></div>
+      <div id="keyStatus" class="small"></div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label>Сгенерированный ключ (после выполнения всех этапов)</label>
+      <div id="keyArea" class="generated">—</div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label>Ссылка (с конфигом)</label>
+      <div id="execLinkArea" class="generated"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div>Формат ссылки: <code>https://yourname.github.io/repo/#config=[base64]</code> — поддерживаются параметры <code>progress</code>, <code>key</code>, <code>keyCreated</code>.</div>
+    <div style="margin-top:8px">Формат ключа: <span class="kbd">AUTH-XXXX-XXXX-XXXX-XXXX</span>, время жизни — 12 часов.</div>
+  </footer>
+</div>
+
+<script>
+/* Utility: Unicode-safe base64 */
+function base64EncodeUnicode(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+    function(match, p1) { return String.fromCharCode('0x' + p1); }));
+}
+function base64DecodeUnicode(str) {
+  return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+}
+
+/* URL hash helpers */
+function parseHash() {
+  const hash = location.hash.replace(/^#/, '');
+  if (!hash) return {};
+  return hash.split('&').reduce((acc, part) => {
+    const [k,v] = part.split('=');
+    acc[k] = v===undefined?null:decodeURIComponent(v);
+    return acc;
+  }, {});
+}
+function buildHash(obj) {
+  const parts = [];
+  for (const k in obj) {
+    if (obj[k] !== undefined && obj[k] !== null) parts.push(k + '=' + encodeURIComponent(obj[k]));
+  }
+  return parts.join('&');
+}
+
+/* Config encode/decode */
+function encodeConfig(cfgObj) {
+  const json = JSON.stringify(cfgObj);
+  return base64EncodeUnicode(json);
+}
+function decodeConfig(b64) {
+  try {
+    const json = base64DecodeUnicode(b64);
+    return JSON.parse(json);
+  } catch(e) { return null; }
+}
+
+/* Validate URL */
+function isValidHttpUrl(string) {
+  try {
+    const u = new URL(string);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch (e) {
+    return false;
+  }
+}
+
+/* DOM refs */
+const numStages = document.getElementById('numStages');
+const stagesConfig = document.getElementById('stagesConfig');
+const genLinkBtn = document.getElementById('genLinkBtn');
+const generatedArea = document.getElementById('generatedArea');
+const copyLinkBtn = document.getElementById('copyLinkBtn');
+const openLinkBtn = document.getElementById('openLinkBtn');
+const previewExec = document.getElementById('previewExec');
+const resetConfig = document.getElementById('resetConfig');
+
+const modeAdmin = document.getElementById('modeAdmin');
+const modeExec = document.getElementById('modeExec');
+const execStages = document.getElementById('execStages');
+const execInfo = document.getElementById('execInfo');
+const resetProgressBtn = document.getElementById('resetProgressBtn');
+const keyArea = document.getElementById('keyArea');
+const keyStatus = document.getElementById('keyStatus');
+const copyKeyBtn = document.getElementById('copyKeyBtn');
+const execLinkArea = document.getElementById('execLinkArea');
+
+/* Create input rows for stages */
+function renderStageInputs() {
+  stagesConfig.innerHTML = '';
+  const n = parseInt(numStages.value,10);
+  for (let i=1;i<=n;i++) {
+    const div = document.createElement('div');
+    div.className = 'stage';
+    div.innerHTML = `
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="flex:1">
+          <label>URL этапа ${i}</label>
+          <input type="url" id="stageUrl_${i}" placeholder="https://example.com/task${i}">
+        </div>
+        <div style="width:220px">
+          <label>Описание (опционально)</label>
+          <input type="text" id="stageDesc_${i}" placeholder="Краткое описание">
+        </div>
+      </div>
+    `;
+    stagesConfig.appendChild(div);
+  }
+}
+numStages.addEventListener('change', renderStageInputs);
+renderStageInputs();
+
+function readConfigFromInputs() {
+  const n = parseInt(numStages.value,10);
+  const stages = [];
+  for (let i=1;i<=n;i++) {
+    const url = document.getElementById('stageUrl_'+i).value.trim();
+    const desc = document.getElementById('stageDesc_'+i).value.trim();
+    stages.push({id:i, url, description: desc || undefined});
+  }
+  return {
+    version: "1.0",
+    stages,
+    created: new Date().toISOString()
+  };
+}
+
+/* Generate link */
+genLinkBtn.addEventListener('click', ()=>{
+  const cfg = readConfigFromInputs();
+  // Validate URLs
+  for (const s of cfg.stages) {
+    if (!isValidHttpUrl(s.url)) {
+      alert('Один из URL некорректен: ' + (s.url || '(пустой)'));
+      return;
+    }
+  }
+  const b64 = encodeConfig(cfg);
+  const base = location.origin + location.pathname;
+  const link = `${base}#config=${b64}`;
+  generatedArea.textContent = link;
+  copyToClipboard(link);
+});
+
+/* Copy & open */
+copyLinkBtn.addEventListener('click', ()=> {
+  const txt = generatedArea.textContent.trim();
+  if (txt && txt !== '—') {
+    copyToClipboard(txt);
+    alert('Ссылка скопирована в буфер обмена');
+  }
+});
+openLinkBtn.addEventListener('click', ()=> {
+  const txt = generatedArea.textContent.trim();
+  if (txt && txt !== '—') window.open(txt, '_blank');
+});
+
+/* Preview execution mode by encoding current inputs and switching */
+previewExec.addEventListener('click', ()=>{
+  const cfg = readConfigFromInputs();
+  for (const s of cfg.stages) if (!isValidHttpUrl(s.url)) { alert('Некорректный URL в настройках.'); return; }
+  const b64 = encodeConfig(cfg);
+  // Simulate visiting link: set hash and reload page mode functions
+  location.hash = 'config=' + b64;
+  checkUrlMode();
+});
+
+/* Reset config fields */
+resetConfig.addEventListener('click', ()=>{
+  if (!confirm('Сбросить все поля конфигурации?')) return;
+  for (let i=1;i<=3;i++) {
+    const a=document.getElementById('stageUrl_'+i), b=document.getElementById('stageDesc_'+i);
+    if (a) a.value='';
+    if (b) b.value='';
+  }
+});
+
+/* Execution mode logic */
+function showExecutionMode(cfg, urlState) {
+  modeAdmin.classList.add('hidden');
+  modeExec.classList.remove('hidden');
+  execLinkArea.textContent = location.origin + location.pathname + '#config=' + encodeConfig(cfg);
+
+  execInfo.textContent = `Конфигурация создана: ${cfg.created} · ${cfg.stages.length} этап(а/ов)`;
+
+  // Determine progress: from URL param progress or from localStorage
+  let progress = [];
+  if (urlState && urlState.progress) {
+    progress = urlState.progress.split(',').filter(Boolean).map(x=>parseInt(x,10));
+  } else {
+    const ls = localStorage.getItem('auth_progress_' + encodeConfig(cfg));
+    if (ls) progress = ls.split(',').map(x=>parseInt(x,10));
+  }
+
+  renderExecStages(cfg.stages, progress);
+
+  // If key present in URL, show its status
+  if (urlState && urlState.key) {
+    keyArea.textContent = urlState.key;
+    copyKeyBtn.classList.remove('hidden');
+    if (urlState.keyCreated) {
+      const created = new Date(decodeURIComponent(urlState.keyCreated));
+      checkKeyValidity(urlState.key, created);
+    } else {
+      keyStatus.textContent = '';
+    }
+  } else {
+    keyArea.textContent = '—';
+    copyKeyBtn.classList.add('hidden');
+  }
+}
+
+/* Render execution stage buttons */
+function renderExecStages(stages, progress) {
+  execStages.innerHTML = '';
+  for (const s of stages) {
+    const row = document.createElement('div');
+    row.className = 'stage';
+    const done = progress.includes(s.id);
+    row.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="flex:1">
+          <div class="stage-row">
+            <div class="meta">
+              <div><strong>Этап ${s.id}</strong> <span class="small muted"> ${s.description?('- '+s.description):''}</span></div>
+              <div class="small muted">${s.url}</div>
+            </div>
+            <div class="actions">
+              <button data-open="${s.id}" class="ghost">Перейти</button>
+              <button data-toggle="${s.id}" ${done? '':'class="ghost"'}>${done? 'Выполнено' : 'Отметить выполненным'}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    execStages.appendChild(row);
+    // attach handlers
+    const openBtn = row.querySelector('button[data-open]');
+    const toggleBtn = row.querySelector('button[data-toggle]');
+    openBtn.addEventListener('click', ()=> {
+      window.open(s.url, '_blank');
+    });
+    toggleBtn.addEventListener('click', async () => {
+      // toggle done
+      const currentHash = parseHash();
+      let prog = [];
+      if (currentHash.progress) prog = currentHash.progress.split(',').filter(Boolean).map(x=>parseInt(x,10));
+      // fallback to localStorage
+      if (!currentHash.progress) {
+        const ls = localStorage.getItem('auth_progress_' + encodeConfig({version:"1.0",stages:stages,created:document.querySelector('#execInfo')?.dataset?.created}));
+        // ignore complex ls fallback to simple in-memory
+      }
+      if (prog.includes(s.id)) {
+        prog = prog.filter(x=>x!==s.id);
+      } else {
+        prog.push(s.id);
+      }
+      // update URL without reloading
+      const newHashObj = Object.assign({}, currentHash, {config: encodeConfig({version:"1.0",stages:stages,created:document.querySelector('#execInfo')?.dataset?.created || new Date().toISOString()}), progress: prog.join(',')});
+      location.hash = buildHash(newHashObj);
+      // save to localStorage
+      localStorage.setItem('auth_progress_' + encodeConfig({version:"1.0",stages:stages,created:newHashObj.config? decodeConfig(newHashObj.config).created : new Date().toISOString()}), prog.join(','));
+      // re-render
+      renderExecStages(stages, prog);
+      // if all done -> generate key
+      if (prog.length === stages.length) {
+        const keyObj = await generateKeyForCompletion(stages, prog);
+        const keyStr = keyObj.key;
+        const keyCreated = keyObj.created.toISOString();
+        const hashObj = parseHash();
+        hashObj.key = keyStr;
+        hashObj.keyCreated = encodeURIComponent(keyCreated);
+        hashObj.config = encodeConfig({version:"1.0",stages:stages,created:document.querySelector('#execInfo')?.dataset?.created || new Date().toISOString()});
+        hashObj.progress = prog.join(',');
+        location.hash = buildHash(hashObj);
+        keyArea.textContent = keyStr;
+        copyKeyBtn.classList.remove('hidden');
+        copyKeyBtn.onclick = ()=> { copyToClipboard(keyStr); alert('Ключ скопирован'); };
+        checkKeyValidity(keyStr, new Date(keyCreated));
+      }
+    });
+  }
+}
+
+/* Reset progress */
+resetProgressBtn.addEventListener('click', ()=> {
+  if (!confirm('Сбросить прогресс для этой конфигурации?')) return;
+  const hashObj = parseHash();
+  delete hashObj.progress;
+  delete hashObj.key;
+  delete hashObj.keyCreated;
+  location.hash = buildHash(hashObj);
+  // also remove from localStorage
+  const cfg = hashObj.config ? decodeConfig(hashObj.config) : null;
+  if (cfg) localStorage.removeItem('auth_progress_' + encodeConfig(cfg));
+  checkUrlMode();
+});
+
+/* Key generation: SHA-256 of (config JSON + progress list + timestamp) -> take first 16 hex chars */
+async function generateKeyForCompletion(stages, progress) {
+  const cfg = {version:"1.0",stages:stages,created:document.querySelector('#execInfo')?.dataset?.created || new Date().toISOString()};
+  const payload = JSON.stringify(cfg) + '|' + progress.join(',') + '|' + new Date().toISOString();
+  const enc = new TextEncoder().encode(payload);
+  const hashBuf = await crypto.subtle.digest('SHA-256', enc);
+  const hashArray = Array.from(new Uint8Array(hashBuf));
+  const hex = hashArray.map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+  const short = hex.slice(0,16); // 16 hex chars = 16 characters
+  const formatted = 'AUTH-' + short.match(/.{1,4}/g).join('-');
+  return {key: formatted, created: new Date()};
+}
+
+/* Check key validity (12 hours) */
+function checkKeyValidity(key, createdDate) {
+  if (!createdDate || !key) { keyStatus.textContent = ''; return; }
+  const now = new Date();
+  const ageMs = now - createdDate;
+  const hours = ageMs / (1000*60*60);
+  if (hours >= 12) {
+    keyStatus.innerHTML = '<span class="error">Ключ просрочен</span>';
+    copyKeyBtn.classList.add('hidden');
+  } else {
+    const remain = 12 - hours;
+    keyStatus.innerHTML = '<span class="ok">Ключ валиден — осталось ' + remain.toFixed(2) + ' ч</span>';
+    copyKeyBtn.classList.remove('hidden');
+  }
+}
+
+/* Copy helper */
+function copyToClipboard(text) {
+  navigator.clipboard?.writeText(text).catch(()=> {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  });
+}
+
+/* Detect mode on load */
+function hasConfigInUrl() {
+  const h = parseHash();
+  return !!h.config;
+}
+
+function checkUrlMode() {
+  const h = parseHash();
+  if (h.config) {
+    const cfg = decodeConfig(h.config);
+    if (!cfg) {
+      alert('Ошибка: не удалось декодировать конфигурацию в URL.');
+      // fallback to admin
+      modeAdmin.classList.remove('hidden');
+      modeExec.classList.add('hidden');
+      return;
+    }
+    // put created timestamp in execInfo dataset for later use
+    execInfo.dataset.created = cfg.created;
+    showExecutionMode(cfg, h);
+  } else {
+    modeAdmin.classList.remove('hidden');
+    modeExec.classList.add('hidden');
+  }
+}
+
+/* On load */
+window.addEventListener('load', ()=> {
+  checkUrlMode();
+});
+
+/* If hash changes externally */
+window.addEventListener('hashchange', ()=> {
+  checkUrlMode();
+});
+</script>
+</body>
+</html>
