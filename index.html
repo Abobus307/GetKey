@@ -1,121 +1,29 @@
-<!doctype html>
+<!-- index.html -->
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Multi-stage Link Authenticator</title>
-  <meta name="description" content="Генератор уникальных ссылок с многоступенчатыми проверками и генерацией ключей." />
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <title>Многоступенчатая защита — Luarmor стиль</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <header class="hero">
-      <div class="logo">MA</div>
-      <div>
-        <h1>Multi-stage Link Authenticator</h1>
-        <p class="lead">Создавайте ссылки с 1–3 этапами, сохраняйте прогресс и генерируйте ключи. Готово для GitHub Pages.</p>
-      </div>
-    </header>
+    <h1>Проверка доступа</h1>
+    <p id="instructions">Нажмите кнопку "Start", чтобы пройти все этапы проверки.</p>
+    <button id="actionBtn">Start</button>
 
-    <main class="grid">
-      <section class="card" id="mainCard">
-        <div id="adminView" class="panel">
-          <div class="section-title">
-            <strong>Режим настройки (админ)</strong>
-            <span class="muted">— создайте конфигурацию и получите ссылку</span>
-          </div>
+    <div id="warning" class="hidden">
+      <h2>⚠️ Предупреждение</h2>
+      <p>Обнаружена попытка обхода! Пожалуйста, проходите этапы последовательно.</p>
+      <button id="reloadBtn">Начать заново</button>
+    </div>
 
-          <div class="flex-row">
-            <div class="flex-1">
-              <label>Имя проекта (опционально)</label>
-              <input id="projectName" type="text" placeholder="Например: Тест IQ" />
-            </div>
-            <div style="width:140px">
-              <label>Этапы</label>
-              <select id="numStages"><option>1</option><option selected>2</option><option>3</option></select>
-            </div>
-          </div>
-
-          <div id="stagesContainer" class="stages"></div>
-
-          <div class="actions-row">
-            <button id="generateBtn" class="btn primary">Сгенерировать ссылку</button>
-            <button id="previewBtn" class="btn ghost">Предпросмотр</button>
-            <button id="clearBtn" class="btn ghost">Очистить</button>
-            <div class="spacer"></div>
-            <button id="copyLinkBtn" class="btn ghost small">Копировать</button>
-            <button id="openLinkBtn" class="btn ghost small">Открыть</button>
-          </div>
-
-          <div class="mt12">
-            <label>Ссылка</label>
-            <div id="linkArea" class="generated">—</div>
-          </div>
-
-          <div class="mt12">
-            <label>Превью конфигурации</label>
-            <pre id="previewArea" class="generated small muted">—</pre>
-          </div>
-        </div>
-
-        <div id="execView" class="panel hidden">
-          <div class="section-title">
-            <strong>Режим выполнения</strong>
-            <span class="muted">— следуйте этапам и получите ключ</span>
-          </div>
-
-          <div class="info-row">
-            <div id="cfgInfo" class="muted small">—</div>
-            <div>
-              <button id="resetProgressBtn" class="btn ghost small">Сбросить прогресс</button>
-              <button id="copyKeyBtn" class="btn ghost small hidden">Копировать ключ</button>
-            </div>
-          </div>
-
-          <div class="mt12">
-            <label>Этапы</label>
-            <div id="execStages" class="stages"></div>
-          </div>
-
-          <div class="mt12 row">
-            <div style="flex:1">
-              <label>Ключ</label>
-              <div id="keyArea" class="generated key-box">—</div>
-            </div>
-            <div style="width:220px">
-              <label>Статус ключа</label>
-              <div id="keyStatus" class="generated small muted">—</div>
-            </div>
-          </div>
-
-          <div class="mt12">
-            <label>Ссылка с конфигурацией</label>
-            <div id="execLink" class="generated small">—</div>
-          </div>
-        </div>
-      </section>
-
-      <aside class="card">
-        <h3>Инструкция</h3>
-        <p class="muted small">1) Настройте этапы → 2) Сгенерируйте ссылку → 3) Разошлите пользователям. Они отметят этапы и получат ключ (12 часов).</p>
-
-        <h4>Формат ссылки</h4>
-        <div class="generated small">https://yourname.github.io/repo/#config=[base64]&progress=1,2&key=...&keyCreated=...</div>
-
-        <h4>Примечания</h4>
-        <ul class="muted small">
-          <li>Статический клиент — для безопасности используйте серверную подпись ключей.</li>
-          <li>Валидация URL: http/https.</li>
-        </ul>
-
-        <h4>Размещение</h4>
-        <p class="muted small">Положите файлы в корень репозитория и включите GitHub Pages.</p>
-      </aside>
-    </main>
-
-    <footer class="muted small">Multi-stage Link Authenticator · key life 12 hours</footer>
+    <div id="success" class="hidden">
+      <h2>✅ Доступ открыт!</h2>
+      <p>Вы успешно прошли все этапы.</p>
+    </div>
   </div>
 
-<script src="js/app.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
