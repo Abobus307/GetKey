@@ -1,1 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEAO Exploit Status</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--light);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            color: var(--light);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .exploits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .exploit-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .exploit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .exploit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        .exploit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .exploit-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-updated {
+            background: var(--success);
+        }
+
+        .status-detected {
+            background: var(--danger);
+        }
+
+        .status-outdated {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .exploit-details {
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-label {
+            opacity: 0.7;
+        }
+
+        .exploit-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .link-btn {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            border-radius: 5px;
+            text-decoration: none;
+            color: var(--light);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .website-link {
+            background: var(--primary);
+        }
+
+        .discord-link {
+            background: #5865F2;
+        }
+
+        .purchase-link {
+            background: var(--success);
+        }
+
+        .link-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-3px);
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 50px 0;
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .exploits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WEAO Exploit Status</h1>
+            <p class="subtitle">Отслеживание статуса 30+ эксплойтов Roblox в реальном времени</p>
+        </header>
+
+        <div class="controls">
+            <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="updated">Обновленные</button>
+            <button class="filter-btn" data-filter="detected">Обнаруженные</button>
+            <button class="filter-btn" data-filter="free">Бесплатные</button>
+            <button class="filter-btn" data-filter="paid">Платные</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Поиск по названию эксплойта...">
+        </div>
+
+        <div id="exploits-container">
+            <div class="loading pulse">Загрузка данных...</div>
+        </div>
+    </div>
+
+    <script>
+        // Данные для демонстрации (в реальном приложении будут загружаться с API)
+        const demoData = [
+            {
+                "_id": "67d6005efa8c791236079278",
+                "title": "Potassium",
+                "version": "1.7.9",
+                "updatedDate": "07/24/2025 at 3:47 PM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": true,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://potassium.pro",
+                "discordlink": "https://discord.com/invite/potassium",
+                "purchaselink": "https://privana.sell.app/product/potassium?variant=329244&affiliate=weao",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "cost": "$20 Lifetime",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 100,
+                "uncPercentage": 99
+            },
+            {
+                "_id": "67e0d0d87d091e8f8b6d2a35",
+                "title": "Matcha",
+                "version": "1.6.0",
+                "updatedDate": "07/24/2025 at 4:30 AM UTC",
+                "uncStatus": false,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://discord.gg/AURAHhSMxc",
+                "discordlink": "https://discord.gg/matchalol",
+                "purchaselink": "https://bloxproducts.com/r/weao#Matcha",
+                "platform": "Windows",
+                "type": "wexternal",
+                "cost": "$11.50 Lifetime"
+            },
+            {
+                "_id": "679553cd2eea89d30d0dae57",
+                "title": "Xeno",
+                "version": "1.2.45",
+                "updatedDate": "07/24/2025 at 9:26 AM UTC",
+                "uncStatus": true,
+                "free": true,
+                "detected": true,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://www.xeno.onl/",
+                "discordlink": "https://discord.gg/xe-no",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "decompiler": false,
+                "multiInject": true,
+                "suncPercentage": 41,
+                "uncPercentage": 81
+            },
+            {
+                "_id": "68084641b50548f01fd62713",
+                "title": "Bunni.lol",
+                "version": "2.2.2",
+                "updatedDate": "07/24/2025 at 9:19 PM UTC",
+                "uncStatus": true,
+                "free": true,
+                "detected": true,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://realbunni.com/",
+                "discordlink": "https://discord.gg/9DPW2G22cF",
+                "purchaselink": "https://robloxcheatz.com/affiliate/weao",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 100,
+                "uncPercentage": 99,
+                "keysystem": true
+            },
+            {
+                "_id": "680ab721b50548f01fd62715",
+                "title": "Photon",
+                "version": "5.2",
+                "updatedDate": "07/23/2025 at 11:51 PM UTC",
+                "uncStatus": false,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://photonsys.sellpass.io/",
+                "discordlink": "https://discord.gg/vro",
+                "purchaselink": "https://photonsys.sellpass.io/products/Photon-Lifetime",
+                "platform": "Windows",
+                "type": "wexternal",
+                "cost": "$20 Lifetime"
+            }
+        ];
+
+        // Функция для получения данных с API
+        async function fetchExploitsData() {
+            try {
+                const response = await fetch('https://weao.xyz/api/status/exploits', {
+                    headers: {
+                        'User-Agent': 'WEAO-3PService'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке данных');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Ошибка:', error);
+                // В случае ошибки используем демо-данные
+                return demoData;
+            }
+        }
+
+        // Функция для создания карточки эксплойта
+        function createExploitCard(exploit) {
+            const card = document.createElement('div');
+            card.className = 'exploit-card';
+            card.setAttribute('data-status', exploit.updateStatus ? 'updated' : 'outdated');
+            card.setAttribute('data-detected', exploit.detected ? 'detected' : 'undetected');
+            card.setAttribute('data-free', exploit.free ? 'free' : 'paid');
+            
+            // Определяем статус для бейджа
+            let statusClass, statusText;
+            if (exploit.updateStatus) {
+                statusClass = 'status-updated';
+                statusText = 'Обновлен';
+            } else {
+                statusClass = 'status-outdated';
+                statusText = 'Устарел';
+            }
+            
+            if (exploit.detected) {
+                statusClass = 'status-detected';
+                statusText = 'Обнаружен';
+            }
+            
+            card.innerHTML = `
+                <div class="exploit-header">
+                    <h3 class="exploit-title">${exploit.title}</h3>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="exploit-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Версия:</span>
+                        <span>${exploit.version}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Обновлено:</span>
+                        <span>${exploit.updatedDate}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Платформа:</span>
+                        <span>${exploit.platform}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Тип:</span>
+                        <span>${exploit.type || 'Не указан'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Статус:</span>
+                        <span>${exploit.free ? 'Бесплатный' : 'Платный'}</span>
+                    </div>
+                    ${exploit.cost ? `
+                    <div class="detail-item">
+                        <span class="detail-label">Стоимость:</span>
+                        <span>${exploit.cost}</span>
+                    </div>
+                    ` : ''}
+                    ${exploit.uncPercentage ? `
+                    <div class="detail-item">
+                        <span class="detail-label">UNC:</span>
+                        <span>${exploit.uncPercentage}%</span>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="exploit-links">
+                    ${exploit.websitelink ? `<a href="${exploit.websitelink}" target="_blank" class="link-btn website-link">Сайт</a>` : ''}
+                    ${exploit.discordlink ? `<a href="${exploit.discordlink}" target="_blank" class="link-btn discord-link">Discord</a>` : ''}
+                    ${exploit.purchaselink ? `<a href="${exploit.purchaselink}" target="_blank" class="link-btn purchase-link">Купить</a>` : ''}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Функция для отображения эксплойтов
+        function displayExploits(exploits) {
+            const container = document.getElementById('exploits-container');
+            container.innerHTML = '';
+            
+            if (exploits.length === 0) {
+                container.innerHTML = '<div class="loading">Ничего не найдено</div>';
+                return;
+            }
+            
+            const grid = document.createElement('div');
+            grid.className = 'exploits-grid';
+            
+            exploits.forEach(exploit => {
+                const card = createExploitCard(exploit);
+                grid.appendChild(card);
+            });
+            
+            container.appendChild(grid);
+        }
+
+        // Функция для фильтрации эксплойтов
+        function filterExploits(exploits, filter, searchTerm) {
+            let filtered = exploits;
+            
+            // Применяем фильтр по категории
+            if (filter !== 'all') {
+                filtered = exploits.filter(exploit => {
+                    switch(filter) {
+                        case 'updated':
+                            return exploit.updateStatus;
+                        case 'detected':
+                            return exploit.detected;
+                        case 'free':
+                            return exploit.free;
+                        case 'paid':
+                            return !exploit.free;
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            // Применяем поиск
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(exploit => 
+                    exploit.title.toLowerCase().includes(term)
+                );
+            }
+            
+            return filtered;
+        }
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', async () => {
+            const exploitsData = await fetchExploitsData();
+            displayExploits(exploitsData);
+            
+            // Обработчики для фильтров
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    const filter = button.getAttribute('data-filter');
+                    const searchTerm = document.querySelector('.search-input').value;
+                    const filtered = filterExploits(exploitsData, filter, searchTerm);
+                    displayExploits(filtered);
+                });
+            });
+            
+            // Обработчик для поиска
+            const searchInput = document.querySelector('.search-input');
+            searchInput.addEventListener('input', () => {
+                const filter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+                const searchTerm = searchInput.value;
+                const filtered = filterExploits(exploitsData, filter, searchTerm);
+                displayExploits(filtered);
+            });
+        });
+    </script>
+</body>
+</html>
