@@ -55,6 +55,43 @@
             opacity: 0.8;
         }
 
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--light);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-icon {
+            font-size: 1.2rem;
+        }
+
         .controls {
             display: flex;
             justify-content: center;
@@ -106,6 +143,15 @@
             outline: none;
             box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
             background: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .exploits-grid {
@@ -260,6 +306,15 @@
             }
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
         @keyframes pulse {
             0% {
                 opacity: 1;
@@ -280,6 +335,17 @@
             .exploits-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -289,6 +355,29 @@
             <h1>WEAO Exploit Status</h1>
             <p class="subtitle">Отслеживание статуса 30+ эксплойтов Roblox в реальном времени</p>
         </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="all">
+                <span class="tab-icon">🌐</span>
+                Все эксплойты
+            </button>
+            <button class="tab-btn" data-tab="windows-external">
+                <span class="tab-icon">🖥️</span>
+                Windows External
+            </button>
+            <button class="tab-btn" data-tab="windows-internal">
+                <span class="tab-icon">⚙️</span>
+                Windows Internal
+            </button>
+            <button class="tab-btn" data-tab="android">
+                <span class="tab-icon">📱</span>
+                Android
+            </button>
+            <button class="tab-btn" data-tab="ios">
+                <span class="tab-icon">📲</span>
+                iOS
+            </button>
+        </div>
 
         <div class="controls">
             <button class="filter-btn active" data-filter="all">Все</button>
@@ -302,8 +391,34 @@
             <input type="text" class="search-input" placeholder="Поиск по названию эксплойта...">
         </div>
 
-        <div id="exploits-container">
-            <div class="loading pulse">Загрузка данных...</div>
+        <div id="tab-all" class="tab-content active">
+            <div id="exploits-container-all">
+                <div class="loading pulse">Загрузка данных...</div>
+            </div>
+        </div>
+
+        <div id="tab-windows-external" class="tab-content">
+            <div id="exploits-container-windows-external">
+                <div class="loading pulse">Загрузка данных...</div>
+            </div>
+        </div>
+
+        <div id="tab-windows-internal" class="tab-content">
+            <div id="exploits-container-windows-internal">
+                <div class="loading pulse">Загрузка данных...</div>
+            </div>
+        </div>
+
+        <div id="tab-android" class="tab-content">
+            <div id="exploits-container-android">
+                <div class="loading pulse">Загрузка данных...</div>
+            </div>
+        </div>
+
+        <div id="tab-ios" class="tab-content">
+            <div id="exploits-container-ios">
+                <div class="loading pulse">Загрузка данных...</div>
+            </div>
         </div>
     </div>
 
@@ -404,6 +519,39 @@
                 "platform": "Windows",
                 "type": "wexternal",
                 "cost": "$20 Lifetime"
+            },
+            {
+                "_id": "example_android_1",
+                "title": "Arceus X",
+                "version": "3.2.1",
+                "updatedDate": "07/22/2025 at 2:15 PM UTC",
+                "uncStatus": false,
+                "free": true,
+                "detected": true,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://arceusx.com",
+                "discordlink": "https://discord.gg/arceusx",
+                "platform": "Android",
+                "type": "mobile",
+                "keysystem": true
+            },
+            {
+                "_id": "example_ios_1",
+                "title": "Delta Executor",
+                "version": "1.5.3",
+                "updatedDate": "07/21/2025 at 10:30 AM UTC",
+                "uncStatus": false,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://deltaexecutor.com",
+                "discordlink": "https://discord.gg/delta",
+                "purchaselink": "https://deltaexecutor.com/purchase",
+                "platform": "iOS",
+                "type": "mobile",
+                "cost": "$15 Lifetime"
             }
         ];
 
@@ -523,34 +671,37 @@
             return card;
         }
 
-        // Функция для отображения эксплойтов
-        function displayExploits(exploits) {
-            const container = document.getElementById('exploits-container');
+        // Функция для отображения эксплойтов в конкретной вкладке
+        function displayExploitsInTab(exploits, tabId, filter, searchTerm) {
+            const container = document.getElementById(`exploits-container-${tabId}`);
             container.innerHTML = '';
             
-            if (exploits.length === 0) {
-                container.innerHTML = '<div class="loading">Ничего не найдено</div>';
-                return;
+            // Фильтруем эксплойты по типу вкладки
+            let filteredExploits = exploits;
+            
+            if (tabId !== 'all') {
+                filteredExploits = exploits.filter(exploit => {
+                    const platform = exploit.platform;
+                    const type = exploit.type || exploit.extype;
+                    
+                    switch(tabId) {
+                        case 'windows-external':
+                            return platform === 'Windows' && type === 'wexternal';
+                        case 'windows-internal':
+                            return platform === 'Windows' && type === 'wexecutor';
+                        case 'android':
+                            return platform === 'Android';
+                        case 'ios':
+                            return platform === 'iOS';
+                        default:
+                            return true;
+                    }
+                });
             }
             
-            const grid = document.createElement('div');
-            grid.className = 'exploits-grid';
-            
-            exploits.forEach(exploit => {
-                const card = createExploitCard(exploit);
-                grid.appendChild(card);
-            });
-            
-            container.appendChild(grid);
-        }
-
-        // Функция для фильтрации эксплойтов
-        function filterExploits(exploits, filter, searchTerm) {
-            let filtered = exploits;
-            
-            // Применяем фильтр по категории
+            // Применяем дополнительные фильтры
             if (filter !== 'all') {
-                filtered = exploits.filter(exploit => {
+                filteredExploits = filteredExploits.filter(exploit => {
                     switch(filter) {
                         case 'updated':
                             return exploit.updateStatus;
@@ -569,20 +720,63 @@
             // Применяем поиск
             if (searchTerm) {
                 const term = searchTerm.toLowerCase();
-                filtered = filtered.filter(exploit => 
+                filteredExploits = filteredExploits.filter(exploit => 
                     exploit.title.toLowerCase().includes(term)
                 );
             }
             
-            return filtered;
+            if (filteredExploits.length === 0) {
+                container.innerHTML = '<div class="loading">Ничего не найдено</div>';
+                return;
+            }
+            
+            const grid = document.createElement('div');
+            grid.className = 'exploits-grid';
+            
+            filteredExploits.forEach(exploit => {
+                const card = createExploitCard(exploit);
+                grid.appendChild(card);
+            });
+            
+            container.appendChild(grid);
+        }
+
+        // Функция для отображения всех вкладок
+        function displayAllTabs(exploits, filter, searchTerm) {
+            const tabs = ['all', 'windows-external', 'windows-internal', 'android', 'ios'];
+            tabs.forEach(tab => {
+                displayExploitsInTab(exploits, tab, filter, searchTerm);
+            });
         }
 
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', async () => {
             const exploitsData = await fetchExploitsData();
-            displayExploits(exploitsData);
             
-            // Обработчики для фильтров
+            // Инициализация вкладок
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // Убираем активный класс у всех кнопок и вкладок
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Добавляем активный класс к текущей кнопке и вкладке
+                    button.classList.add('active');
+                    document.getElementById(`tab-${tabId}`).classList.add('active');
+                    
+                    // Обновляем отображение для активной вкладки
+                    const filter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+                    const searchTerm = document.querySelector('.search-input').value;
+                    displayExploitsInTab(exploitsData, tabId, filter, searchTerm);
+                });
+            });
+            
+            // Инициализация фильтров
             const filterButtons = document.querySelectorAll('.filter-btn');
             filterButtons.forEach(button => {
                 button.addEventListener('click', () => {
@@ -591,19 +785,24 @@
                     
                     const filter = button.getAttribute('data-filter');
                     const searchTerm = document.querySelector('.search-input').value;
-                    const filtered = filterExploits(exploitsData, filter, searchTerm);
-                    displayExploits(filtered);
+                    const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+                    
+                    displayExploitsInTab(exploitsData, activeTab, filter, searchTerm);
                 });
             });
             
-            // Обработчик для поиска
+            // Инициализация поиска
             const searchInput = document.querySelector('.search-input');
             searchInput.addEventListener('input', () => {
                 const filter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
                 const searchTerm = searchInput.value;
-                const filtered = filterExploits(exploitsData, filter, searchTerm);
-                displayExploits(filtered);
+                const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+                
+                displayExploitsInTab(exploitsData, activeTab, filter, searchTerm);
             });
+            
+            // Первоначальное отображение данных
+            displayAllTabs(exploitsData, 'all', '');
         });
     </script>
 </body>
