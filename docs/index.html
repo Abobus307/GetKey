@@ -682,735 +682,626 @@
             border: 1px solid #ff6b6b;
         }
 
-        .loading {
+        .status-badge {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .last-updated {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        .refresh-button {
-            background: #57F287;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
+            margin-top: 8px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
             font-weight: bold;
-            margin-left: 10px;
-            transition: all 0.3s ease;
         }
 
-        .refresh-button:hover {
-            background: #43b881;
-            transform: translateY(-2px);
-        }
-
-        .api-status {
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 0.9rem;
-        }
-
-        .api-success {
-            background: rgba(87, 242, 135, 0.1);
-            border: 1px solid #57F287;
+        .status-badge.updated {
+            background: rgba(87, 242, 135, 0.15);
             color: #57F287;
+            border: 1px solid #57F287;
         }
 
-        .api-error {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid #ff6b6b;
+        .status-badge.outdated {
+            background: rgba(255, 107, 107, 0.15);
             color: #ff6b6b;
+            border: 1px solid #ff6b6b;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>💸 CPS Network</h1>
-            <p class="subtitle">Premium Services & Community</p>
-            
-            <div class="tabs">
-                <button class="tab-button active" data-tab="premium">Premium</button>
-                <button class="tab-button" data-tab="discord">Discord Info</button>
-                <button class="tab-button" data-tab="scripts">Script List</button>
-                <button class="tab-button" data-tab="executers">Supported Executers</button>
+<div class="container">
+    <div class="header">
+        <h1>💸 CPS Network</h1>
+        <p class="subtitle">Premium Services & Community</p>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="premium">Premium</button>
+            <button class="tab-button" data-tab="discord">Discord Info</button>
+            <button class="tab-button" data-tab="scripts">Script List</button>
+            <button class="tab-button" data-tab="executers">Supported Executers</button>
+        </div>
+    </div>
+
+    <!-- PREMIUM TAB -->
+    <div class="tab-content active" id="premium-tab">
+        <div class="service">
+            <h2 class="service-title">🪓 99 NIGHTS HUB & DIAMONDS/DAYS FARM</h2>
+
+            <div class="plan">
+                <div class="plan-header">
+                    <span class="plan-name">👑 Lifetime Plan</span>
+                </div>
+                <div class="price">💲 950 Robux</div>
+            </div>
+
+            <div class="plan">
+                <div class="plan-header">
+                    <span class="plan-name">✨ Monthly Plan</span>
+                </div>
+                <div class="price">💲 550 Robux</div>
+                <div class="features">
+                    <div class="feature">💎 2 Server Boosts</div>
+                </div>
             </div>
         </div>
 
-        <div class="tab-content active" id="premium-tab">
-            <div class="service">
-                <h2 class="service-title">🪓 99 NIGHTS HUB & DIAMONDS/DAYS FARM</h2>
-                
-                <div class="plan">
-                    <div class="plan-header">
-                        <span class="plan-name">👑 Lifetime Plan</span>
-                    </div>
-                    <div class="price">💲 950 Robux</div>
+        <div class="service">
+            <h2 class="service-title">⚽ TOUCH FOOTBALL KEYLESS</h2>
+
+            <div class="plan">
+                <div class="plan-header">
+                    <span class="plan-name">👑 Lifetime Plan</span>
                 </div>
-                
-                <div class="plan">
-                    <div class="plan-header">
-                        <span class="plan-name">✨ Monthly Plan</span>
+                <div class="price">💲 1450 Robux</div>
+                <div class="price">💸 $13.99 PayPal</div>
+            </div>
+
+            <div class="plan">
+                <div class="plan-header">
+                    <span class="plan-name">✨ Monthly Plan</span>
+                </div>
+                <div class="price">💲 550 Robux</div>
+                <div class="price">💸 $4.99 PayPal</div>
+                <div class="features">
+                    <div class="feature">💎 2 Server Boosts</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-perks">
+            <h2 class="perks-title">✨ Premium Perks</h2>
+            <div class="perks-grid">
+                <div class="perk-card">
+                    <div class="perk-icon">🪓</div>
+                    <div class="perk-name">99 Nights Hub Gui</div>
+                    <div class="perk-features">
+                        <div class="perk-feature">✅ Keyless</div>
+                        <div class="perk-feature">✅ Priority Support</div>
                     </div>
-                    <div class="price">💲 550 Robux</div>
-                    <div class="features">
-                        <div class="feature">💎 2 Server Boosts</div>
+                </div>
+
+                <div class="perk-card">
+                    <div class="perk-icon">💎</div>
+                    <div class="perk-name">Diamonds & Days Farm</div>
+                    <div class="perk-features">
+                        <div class="perk-feature">✅ Keyless</div>
+                        <div class="perk-feature">✅ Priority Support</div>
+                    </div>
+                </div>
+
+                <div class="perk-card">
+                    <div class="perk-icon">⚽</div>
+                    <div class="perk-name">Touch Football</div>
+                    <div class="perk-features">
+                        <div class="perk-feature">✅ Keyless</div>
+                        <div class="perk-feature">✅ Priority Support</div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="service">
-                <h2 class="service-title">⚽ TOUCH FOOTBALL KEYLESS</h2>
-                
-                <div class="plan">
-                    <div class="plan-header">
-                        <span class="plan-name">👑 Lifetime Plan</span>
-                    </div>
-                    <div class="price">💲 1450 Robux</div>
-                    <div class="price">💸 $13.99 PayPal</div>
-                </div>
-                
-                <div class="plan">
-                    <div class="plan-header">
-                        <span class="plan-name">✨ Monthly Plan</span>
-                    </div>
-                    <div class="price">💲 550 Robux</div>
-                    <div class="price">💸 $4.99 PayPal</div>
-                    <div class="features">
-                        <div class="feature">💎 2 Server Boosts</div>
-                    </div>
-                </div>
+        <div class="notes-container">
+            <div class="note-row">
+                <div class="warning">⚠️ All robux payments are done "tax covered"!</div>
+                <div class="warning">ℹ️ No refunds.</div>
+                <div class="purchase-info">💸 Open A Ticket To Purchase In Discord Server</div>
+                <a href="https://discord.gg/uCq6dNAfRV" class="main-server-button" target="_blank">
+                    🏠 Main Server
+                </a>
+                <a href="https://discord.gg/FhK8UGTtU8" class="support-button" target="_blank">
+                    🛠️ Support Server
+                </a>
             </div>
+        </div>
+    </div>
 
-            <div class="premium-perks">
-                <h2 class="perks-title">✨ Premium Perks</h2>
-                <div class="perks-grid">
-                    <div class="perk-card">
-                        <div class="perk-icon">🪓</div>
-                        <div class="perk-name">99 Nights Hub Gui</div>
-                        <div class="perk-features">
-                            <div class="perk-feature">✅ Keyless</div>
-                            <div class="perk-feature">✅ Priority Support</div>
-                        </div>
-                    </div>
-                    
-                    <div class="perk-card">
-                        <div class="perk-icon">💎</div>
-                        <div class="perk-name">Diamonds & Days Farm</div>
-                        <div class="perk-features">
-                            <div class="perk-feature">✅ Keyless</div>
-                            <div class="perk-feature">✅ Priority Support</div>
-                        </div>
-                    </div>
-                    
-                    <div class="perk-card">
-                        <div class="perk-icon">⚽</div>
-                        <div class="perk-name">Touch Football</div>
-                        <div class="perk-features">
-                            <div class="perk-feature">✅ Keyless</div>
-                            <div class="perk-feature">✅ Priority Support</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- DISCORD TAB -->
+    <div class="tab-content" id="discord-tab">
+        <div class="discord-container">
+            <div class="discord-widget">
+                <div class="discord-icon">🎮</div>
+                <h2 class="discord-title">Join Our Discord Community</h2>
+                <p class="discord-description">
+                    Connect with our growing community of gamers, get support for our products,
+                    stay updated with the latest news, and participate in exclusive events!
+                </p>
 
-            <div class="notes-container">
-                <div class="note-row">
-                    <div class="warning">⚠️ All robux payments are done "tax covered"!</div>
-                    <div class="warning">ℹ️ No refunds.</div>
-                    <div class="purchase-info">💸 Open A Ticket To Purchase In Discord Server</div>
-                    <a href="https://discord.gg/uCq6dNAfRV" class="main-server-button" target="_blank">
-                        🏠 Main Server
+                <div class="button-group">
+                    <a href="https://discord.gg/uCq6dNAfRV" class="discord-button" target="_blank">
+                        Join Discord Server
                     </a>
-                    <a href="https://discord.gg/FhK8UGTtU8" class="support-button" target="_blank">
+                    <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
                         🛠️ Support Server
                     </a>
                 </div>
             </div>
-        </div>
 
-        <div class="tab-content" id="discord-tab">
-            <div class="discord-container">
-                <div class="discord-widget">
-                    <div class="discord-icon">🎮</div>
-                    <h2 class="discord-title">Join Our Discord Community</h2>
-                    <p class="discord-description">
-                        Connect with our growing community of gamers, get support for our products, 
-                        stay updated with the latest news, and participate in exclusive events!
-                    </p>
-                    
-                    <div class="button-group">
-                        <a href="https://discord.gg/uCq6dNAfRV" class="discord-button" target="_blank">
-                            Join Discord Server
-                        </a>
-                        <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
-                            🛠️ Support Server
-                        </a>
-                    </div>
+            <div class="discord-features">
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Active Community</h3>
+                    <p>Chat with other members and share your experiences</p>
                 </div>
-                
-                <div class="discord-features">
-                    <div class="feature-card">
-                        <div class="feature-icon">💬</div>
-                        <h3>Active Community</h3>
-                        <p>Chat with other members and share your experiences</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🛠️</div>
-                        <h3>Quick Support</h3>
-                        <p>Get help with any issues or questions you might have</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🚀</div>
-                        <h3>Latest Updates</h3>
-                        <p>Be the first to know about new features and products</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🎯</div>
-                        <h3>Exclusive Content</h3>
-                        <p>Access special channels and content for members</p>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛠️</div>
+                    <h3>Quick Support</h3>
+                    <p>Get help with any issues or questions you might have</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Latest Updates</h3>
+                    <p>Be the first to know about new features and products</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Exclusive Content</h3>
+                    <p>Access special channels and content for members</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="tab-content" id="scripts-tab">
-            <div class="scripts-container">
-                <h2 class="service-title">📜 Available Scripts</h2>
-                <p style="margin-bottom: 30px; opacity: 0.8;">Click on any script to get the direct Discord link</p>
-                
-                <div class="script-grid">
-                    <div class="script-item">
-                        <a href="https://discordapp.com/channels/1400295038285512864/1440706256263319672" class="script-button" target="_blank">
-                            <div class="script-icon">🌐</div>
-                            <div class="script-name">Universal GUI Script</div>
-                        </a>
-                    </div>
-                    
-                    <a href="https://discordapp.com/channels/1400295038285512864/1441769355393106030" class="script-button" target="_blank">
-                        <div class="script-icon">⚽</div>
-                        <div class="script-name">Touch Football Script</div>
-                    </a>
-                    
-                    <a href="https://discordapp.com/channels/1400295038285512864/1440710857154891898" class="script-button" target="_blank">
-                        <div class="script-icon">🛡️</div>
-                        <div class="script-name">PVB Script</div>
-                    </a>
-                    
-                    <div class="script-item">
-                        <a href="https://discordapp.com/channels/1400295038285512864/1440690028274782219" class="script-button" target="_blank">
-                            <div class="script-icon">🌙</div>
-                            <div class="script-name">99 Nights Farm Script</div>
-                        </a>
-                    </div>
-                    
-                    <a href="https://discordapp.com/channels/1400295038285512864/1440689938944495686" class="script-button" target="_blank">
-                        <div class="script-icon">🏈</div>
-                        <div class="script-name">TSB Script</div>
+    <!-- SCRIPTS TAB -->
+    <div class="tab-content" id="scripts-tab">
+        <div class="scripts-container">
+            <h2 class="service-title">📜 Available Scripts</h2>
+            <p style="margin-bottom: 30px; opacity: 0.8;">Click on any script to get the direct Discord link</p>
+
+            <div class="script-grid">
+                <div class="script-item">
+                    <a href="https://discordapp.com/channels/1400295038285512864/1440706256263319672" class="script-button" target="_blank">
+                        <div class="script-icon">🌐</div>
+                        <div class="script-name">Universal GUI Script</div>
                     </a>
                 </div>
 
-                <div class="script-warning">
-                    <h3>⚠️ Important Notice</h3>
-                    <p>This list is NOT automatically updated and may not include newly added scripts. 
+                <a href="https://discordapp.com/channels/1400295038285512864/1441769355393106030" class="script-button" target="_blank">
+                    <div class="script-icon">⚽</div>
+                    <div class="script-name">Touch Football Script</div>
+                </a>
+
+                <a href="https://discordapp.com/channels/1400295038285512864/1440710857154891898" class="script-button" target="_blank">
+                    <div class="script-icon">🛡️</div>
+                    <div class="script-name">PVB Script</div>
+                </a>
+
+                <div class="script-item">
+                    <a href="https://discordapp.com/channels/1400295038285512864/1440690028274782219" class="script-button" target="_blank">
+                        <div class="script-icon">🌙</div>
+                        <div class="script-name">99 Nights Farm Script</div>
+                    </a>
+                </div>
+
+                <a href="https://discordapp.com/channels/1400295038285512864/1440689938944495686" class="script-button" target="_blank">
+                    <div class="script-icon">🏈</div>
+                    <div class="script-name">TSB Script</div>
+                </a>
+            </div>
+
+            <div class="script-warning">
+                <h3>⚠️ Important Notice</h3>
+                <p>This list is NOT automatically updated and may not include newly added scripts.
                     Always check the Discord server for the most current script list and updates.</p>
-                </div>
-
-                <div class="script-support">
-                    <h3 style="margin-bottom: 15px;">🐛 Found a bug or script not working?</h3>
-                    <p style="margin-bottom: 20px; opacity: 0.8;">Open a ticket on our support server and our team will help you!</p>
-                    <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
-                        🛠️ Open Support Ticket
-                    </a>
-                </div>
             </div>
-        </div>
 
-        <div class="tab-content" id="executers-tab">
-            <div class="executers-container">
-                <h2 class="service-title">⚙️ Supported Executers</h2>
-                <p style="margin-bottom: 30px; opacity: 0.8;">
-                    Click on any executor to check its update status
-                    <button class="refresh-button" onclick="loadExploitsData()">
-                        🔄 Refresh Status
-                    </button>
-                </p>
-                
-                <div id="loading-status" style="margin-bottom: 20px;">
-                    <div class="loading"></div> Loading exploit data from WEAO API...
-                </div>
-                
-                <div id="api-status" class="api-status" style="display: none;"></div>
-                
-                <div class="platform-tabs">
-                    <button class="platform-tab active" data-platform="pc">💻 PC</button>
-                    <button class="platform-tab" data-platform="mac">🍎 Mac</button>
-                    <button class="platform-tab" data-platform="android">📱 Android</button>
-                    <button class="platform-tab" data-platform="ios">📱 iOS</button>
-                </div>
-                
-                <div class="platform-content active" id="pc-content">
-                    <h3 style="margin-bottom: 20px; color: #57F287;">PC Executers</h3>
-                    <div class="counters">
-                        <div class="counter-item updated-counter">Updated: <span id="pc-updated">0</span></div>
-                        <div class="counter-item not-updated-counter">Not Updated: <span id="pc-not-updated">0</span></div>
-                    </div>
-                    <div class="executers-grid" id="pc-executers">
-                        <!-- Динамически заполняется через JavaScript -->
-                    </div>
-                </div>
-                
-                <div class="platform-content" id="mac-content">
-                    <h3 style="margin-bottom: 20px; color: #57F287;">Mac Executers</h3>
-                    <div class="counters">
-                        <div class="counter-item updated-counter">Updated: <span id="mac-updated">0</span></div>
-                        <div class="counter-item not-updated-counter">Not Updated: <span id="mac-not-updated">0</span></div>
-                    </div>
-                    <div class="executers-grid" id="mac-executers">
-                        <!-- Динамически заполняется через JavaScript -->
-                    </div>
-                </div>
-                
-                <div class="platform-content" id="android-content">
-                    <h3 style="margin-bottom: 20px; color: #57F287;">Android Executers</h3>
-                    <div class="counters">
-                        <div class="counter-item updated-counter">Updated: <span id="android-updated">0</span></div>
-                        <div class="counter-item not-updated-counter">Not Updated: <span id="android-not-updated">0</span></div>
-                    </div>
-                    <div class="executers-grid" id="android-executers">
-                        <!-- Динамически заполняется через JavaScript -->
-                    </div>
-                </div>
-                
-                <div class="platform-content" id="ios-content">
-                    <h3 style="margin-bottom: 20px; color: #57F287;">iOS Executers</h3>
-                    <div class="counters">
-                        <div class="counter-item updated-counter">Updated: <span id="ios-updated">0</span></div>
-                        <div class="counter-item not-updated-counter">Not Updated: <span id="ios-not-updated">0</span></div>
-                    </div>
-                    <div class="executers-grid" id="ios-executers">
-                        <!-- Динамически заполняется через JavaScript -->
-                    </div>
-                </div>
-                
-                <div class="last-updated" id="last-updated">
-                    Last updated: Never
-                </div>
+            <div class="script-support">
+                <h3 style="margin-bottom: 15px;">🐛 Found a bug or script not working?</h3>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Open a ticket on our support server and our team will help you!</p>
+                <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
+                    🛠️ Open Support Ticket
+                </a>
             </div>
         </div>
     </div>
 
-    <div id="executerModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeExecuterModal()">&times;</span>
-            <h2 class="modal-title" id="executerModalTitle">Executer Info</h2>
-            <div id="executerModalContent">
+    <!-- EXECUTERS TAB -->
+    <div class="tab-content" id="executers-tab">
+        <div class="executers-container">
+            <h2 class="service-title">⚙️ Supported Executers</h2>
+            <p style="margin-bottom: 30px; opacity: 0.8;">Click on any executor to check its update status (from WEAO API)</p>
+
+            <div class="platform-tabs">
+                <button class="platform-tab active" data-platform="pc">💻 PC</button>
+                <button class="platform-tab" data-platform="mac">🍎 Mac</button>
+                <button class="platform-tab" data-platform="android">📱 Android</button>
+                <button class="platform-tab" data-platform="ios">📱 iOS</button>
             </div>
+
+            <!-- PC -->
+            <div class="platform-content active" id="pc-content">
+                <h3 style="margin-bottom: 20px; color: #57F287;">PC Executers</h3>
+                <div class="counters">
+                    <div class="counter-item updated-counter">Updated: <span id="pc-updated">0</span></div>
+                    <div class="counter-item not-updated-counter">Not Updated: <span id="pc-not-updated">0</span></div>
+                </div>
+                <div class="executers-grid">
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Volcano', false, 'Free (Key System)', 'https://volcano.wtf')">
+                        <div class="executer-icon">🌋</div>
+                        <div class="executer-name">Volcano</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">volcano.wtf</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Velocity', false, 'Free', 'https://getvelocity.lol')">
+                        <div class="executer-icon">⚡</div>
+                        <div class="executer-name">Velocity</div>
+                        <div class="executer-price">Free</div>
+                        <div class="executer-website">getvelocity.lol</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Zenith', false, 'Paid - $6.49 Weekly', 'https://zenith.win')">
+                        <div class="executer-icon">🌟</div>
+                        <div class="executer-name">Zenith</div>
+                        <div class="executer-price">Paid - $6.49 Weekly</div>
+                        <div class="executer-website">zenith.win</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Wave', false, 'Paid - $7.49 Weekly', 'https://getwave.gg')">
+                        <div class="executer-icon">🌊</div>
+                        <div class="executer-name">Wave</div>
+                        <div class="executer-price">Paid - $7.49 Weekly</div>
+                        <div class="executer-website">getwave.gg</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Volt', false, 'Paid - $8 Weekly', 'https://volt.bz')">
+                        <div class="executer-icon">🔌</div>
+                        <div class="executer-name">Volt</div>
+                        <div class="executer-price">Paid - $8 Weekly</div>
+                        <div class="executer-website">volt.bz</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Seliware', false, 'Paid - $9.99 Monthly', 'https://seliware.com')">
+                        <div class="executer-icon">🛡️</div>
+                        <div class="executer-name">Seliware</div>
+                        <div class="executer-price">Paid - $9.99 Monthly</div>
+                        <div class="executer-website">seliware.com</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Swift', false, 'Free (Key System)', 'https://getswift.vip')">
+                        <div class="executer-icon">💨</div>
+                        <div class="executer-name">Swift</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">getswift.vip</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Valex', false, 'Free (Key System)', 'https://valex.io')">
+                        <div class="executer-icon">🔮</div>
+                        <div class="executer-name">Valex</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">valex.io</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Potassium', false, 'Paid - $20 Lifetime', 'https://potassium.pro')">
+                        <div class="executer-icon">🥔</div>
+                        <div class="executer-name">Potassium</div>
+                        <div class="executer-price">Paid - $20 Lifetime</div>
+                        <div class="executer-website">potassium.pro</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Bunni.lol', false, 'Free (Key System)', 'https://realbunni.com')">
+                        <div class="executer-icon">🐰</div>
+                        <div class="executer-name">Bunni.lol</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">realbunni.com</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Sirhurt', false, 'Paid - $2.80 Weekly', 'https://sirhurt.net')">
+                        <div class="executer-icon">👑</div>
+                        <div class="executer-name">Sirhurt</div>
+                        <div class="executer-price">Paid - $2.80 Weekly</div>
+                        <div class="executer-website">sirhurt.net</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAC -->
+            <div class="platform-content" id="mac-content">
+                <h3 style="margin-bottom: 20px; color: #57F287;">Mac Executers</h3>
+                <div class="counters">
+                    <div class="counter-item updated-counter">Updated: <span id="mac-updated">0</span></div>
+                    <div class="counter-item not-updated-counter">Not Updated: <span id="mac-not-updated">0</span></div>
+                </div>
+                <div class="executers-grid">
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Hydrogen', false, 'Free (Key System)', 'https://hydrogen.lat')">
+                        <div class="executer-icon">💧</div>
+                        <div class="executer-name">Hydrogen</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">hydrogen.lat</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Macsploit', false, 'Paid - $8 Lifetime', 'https://abyssdigital.xyz')">
+                        <div class="executer-icon">🍎</div>
+                        <div class="executer-name">Macsploit</div>
+                        <div class="executer-price">Paid - $8 Lifetime</div>
+                        <div class="executer-website">abyssdigital.xyz</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANDROID -->
+            <div class="platform-content" id="android-content">
+                <h3 style="margin-bottom: 20px; color: #57F287;">Android Executers</h3>
+                <div class="counters">
+                    <div class="counter-item updated-counter">Updated: <span id="android-updated">0</span></div>
+                    <div class="counter-item not-updated-counter">Not Updated: <span id="android-not-updated">0</span></div>
+                </div>
+                <div class="executers-grid">
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Codex', false, 'Free (Key System)', 'https://codex.lol')">
+                        <div class="executer-icon">📜</div>
+                        <div class="executer-name">Codex</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">codex.lol</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Cryptic', false, 'Free (Key System)', 'https://getcryptic.net')">
+                        <div class="executer-icon">🔐</div>
+                        <div class="executer-name">Cryptic</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">getcryptic.net</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Delta', false, 'Free (Key System)', 'https://deltaexploits.gg')">
+                        <div class="executer-icon">Δ</div>
+                        <div class="executer-name">Delta</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">deltaexploits.gg</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IOS -->
+            <div class="platform-content" id="ios-content">
+                <h3 style="margin-bottom: 20px; color: #57F287;">iOS Executers</h3>
+                <div class="counters">
+                    <div class="counter-item updated-counter">Updated: <span id="ios-updated">0</span></div>
+                    <div class="counter-item not-updated-counter">Not Updated: <span id="ios-not-updated">0</span></div>
+                </div>
+                <div class="executers-grid">
+                    <div class="executer-card" data-updated="false" onclick="showExecuterInfo('Delta', false, 'Free (Key System)', 'https://deltaexploits.gg')">
+                        <div class="executer-icon">Δ</div>
+                        <div class="executer-name">Delta</div>
+                        <div class="executer-price">Free (Key System)</div>
+                        <div class="executer-website">deltaexploits.gg</div>
+                        <div class="status-badge outdated">Unknown</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+</div>
 
-    <script>
-        // Конфигурация API
-        const WEAO_API_URL = 'https://weao.xyz/api/status/exploits';
-        
-        // Кэш данных
-        let exploitsCache = null;
-        let lastUpdateTime = null;
+<!-- MODAL -->
+<div id="executerModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeExecuterModal()">&times;</span>
+        <h2 class="modal-title" id="executerModalTitle">Executer Info</h2>
+        <div id="executerModalContent"></div>
+    </div>
+</div>
 
-        // Маппинг иконок для исполнителей
-        const iconMapping = {
-            'potassium': '🥔',
-            'matcha': '🍵',
-            'xeno': '👽',
-            'bunni': '🐰',
-            'photon': '⚡',
-            'synapse': '🧠',
-            'hydrogen': '💧',
-            'macsploit': '🍎',
-            'codex': '📜',
-            'cryptic': '🔐',
-            'delta': 'Δ',
-            'volcano': '🌋',
-            'velocity': '⚡',
-            'zenith': '🌟',
-            'wave': '🌊',
-            'volt': '🔌',
-            'seliware': '🛡️',
-            'swift': '💨',
-            'valex': '🔮',
-            'sirhurt': '👑',
-            'electron': '⚛️',
-            'scriptware': '📃',
-            'krnl': '🔑',
-            'oxygen': '💨',
-            'fluxus': '🌀',
-            'comet': '☄️'
-        };
+<script>
+    // Переключение главных табов
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-        // Функция для получения иконки по названию
-        function getIconForExploit(title) {
-            if (!title) return '⚙️';
-            
-            const lowerTitle = title.toLowerCase();
-            for (const [key, icon] of Object.entries(iconMapping)) {
-                if (lowerTitle.includes(key)) {
-                    return icon;
-                }
+            button.classList.add('active');
+            const tabId = button.getAttribute('data-tab') + '-tab';
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // Переключение платформ
+    document.querySelectorAll('.platform-tab').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.platform-content').forEach(content => content.classList.remove('active'));
+
+            button.classList.add('active');
+
+            const platformId = button.getAttribute('data-platform') + '-content';
+            document.getElementById(platformId).classList.add('active');
+
+            updateCounters(platformId);
+        });
+    });
+
+    // Окно с инфой
+    function showExecuterInfo(executerName, isUpdated, price, website) {
+        // Проверяем актуальный статус по data-updated
+        const cards = document.querySelectorAll('.executer-card');
+        let realUpdated = isUpdated;
+        cards.forEach(card => {
+            const nameEl = card.querySelector('.executer-name');
+            if (nameEl && nameEl.textContent.trim() === executerName) {
+                const attr = card.getAttribute('data-updated');
+                if (attr === 'true') realUpdated = true;
+                if (attr === 'false') realUpdated = false;
             }
-            return '⚙️'; // Иконка по умолчанию
+        });
+
+        const modal = document.getElementById('executerModal');
+        const modalTitle = document.getElementById('executerModalTitle');
+        const modalContent = document.getElementById('executerModalContent');
+
+        modalTitle.textContent = `${executerName} Info`;
+
+        const statusClass = realUpdated ? 'status-updated' : 'status-outdated';
+        const statusText = realUpdated ? '🟢 UPDATED (From WEAO)' : '🔴 NOT UPDATED (From WEAO)';
+
+        modalContent.innerHTML = `
+            <div class="update-status ${statusClass}">
+                ${statusText}
+            </div>
+
+            <div class="executer-details">
+                <div class="detail-row">
+                    <span class="detail-label">Price:</span>
+                    <span class="detail-value">${price}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value">${realUpdated ? 'Working with current Roblox' : 'May not work with current Roblox'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Website:</span>
+                    <span class="detail-value">${website.replace('https://', '')}</span>
+                </div>
+            </div>
+
+            <a href="${website}" class="website-link" target="_blank">Visit Website</a>
+
+            <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
+                Status data is fetched from WEAO API and may change over time.
+            </p>
+        `;
+
+        modal.style.display = 'block';
+    }
+
+    function closeExecuterModal() {
+        document.getElementById('executerModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('executerModal');
+        if (event.target === modal) {
+            closeExecuterModal();
         }
+    }
 
-        // Функция для получения данных с API через CORS прокси
-        async function fetchExploitsData() {
-            const CORS_PROXIES = [
-                'https://api.allorigins.win/raw?url=',
-                'https://corsproxy.io/?',
-                'https://cors-anywhere.herokuapp.com/'
-            ];
+    // Счётчики updated / not-updated на каждой платформе
+    function updateCounters(platformId) {
+        const platformContent = document.getElementById(platformId);
+        const executerCards = platformContent.querySelectorAll('.executer-card');
 
-            const targetUrl = 'https://weao.xyz/api/status/exploits';
+        let updatedCount = 0;
+        let notUpdatedCount = 0;
 
-            for (const proxy of CORS_PROXIES) {
-                try {
-                    const proxyUrl = proxy + encodeURIComponent(targetUrl);
-                    console.log('Trying proxy:', proxy);
-                    
-                    const response = await fetch(proxyUrl, {
-                        method: 'GET',
-                        headers: {
-                            'User-Agent': 'WEAO-3PService',
-                            'Accept': 'application/json'
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Success with proxy:', proxy);
-                        return data;
-                    }
-                } catch (error) {
-                    console.warn(`Proxy ${proxy} failed:`, error.message);
-                    continue;
-                }
+        executerCards.forEach(card => {
+            if (card.getAttribute('data-updated') === 'true') {
+                updatedCount++;
+            } else {
+                notUpdatedCount++;
             }
-            
-            // Fallback на статические данные
-            console.log('All proxies failed, using fallback data');
-            return getFallbackData();
-        }
+        });
 
-        // Fallback данные на случай недоступности API
-        function getFallbackData() {
-            return [
-                {
-                    "title": "Codex",
-                    "version": "Latest",
-                    "updatedDate": new Date().toLocaleDateString(),
-                    "free": true,
-                    "detected": false,
-                    "updateStatus": true,
-                    "websitelink": "https://codex.lol",
-                    "platform": "Android",
-                    "cost": "Free",
-                    "keysystem": true
-                },
-                {
-                    "title": "Delta",
-                    "version": "Latest",
-                    "updatedDate": new Date().toLocaleDateString(),
-                    "free": true,
-                    "detected": false,
-                    "updateStatus": true,
-                    "websitelink": "https://deltaexploits.gg",
-                    "platform": "iOS",
-                    "cost": "Free",
-                    "keysystem": true
-                },
-                {
-                    "title": "Hydrogen",
-                    "version": "Latest",
-                    "updatedDate": new Date().toLocaleDateString(),
-                    "free": true,
-                    "detected": false,
-                    "updateStatus": true,
-                    "websitelink": "https://hydrogen.lat",
-                    "platform": "Mac",
-                    "cost": "Free (Key System)",
-                    "keysystem": true
-                },
-                {
-                    "title": "Potassium",
-                    "version": "Latest",
-                    "updatedDate": new Date().toLocaleDateString(),
-                    "free": false,
-                    "detected": false,
-                    "updateStatus": true,
-                    "websitelink": "https://potassium.pro",
-                    "platform": "Windows",
-                    "cost": "$20 Lifetime"
-                }
-            ];
-        }
+        const platform = platformId.split('-')[0];
+        document.getElementById(`${platform}-updated`).textContent = updatedCount;
+        document.getElementById(`${platform}-not-updated`).textContent = notUpdatedCount;
+    }
 
-        // Функция для загрузки и отображения данных
-        async function loadExploitsData() {
-            const loadingElement = document.getElementById('loading-status');
-            const lastUpdatedElement = document.getElementById('last-updated');
-            const apiStatusElement = document.getElementById('api-status');
-            
-            try {
-                loadingElement.innerHTML = '<div class="loading"></div> Loading exploit data from WEAO API...';
-                loadingElement.style.display = 'block';
-                apiStatusElement.style.display = 'none';
-                
-                const data = await fetchExploitsData();
-                exploitsCache = data;
-                lastUpdateTime = new Date();
-                
-                // Обновляем время последнего обновления
-                lastUpdatedElement.textContent = `Last updated: ${lastUpdateTime.toLocaleTimeString()}`;
-                
-                // Обновляем интерфейс
-                updateExecutersUI(data);
-                
-                loadingElement.innerHTML = '✅ Data loaded successfully!';
-                apiStatusElement.className = 'api-status api-success';
-                apiStatusElement.innerHTML = '✅ Successfully loaded data from WEAO API';
-                apiStatusElement.style.display = 'block';
-                
-                setTimeout(() => {
-                    loadingElement.style.display = 'none';
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Failed to load exploits data:', error);
-                loadingElement.innerHTML = '❌ Failed to load data. Using cached data.';
-                apiStatusElement.className = 'api-status api-error';
-                apiStatusElement.innerHTML = '❌ Failed to fetch from WEAO API. Using fallback data.';
-                apiStatusElement.style.display = 'block';
-                
-                // Если есть кэшированные данные, используем их
-                if (exploitsCache) {
-                    updateExecutersUI(exploitsCache);
-                }
+    // === WEAO INTEGRATION ===
+
+    // Маппинг названий на сайте -> названия в WEAO (display или id)
+    const EXECUTOR_MAP = {
+        "Volcano": "Volcano",
+        "Velocity": "Velocity",
+        "Zenith": "Zenith",
+        "Wave": "Wave",
+        "Volt": "Volt",
+        "Seliware": "Seliware",
+        "Swift": "Swift",
+        "Valex": "Valex",
+        "Potassium": "Potassium",
+        "Bunni.lol": "Bunni.lol",
+        "Sirhurt": "Sirhurt",
+        "Hydrogen": "Hydrogen",
+        "Macsploit": "Macsploit",
+        "Codex": "Codex",
+        "Cryptic": "Cryptic",
+        "Delta": "Delta"
+    };
+
+    async function fetchWeaoStatus() {
+        try {
+            // В идеале через backend-прокси с User-Agent: WEAO-3PService.
+            const resp = await fetch('https://weao.xyz/api/status/exploits');
+            if (!resp.ok) {
+                console.warn('WEAO API error:', resp.status);
+                return null;
             }
+            return await resp.json();
+        } catch (e) {
+            console.error('Failed to fetch WEAO status', e);
+            return null;
         }
+    }
 
-        // Функция для обновления интерфейса с данными
-        function updateExecutersUI(exploits) {
-            // Группируем эксплойты по платформам
-            const platforms = {
-                'pc': { element: 'pc-executers', updated: 0, notUpdated: 0 },
-                'mac': { element: 'mac-executers', updated: 0, notUpdated: 0 },
-                'android': { element: 'android-executers', updated: 0, notUpdated: 0 },
-                'ios': { element: 'ios-executers', updated: 0, notUpdated: 0 }
-            };
+    function applyWeaoStatusToCards(weaoData) {
+        if (!Array.isArray(weaoData)) return;
 
-            // Очищаем контейнеры
-            Object.values(platforms).forEach(platform => {
-                const element = document.getElementById(platform.element);
-                if (element) element.innerHTML = '';
-            });
+        const statusByName = {};
+        weaoData.forEach(ex => {
+            const name = ex.display || ex.id;
+            statusByName[name] = !!ex.updateStatus;
+        });
 
-            // Обрабатываем каждый эксплойт
-            exploits.forEach(exploit => {
-                const platform = getPlatform(exploit.platform);
-                if (!platform || !platforms[platform]) return;
+        document.querySelectorAll('.executer-card').forEach(card => {
+            const nameEl = card.querySelector('.executer-name');
+            const badge = card.querySelector('.status-badge');
+            if (!nameEl || !badge) return;
 
-                const platformData = platforms[platform];
-                const container = document.getElementById(platformData.element);
-                
-                if (!container) return;
+            const localName = nameEl.textContent.trim();
+            const weaoName = EXECUTOR_MAP[localName];
+            if (!weaoName) return;
 
-                // Создаем карточку эксплойта
-                const card = createExecuterCard(exploit);
-                container.appendChild(card);
-
-                // Обновляем счетчики
-                if (exploit.updateStatus) {
-                    platformData.updated++;
+            const isUpdatedFromWeao = statusByName[weaoName];
+            if (typeof isUpdatedFromWeao === 'boolean') {
+                card.setAttribute('data-updated', isUpdatedFromWeao ? 'true' : 'false');
+                if (isUpdatedFromWeao) {
+                    badge.textContent = 'Updated';
+                    badge.classList.remove('outdated');
+                    badge.classList.add('updated');
                 } else {
-                    platformData.notUpdated++;
+                    badge.textContent = 'Not Updated';
+                    badge.classList.remove('updated');
+                    badge.classList.add('outdated');
                 }
-            });
-
-            // Обновляем счетчики для каждой платформы
-            Object.entries(platforms).forEach(([platform, data]) => {
-                const updatedElement = document.getElementById(`${platform}-updated`);
-                const notUpdatedElement = document.getElementById(`${platform}-not-updated`);
-                
-                if (updatedElement) updatedElement.textContent = data.updated;
-                if (notUpdatedElement) notUpdatedElement.textContent = data.notUpdated;
-            });
-        }
-
-        // Функция для определения платформы
-        function getPlatform(platformName) {
-            if (!platformName) return null;
-            
-            const platformMap = {
-                'Windows': 'pc',
-                'Mac': 'mac', 
-                'Android': 'android',
-                'iOS': 'ios'
-            };
-            return platformMap[platformName] || null;
-        }
-
-        // Функция для создания карточки эксплойта
-        function createExecuterCard(exploit) {
-            const card = document.createElement('div');
-            card.className = 'executer-card';
-            card.setAttribute('data-updated', exploit.updateStatus);
-            card.onclick = () => showExecuterInfo(exploit);
-
-            const icon = getIconForExploit(exploit.title);
-            const price = exploit.free ? 
-                (exploit.keysystem ? 'Free (Key System)' : 'Free') : 
-                (exploit.cost || 'Paid');
-            
-            const website = exploit.websitelink ? 
-                exploit.websitelink.replace('https://', '').replace('http://', '') : 
-                'No website';
-
-            card.innerHTML = `
-                <div class="executer-icon">${icon}</div>
-                <div class="executer-name">${exploit.title || 'Unknown'}</div>
-                <div class="executer-price">${price}</div>
-                <div class="executer-website">${website}</div>
-            `;
-
-            return card;
-        }
-
-        // Функция для показа информации об эксплойте
-        function showExecuterInfo(exploit) {
-            const modal = document.getElementById('executerModal');
-            const modalTitle = document.getElementById('executerModalTitle');
-            const modalContent = document.getElementById('executerModalContent');
-            
-            modalTitle.textContent = `${exploit.title} Info`;
-            
-            const statusClass = exploit.updateStatus ? 'status-updated' : 'status-outdated';
-            const statusText = exploit.updateStatus ? '🟢 UPDATED' : '🔴 NOT UPDATED';
-            
-            const price = exploit.free ? 
-                (exploit.keysystem ? 'Free (Key System)' : 'Free') : 
-                (exploit.cost || 'Paid');
-            
-            const website = exploit.websitelink || 'No website available';
-
-            modalContent.innerHTML = `
-                <div class="update-status ${statusClass}">
-                    ${statusText}
-                </div>
-                
-                <div class="executer-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Version:</span>
-                        <span class="detail-value">${exploit.version || 'Unknown'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Price:</span>
-                        <span class="detail-value">${price}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Platform:</span>
-                        <span class="detail-value">${exploit.platform || 'Unknown'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Status:</span>
-                        <span class="detail-value">${exploit.updateStatus ? 
-                            'Working with current Roblox' : 
-                            'May not work with current Roblox'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Detected:</span>
-                        <span class="detail-value">${exploit.detected ? 'Yes' : 'No'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Last Updated:</span>
-                        <span class="detail-value">${exploit.updatedDate || 'Unknown'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Website:</span>
-                        <span class="detail-value">${website.replace('https://', '').replace('http://', '')}</span>
-                    </div>
-                </div>
-                
-                ${website !== 'No website available' ? 
-                    `<a href="${website}" class="website-link" target="_blank">Visit Website</a>` : 
-                    ''}
-                
-                <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
-                    ${exploit.updateStatus ? 
-                        'This executor is currently updated and should work with the latest Roblox version.' : 
-                        'This executor is not updated and may not work with the current Roblox version.'}
-                </p>
-            `;
-            
-            modal.style.display = 'block';
-        }
-
-        // Остальные функции для управления интерфейсом
-        function closeExecuterModal() {
-            document.getElementById('executerModal').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('executerModal');
-            if (event.target === modal) {
-                closeExecuterModal();
             }
+        });
+
+        // пересчёт всех платформ
+        updateCounters('pc-content');
+        updateCounters('mac-content');
+        updateCounters('android-content');
+        updateCounters('ios-content');
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        // начальный подсчёт (из дефолтных data-updated)
+        updateCounters('pc-content');
+        updateCounters('mac-content');
+        updateCounters('android-content');
+        updateCounters('ios-content');
+
+        // подтягиваем данные из WEAO и обновляем
+        const weaoData = await fetchWeaoStatus();
+        if (weaoData) {
+            applyWeaoStatusToCards(weaoData);
         }
-
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                
-                button.classList.add('active');
-                
-                const tabId = button.getAttribute('data-tab') + '-tab';
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-
-        document.querySelectorAll('.platform-tab').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.platform-content').forEach(content => content.classList.remove('active'));
-                
-                button.classList.add('active');
-                
-                const platformId = button.getAttribute('data-platform') + '-content';
-                document.getElementById(platformId).classList.add('active');
-            });
-        });
-
-        // Автоматически загружаем данные при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            loadExploitsData();
-            
-            // Обновляем каждые 5 минут
-            setInterval(loadExploitsData, 5 * 60 * 1000);
-        });
-    </script>
+    });
+</script>
 </body>
 </html>
