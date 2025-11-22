@@ -1,0 +1,15 @@
+{
+  "name": "neon-ip-backend",
+  "version": "1.0.0",
+  "description": "Backend для Neon IP Status — ping и port scan endpoints",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.12",
+    "ping": "^0.4.0",
+    "cors": "^2.8.5"
+  }
+}
