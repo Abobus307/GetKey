@@ -407,12 +407,16 @@
             }
         ];
 
-        // Функция для получения данных с API
+        // Функция для получения данных с API через прокси
         async function fetchExploitsData() {
             try {
-                const response = await fetch('https://weao.xyz/api/status/exploits', {
+                // Используем прокси-сервер для обхода CORS
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('http://farts.fadedis.xyz:25505/api/status/exploits');
+                
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
                     headers: {
-                        'User-Agent': 'WEAO-3PService'
+                        'Accept': 'application/json',
                     }
                 });
                 
@@ -422,7 +426,20 @@
                 
                 return await response.json();
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('Ошибка при загрузке данных с прокси:', error);
+                
+                // Попробуем альтернативный прокси
+                try {
+                    const altProxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('http://farts.fadedis.xyz:25505/api/status/exploits');
+                    const altResponse = await fetch(altProxyUrl);
+                    
+                    if (altResponse.ok) {
+                        return await altResponse.json();
+                    }
+                } catch (altError) {
+                    console.error('Ошибка при загрузке данных с альтернативного прокси:', altError);
+                }
+                
                 // В случае ошибки используем демо-данные
                 return demoData;
             }
@@ -471,7 +488,7 @@
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Тип:</span>
-                        <span>${exploit.type || 'Не указан'}</span>
+                        <span>${exploit.type || exploit.extype || 'Не указан'}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Статус:</span>
@@ -487,6 +504,12 @@
                     <div class="detail-item">
                         <span class="detail-label">UNC:</span>
                         <span>${exploit.uncPercentage}%</span>
+                    </div>
+                    ` : ''}
+                    ${exploit.suncPercentage ? `
+                    <div class="detail-item">
+                        <span class="detail-label">sUNC:</span>
+                        <span>${exploit.suncPercentage}%</span>
                     </div>
                     ` : ''}
                 </div>
