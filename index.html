@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WEAO Exploit Status Monitor</title>
     <style>
+        /* Стили остаются такими же как в предыдущем коде */
         :root {
             --primary: #6c5ce7;
             --secondary: #a29bfe;
@@ -316,6 +317,16 @@
             margin: 20px 0;
         }
 
+        .demo-notice {
+            text-align: center;
+            color: var(--warning);
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(253, 203, 110, 0.1);
+            border-radius: 10px;
+            animation: pulse 2s infinite;
+        }
+
         footer {
             text-align: center;
             padding: 40px 0 20px;
@@ -355,6 +366,12 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
 
         @media (max-width: 768px) {
@@ -433,6 +450,10 @@
             <p>Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.</p>
         </div>
 
+        <div id="demoNotice" class="demo-notice" style="display: none;">
+            <strong>Внимание:</strong> Показаны демо-данные. Реальные данные недоступны из-за ограничений CORS.
+        </div>
+
         <div class="exploits-grid" id="exploitsGrid">
             <!-- Карточки эксплойтов будут здесь -->
         </div>
@@ -449,12 +470,14 @@
             const toggleViewBtn = document.getElementById('toggleViewBtn');
             const loader = document.getElementById('loader');
             const errorMessage = document.getElementById('errorMessage');
+            const demoNotice = document.getElementById('demoNotice');
             const platformFilter = document.getElementById('platformFilter');
             const statusFilter = document.getElementById('statusFilter');
             const sortSelect = document.getElementById('sortSelect');
 
             let exploitsData = [];
             let isGridView = true;
+            let isDemoData = false;
 
             // Загрузка данных при загрузке страницы
             loadExploitsData();
@@ -466,41 +489,78 @@
             statusFilter.addEventListener('change', filterExploits);
             sortSelect.addEventListener('change', sortExploits);
 
-            // Функция загрузки данных через CORS прокси
+            // Функция загрузки данных через различные прокси
             async function loadExploitsData() {
                 showLoader();
                 hideError();
+                hideDemoNotice();
 
-                try {
-                    // Используем CORS прокси для обхода ограничений
-                    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                    const targetUrl = encodeURIComponent('https://weao.xyz/api/status/exploits');
-                    
-                    const response = await fetch(proxyUrl + targetUrl, {
-                        headers: {
-                            'User-Agent': 'WEAO-3PService',
-                            'Accept': 'application/json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Ошибка сети: ' + response.status);
+                // Список прокси сервисов для перебора
+                const proxyServices = [
+                    {
+                        name: 'cors-anywhere',
+                        url: 'https://cors-anywhere.herokuapp.com/'
+                    },
+                    {
+                        name: 'allorigins',
+                        url: 'https://api.allorigins.win/raw?url='
+                    },
+                    {
+                        name: 'corsproxy',
+                        url: 'https://corsproxy.io/?'
                     }
+                ];
 
-                    exploitsData = await response.json();
-                    displayExploits(exploitsData);
-                } catch (error) {
-                    console.error('Ошибка при загрузке данных:', error);
-                    showError();
-                    
-                    // Показываем демо-данные при ошибке
-                    showDemoData();
-                } finally {
-                    hideLoader();
+                const targetUrl = 'https://weao.xyz/api/status/exploits';
+                
+                for (let proxy of proxyServices) {
+                    try {
+                        console.log(`Пробуем прокси: ${proxy.name}`);
+                        
+                        const proxyUrl = proxy.url + encodeURIComponent(targetUrl);
+                        const response = await fetch(proxyUrl, {
+                            method: 'GET',
+                            headers: {
+                                'User-Agent': 'WEAO-3PService',
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            console.log(`Прокси ${proxy.name} вернул статус: ${response.status}`);
+                            continue;
+                        }
+
+                        const text = await response.text();
+                        
+                        // Проверяем, что ответ - валидный JSON
+                        if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
+                            const data = JSON.parse(text);
+                            
+                            if (Array.isArray(data) && data.length > 0) {
+                                exploitsData = data;
+                                isDemoData = false;
+                                displayExploits(exploitsData);
+                                hideLoader();
+                                console.log(`Успешно загружено через ${proxy.name}`);
+                                return;
+                            }
+                        } else {
+                            console.log(`Прокси ${proxy.name} вернул не JSON:`, text.substring(0, 100));
+                        }
+                    } catch (error) {
+                        console.log(`Ошибка с прокси ${proxy.name}:`, error.message);
+                        continue;
+                    }
                 }
+
+                // Если все прокси не сработали, используем демо-данные
+                console.log('Все прокси не сработали, используем демо-данные');
+                showDemoData();
             }
 
-            // Демо-данные на случай ошибки
+            // Демо-данные
             function showDemoData() {
                 const demoData = [
                     {
@@ -556,17 +616,50 @@
                         "multiInject": true,
                         "suncPercentage": 41,
                         "uncPercentage": 81
+                    },
+                    {
+                        "_id": "68084641b50548f01fd62713",
+                        "title": "Bunni.lol",
+                        "version": "2.2.2",
+                        "updatedDate": "07/24/2025 at 9:19 PM UTC",
+                        "uncStatus": true,
+                        "free": true,
+                        "detected": true,
+                        "rbxversion": "version-2a06298afe3947ab",
+                        "updateStatus": true,
+                        "websitelink": "https://realbunni.com/",
+                        "discordlink": "https://discord.gg/9DPW2G22cF",
+                        "platform": "Windows",
+                        "purchaselink": "https://robloxcheatz.com/affiliate/weao",
+                        "decompiler": true,
+                        "multiInject": true,
+                        "suncPercentage": 100,
+                        "uncPercentage": 99,
+                        "keysystem": true
+                    },
+                    {
+                        "_id": "680ab721b50548f01fd62715",
+                        "title": "Photon",
+                        "version": "5.2",
+                        "updatedDate": "07/23/2025 at 11:51 PM UTC",
+                        "uncStatus": false,
+                        "free": false,
+                        "detected": false,
+                        "rbxversion": "version-2a06298afe3947ab",
+                        "updateStatus": true,
+                        "websitelink": "https://photonsys.sellpass.io/",
+                        "discordlink": "https://discord.gg/vro",
+                        "purchaselink": "https://photonsys.sellpass.io/products/Photon-Lifetime",
+                        "platform": "Windows",
+                        "cost": "$20 Lifetime"
                     }
                 ];
                 
                 exploitsData = demoData;
+                isDemoData = true;
                 displayExploits(demoData);
-                
-                // Показываем сообщение, что это демо-данные
-                const demoNotice = document.createElement('div');
-                demoNotice.style.cssText = 'text-align: center; color: var(--warning); margin: 20px 0; padding: 15px; background: rgba(253, 203, 110, 0.1); border-radius: 10px;';
-                demoNotice.innerHTML = '<strong>Внимание:</strong> Показаны демо-данные. Реальные данные недоступны из-за ограничений CORS.';
-                exploitsGrid.parentNode.insertBefore(demoNotice, exploitsGrid);
+                showDemoNotice();
+                hideLoader();
             }
 
             // Функция отображения эксплойтов
@@ -672,12 +765,10 @@
             function toggleView() {
                 isGridView = !isGridView;
                 if (isGridView) {
-                    exploitsGrid.classList.remove('list-view');
-                    exploitsGrid.classList.add('grid-view');
+                    exploitsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(350px, 1fr))';
                     toggleViewBtn.textContent = 'Переключить на список';
                 } else {
-                    exploitsGrid.classList.remove('grid-view');
-                    exploitsGrid.classList.add('list-view');
+                    exploitsGrid.style.gridTemplateColumns = '1fr';
                     toggleViewBtn.textContent = 'Переключить на сетку';
                 }
             }
@@ -747,6 +838,14 @@
 
             function hideError() {
                 errorMessage.style.display = 'none';
+            }
+
+            function showDemoNotice() {
+                demoNotice.style.display = 'block';
+            }
+
+            function hideDemoNotice() {
+                demoNotice.style.display = 'none';
             }
         });
     </script>
