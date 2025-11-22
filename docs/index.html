@@ -1235,19 +1235,19 @@
     };
 
     async function fetchWeaoStatus() {
-        try {
-            // В идеале через backend-прокси с User-Agent: WEAO-3PService.
-            const resp = await fetch('http://localhost:3000/api/status/exploits');
-            if (!resp.ok) {
-                console.warn('WEAO API error:', resp.status);
-                return null;
-            }
-            return await resp.json();
-        } catch (e) {
-            console.error('Failed to fetch WEAO status', e);
+    try {
+        const resp = await fetch('http://localhost:3000/api/status/exploits');
+        if (!resp.ok) {
+            console.warn('WEAO API error:', resp.status);
             return null;
         }
+        return await resp.json();
+    } catch (e) {
+        console.error('Failed to fetch WEAO status', e);
+        return null;
     }
+}
+
 
     function applyWeaoStatusToCards(weaoData) {
         if (!Array.isArray(weaoData)) return;
