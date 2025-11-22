@@ -215,7 +215,7 @@
             background: var(--danger);
         }
 
-        .status-outdated {
+        .status-not-updated {
             background: var(--warning);
             color: var(--dark);
         }
@@ -472,7 +472,7 @@
                 "free": true,
                 "detected": true,
                 "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": true,
+                "updateStatus": false,
                 "websitelink": "https://www.xeno.onl/",
                 "discordlink": "https://discord.gg/xe-no",
                 "platform": "Windows",
@@ -512,7 +512,7 @@
                 "free": false,
                 "detected": false,
                 "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": true,
+                "updateStatus": false,
                 "websitelink": "https://photonsys.sellpass.io/",
                 "discordlink": "https://discord.gg/vro",
                 "purchaselink": "https://photonsys.sellpass.io/products/Photon-Lifetime",
@@ -545,7 +545,7 @@
                 "free": false,
                 "detected": false,
                 "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": true,
+                "updateStatus": false,
                 "websitelink": "https://deltaexecutor.com",
                 "discordlink": "https://discord.gg/delta",
                 "purchaselink": "https://deltaexecutor.com/purchase",
@@ -597,7 +597,7 @@
         function createExploitCard(exploit) {
             const card = document.createElement('div');
             card.className = 'exploit-card';
-            card.setAttribute('data-status', exploit.updateStatus ? 'updated' : 'outdated');
+            card.setAttribute('data-status', exploit.updateStatus ? 'updated' : 'not-updated');
             card.setAttribute('data-detected', exploit.detected ? 'detected' : 'undetected');
             card.setAttribute('data-free', exploit.free ? 'free' : 'paid');
             
@@ -607,10 +607,11 @@
                 statusClass = 'status-updated';
                 statusText = 'Обновлен';
             } else {
-                statusClass = 'status-outdated';
-                statusText = 'Устарел';
+                statusClass = 'status-not-updated';
+                statusText = 'Не обновлен'; // Изменено с "Устарел" на "Не обновлен"
             }
             
+            // Если эксплойт обнаружен, показываем это как главный статус
             if (exploit.detected) {
                 statusClass = 'status-detected';
                 statusText = 'Обнаружен';
