@@ -8,9 +8,9 @@
         :root {
             --primary: #6c5ce7;
             --secondary: #a29bfe;
-            --success: #00b894;
-            --danger: #d63031;
-            --warning: #fdcb6e;
+            --undetected: #6c5ce7; /* Фиолетовый для Undetected */
+            --detected: #fdcb6e; /* Желтый для Detected */
+            --not-updated: #d63031; /* Красный для Не обновлен */
             --dark: #2d3436;
             --light: #f5f6fa;
         }
@@ -208,16 +208,16 @@
         }
 
         .status-undetected {
-            background: var(--success);
+            background: var(--undetected);
         }
 
         .status-detected {
-            background: var(--danger);
+            background: var(--detected);
+            color: var(--dark);
         }
 
         .status-not-updated {
-            background: var(--warning);
-            color: var(--dark);
+            background: var(--not-updated);
         }
 
         .exploit-details {
@@ -262,7 +262,7 @@
         }
 
         .purchase-link {
-            background: var(--success);
+            background: var(--undetected);
         }
 
         .link-btn:hover {
