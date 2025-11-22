@@ -207,7 +207,7 @@
             font-weight: 600;
         }
 
-        .status-updated {
+        .status-undetected {
             background: var(--success);
         }
 
@@ -381,8 +381,10 @@
 
         <div class="controls">
             <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="undetected">Undetected</button>
+            <button class="filter-btn" data-filter="detected">Detected</button>
             <button class="filter-btn" data-filter="updated">Обновленные</button>
-            <button class="filter-btn" data-filter="detected">Обнаруженные</button>
+            <button class="filter-btn" data-filter="not-updated">Не обновленные</button>
             <button class="filter-btn" data-filter="free">Бесплатные</button>
             <button class="filter-btn" data-filter="paid">Платные</button>
         </div>
@@ -489,7 +491,7 @@
                 "updatedDate": "07/24/2025 at 9:19 PM UTC",
                 "uncStatus": true,
                 "free": true,
-                "detected": true,
+                "detected": false,
                 "rbxversion": "version-2a06298afe3947ab",
                 "updateStatus": true,
                 "websitelink": "https://realbunni.com/",
@@ -603,18 +605,16 @@
             
             // Определяем статус для бейджа
             let statusClass, statusText;
-            if (exploit.updateStatus) {
-                statusClass = 'status-updated';
-                statusText = 'Обновлен';
-            } else {
-                statusClass = 'status-not-updated';
-                statusText = 'Не обновлен'; // Изменено с "Устарел" на "Не обновлен"
-            }
             
-            // Если эксплойт обнаружен, показываем это как главный статус
             if (exploit.detected) {
                 statusClass = 'status-detected';
-                statusText = 'Обнаружен';
+                statusText = 'Detected';
+            } else if (!exploit.updateStatus) {
+                statusClass = 'status-not-updated';
+                statusText = 'Не обновлен';
+            } else {
+                statusClass = 'status-undetected';
+                statusText = 'Undetected';
             }
             
             card.innerHTML = `
@@ -704,10 +704,14 @@
             if (filter !== 'all') {
                 filteredExploits = filteredExploits.filter(exploit => {
                     switch(filter) {
-                        case 'updated':
-                            return exploit.updateStatus;
+                        case 'undetected':
+                            return !exploit.detected;
                         case 'detected':
                             return exploit.detected;
+                        case 'updated':
+                            return exploit.updateStatus;
+                        case 'not-updated':
+                            return !exploit.updateStatus;
                         case 'free':
                             return exploit.free;
                         case 'paid':
