@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -211,7 +211,6 @@
             background: var(--not-updated);
         }
 
-        /* Модальное окно */
         .modal {
             display: none;
             position: fixed;
@@ -428,13 +427,13 @@
     <div class="container">
         <header>
             <h1>WEAO Exploit Status</h1>
-            <p class="subtitle">Отслеживание статуса эксплойтов Roblox в реальном времени</p>
+            <p class="subtitle">Real-time tracking of 30+ Roblox exploits</p>
         </header>
 
         <div class="tabs">
             <button class="tab-btn active" data-tab="all">
                 <span class="tab-icon">🌐</span>
-                Все эксплойты
+                All Exploits
             </button>
             <button class="tab-btn" data-tab="windows-external">
                 <span class="tab-icon">🖥️</span>
@@ -455,65 +454,61 @@
         </div>
 
         <div class="controls">
-            <button class="filter-btn active" data-filter="all">Все</button>
-            <button class="filter-btn" data-filter="updated">Обновленные</button>
-            <button class="filter-btn" data-filter="not-updated">Не обновленные</button>
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="updated">Updated</button>
+            <button class="filter-btn" data-filter="not-updated">Not Updated</button>
         </div>
 
         <div class="search-box">
-            <input type="text" class="search-input" placeholder="Поиск по названию эксплойта...">
+            <input type="text" class="search-input" placeholder="Search by exploit name...">
         </div>
 
         <div id="tab-all" class="tab-content active">
             <div id="exploits-container-all">
-                <div class="loading pulse">Загрузка данных...</div>
+                <div class="loading pulse">Loading data...</div>
             </div>
         </div>
 
         <div id="tab-windows-external" class="tab-content">
             <div id="exploits-container-windows-external">
-                <div class="loading pulse">Загрузка данных...</div>
+                <div class="loading pulse">Loading data...</div>
             </div>
         </div>
 
         <div id="tab-windows-internal" class="tab-content">
             <div id="exploits-container-windows-internal">
-                <div class="loading pulse">Загрузка данных...</div>
+                <div class="loading pulse">Loading data...</div>
             </div>
         </div>
 
         <div id="tab-android" class="tab-content">
             <div id="exploits-container-android">
-                <div class="loading pulse">Загрузка данных...</div>
+                <div class="loading pulse">Loading data...</div>
             </div>
         </div>
 
         <div id="tab-ios" class="tab-content">
             <div id="exploits-container-ios">
-                <div class="loading pulse">Загрузка данных...</div>
+                <div class="loading pulse">Loading data...</div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <button class="close-btn">&times;</button>
             <div class="modal-header">
-                <h2 id="modal-title" class="modal-title">Название</h2>
-                <span id="modal-status" class="modal-status-badge">Статус</span>
+                <h2 id="modal-title" class="modal-title">Name</h2>
+                <span id="modal-status" class="modal-status-badge">Status</span>
             </div>
             <div id="modal-details" class="modal-details">
-                <!-- Детали будут заполнены JavaScript -->
             </div>
             <div id="modal-links" class="modal-links">
-                <!-- Ссылки будут заполнены JavaScript -->
             </div>
         </div>
     </div>
 
     <script>
-        // Данные для демонстрации (в реальном приложении будут загружаться с API)
         const demoData = [
             {
                 "_id": "67d6005efa8c791236079278",
@@ -741,10 +736,8 @@
             }
         ];
 
-        // Функция для получения данных с API через прокси
         async function fetchExploitsData() {
             try {
-                // Используем прокси-сервер для обхода CORS
                 const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('http://farts.fadedis.xyz:25505/api/status/exploits');
                 
                 const response = await fetch(proxyUrl, {
@@ -755,14 +748,13 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Ошибка при загрузке данных');
+                    throw new Error('Error loading data');
                 }
                 
                 return await response.json();
             } catch (error) {
-                console.error('Ошибка при загрузке данных с прокси:', error);
+                console.error('Error loading data from proxy:', error);
                 
-                // Попробуем альтернативный прокси
                 try {
                     const altProxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('http://farts.fadedis.xyz:25505/api/status/exploits');
                     const altResponse = await fetch(altProxyUrl);
@@ -771,36 +763,31 @@
                         return await altResponse.json();
                     }
                 } catch (altError) {
-                    console.error('Ошибка при загрузке данных с альтернативного прокси:', altError);
+                    console.error('Error loading data from alternative proxy:', altError);
                 }
                 
-                // В случае ошибки используем демо-данные
                 return demoData;
             }
         }
 
-        // Функция для создания карточки эксплойта (упрощенная версия)
         function createExploitCard(exploit) {
             const card = document.createElement('div');
             card.className = 'exploit-card';
             card.setAttribute('data-id', exploit._id);
             
-            // Определяем статус для бейджа
             const statusClass = exploit.updateStatus ? 'status-updated' : 'status-not-updated';
-            const statusText = exploit.updateStatus ? 'Обновлен' : 'Не обновлен';
+            const statusText = exploit.updateStatus ? 'Updated' : 'Not Updated';
             
             card.innerHTML = `
                 <h3 class="exploit-title">${exploit.title}</h3>
                 <span class="status-badge ${statusClass}">${statusText}</span>
             `;
             
-            // Добавляем обработчик клика для открытия модального окна
             card.addEventListener('click', () => openModal(exploit));
             
             return card;
         }
 
-        // Функция для открытия модального окна с детальной информацией
         function openModal(exploit) {
             const modal = document.getElementById('modal');
             const modalTitle = document.getElementById('modal-title');
@@ -808,10 +795,8 @@
             const modalDetails = document.getElementById('modal-details');
             const modalLinks = document.getElementById('modal-links');
             
-            // Заполняем заголовок и статус
             modalTitle.textContent = exploit.title;
             
-            // Определяем статус для модального окна
             let statusClass, statusText;
             
             if (exploit.detected) {
@@ -819,7 +804,7 @@
                 statusText = 'Detected';
             } else if (!exploit.updateStatus) {
                 statusClass = 'status-not-updated';
-                statusText = 'Не обновлен';
+                statusText = 'Not Updated';
             } else {
                 statusClass = 'status-updated';
                 statusText = 'Undetected';
@@ -828,37 +813,36 @@
             modalStatus.textContent = statusText;
             modalStatus.className = `modal-status-badge ${statusClass}`;
             
-            // Заполняем детали
             modalDetails.innerHTML = `
                 <div class="detail-item">
-                    <span class="detail-label">Версия:</span>
+                    <span class="detail-label">Version:</span>
                     <span>${exploit.version}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Обновлено:</span>
+                    <span class="detail-label">Updated:</span>
                     <span>${exploit.updatedDate}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Платформа:</span>
+                    <span class="detail-label">Platform:</span>
                     <span>${exploit.platform}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Тип:</span>
-                    <span>${exploit.type || exploit.extype || 'Не указан'}</span>
+                    <span class="detail-label">Type:</span>
+                    <span>${exploit.type || exploit.extype || 'Not specified'}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Статус:</span>
-                    <span>${exploit.free ? 'Бесплатный' : 'Платный'}</span>
+                    <span class="detail-label">Status:</span>
+                    <span>${exploit.free ? 'Free' : 'Paid'}</span>
                 </div>
                 ${exploit.cost ? `
                 <div class="detail-item">
-                    <span class="detail-label">Стоимость:</span>
+                    <span class="detail-label">Cost:</span>
                     <span>${exploit.cost}</span>
                 </div>
                 ` : ''}
                 ${exploit.detected !== undefined ? `
                 <div class="detail-item">
-                    <span class="detail-label">Античит:</span>
+                    <span class="detail-label">Anti-Cheat:</span>
                     <span>${exploit.detected ? 'Detected' : 'Undetected'}</span>
                 </div>
                 ` : ''}
@@ -876,26 +860,25 @@
                 ` : ''}
                 ${exploit.decompiler !== undefined ? `
                 <div class="detail-item">
-                    <span class="detail-label">Декомпилятор:</span>
-                    <span>${exploit.decompiler ? 'Есть' : 'Нет'}</span>
+                    <span class="detail-label">Decompiler:</span>
+                    <span>${exploit.decompiler ? 'Yes' : 'No'}</span>
                 </div>
                 ` : ''}
                 ${exploit.multiInject !== undefined ? `
                 <div class="detail-item">
-                    <span class="detail-label">Мульти-инжект:</span>
-                    <span>${exploit.multiInject ? 'Поддерживается' : 'Не поддерживается'}</span>
+                    <span class="detail-label">Multi-Inject:</span>
+                    <span>${exploit.multiInject ? 'Supported' : 'Not supported'}</span>
                 </div>
                 ` : ''}
             `;
             
-            // Заполняем ссылки
             modalLinks.innerHTML = '';
             if (exploit.websitelink) {
                 const websiteLink = document.createElement('a');
                 websiteLink.href = exploit.websitelink;
                 websiteLink.target = '_blank';
                 websiteLink.className = 'modal-link-btn website-link';
-                websiteLink.textContent = 'Сайт';
+                websiteLink.textContent = 'Website';
                 modalLinks.appendChild(websiteLink);
             }
             
@@ -913,20 +896,17 @@
                 purchaseLink.href = exploit.purchaselink;
                 purchaseLink.target = '_blank';
                 purchaseLink.className = 'modal-link-btn purchase-link';
-                purchaseLink.textContent = 'Купить';
+                purchaseLink.textContent = 'Purchase';
                 modalLinks.appendChild(purchaseLink);
             }
             
-            // Показываем модальное окно
             modal.classList.add('active');
             
-            // Добавляем обработчик для закрытия модального окна
             const closeBtn = document.querySelector('.close-btn');
             closeBtn.onclick = () => {
                 modal.classList.remove('active');
             };
             
-            // Закрытие модального окна при клике вне его
             modal.onclick = (e) => {
                 if (e.target === modal) {
                     modal.classList.remove('active');
@@ -934,12 +914,10 @@
             };
         }
 
-        // Функция для отображения эксплойтов в конкретной вкладке
         function displayExploitsInTab(exploits, tabId, filter, searchTerm) {
             const container = document.getElementById(`exploits-container-${tabId}`);
             container.innerHTML = '';
             
-            // Фильтруем эксплойты по типу вкладки
             let filteredExploits = exploits;
             
             if (tabId !== 'all') {
@@ -962,7 +940,6 @@
                 });
             }
             
-            // Применяем дополнительные фильтры
             if (filter !== 'all') {
                 filteredExploits = filteredExploits.filter(exploit => {
                     switch(filter) {
@@ -976,7 +953,6 @@
                 });
             }
             
-            // Применяем поиск
             if (searchTerm) {
                 const term = searchTerm.toLowerCase();
                 filteredExploits = filteredExploits.filter(exploit => 
@@ -985,7 +961,7 @@
             }
             
             if (filteredExploits.length === 0) {
-                container.innerHTML = '<div class="loading">Ничего не найдено</div>';
+                container.innerHTML = '<div class="loading">Nothing found</div>';
                 return;
             }
             
@@ -1000,7 +976,6 @@
             container.appendChild(grid);
         }
 
-        // Функция для отображения всех вкладок
         function displayAllTabs(exploits, filter, searchTerm) {
             const tabs = ['all', 'windows-external', 'windows-internal', 'android', 'ios'];
             tabs.forEach(tab => {
@@ -1008,11 +983,9 @@
             });
         }
 
-        // Инициализация приложения
         document.addEventListener('DOMContentLoaded', async () => {
             const exploitsData = await fetchExploitsData();
             
-            // Инициализация вкладок
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
             
@@ -1020,22 +993,18 @@
                 button.addEventListener('click', () => {
                     const tabId = button.getAttribute('data-tab');
                     
-                    // Убираем активный класс у всех кнопок и вкладок
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     tabContents.forEach(content => content.classList.remove('active'));
                     
-                    // Добавляем активный класс к текущей кнопке и вкладке
                     button.classList.add('active');
                     document.getElementById(`tab-${tabId}`).classList.add('active');
                     
-                    // Обновляем отображение для активной вкладки
                     const filter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
                     const searchTerm = document.querySelector('.search-input').value;
                     displayExploitsInTab(exploitsData, tabId, filter, searchTerm);
                 });
             });
             
-            // Инициализация фильтров
             const filterButtons = document.querySelectorAll('.filter-btn');
             filterButtons.forEach(button => {
                 button.addEventListener('click', () => {
@@ -1050,7 +1019,6 @@
                 });
             });
             
-            // Инициализация поиска
             const searchInput = document.querySelector('.search-input');
             searchInput.addEventListener('input', () => {
                 const filter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
@@ -1060,7 +1028,6 @@
                 displayExploitsInTab(exploitsData, activeTab, filter, searchTerm);
             });
             
-            // Первоначальное отображение данных
             displayAllTabs(exploitsData, 'all', '');
         });
     </script>
