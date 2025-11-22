@@ -8,9 +8,9 @@
         :root {
             --primary: #6c5ce7;
             --secondary: #a29bfe;
-            --undetected: #6c5ce7; /* Фиолетовый для Undetected */
-            --detected: #fdcb6e; /* Желтый для Detected */
-            --not-updated: #d63031; /* Красный для Не обновлен */
+            --undetected: #6c5ce7;
+            --detected: #fdcb6e;
+            --not-updated: #d63031;
             --dark: #2d3436;
             --light: #f5f6fa;
         }
@@ -156,8 +156,8 @@
 
         .exploits-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
         }
 
         .exploit-card {
@@ -170,6 +170,8 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            text-align: center;
         }
 
         .exploit-card:hover {
@@ -188,16 +190,10 @@
             background: linear-gradient(to right, var(--primary), var(--secondary));
         }
 
-        .exploit-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
         .exploit-title {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 600;
+            margin-bottom: 10px;
         }
 
         .status-badge {
@@ -207,28 +203,95 @@
             font-weight: 600;
         }
 
-        .status-undetected {
+        .status-updated {
             background: var(--undetected);
-        }
-
-        .status-detected {
-            background: var(--detected);
-            color: var(--dark);
         }
 
         .status-not-updated {
             background: var(--not-updated);
         }
 
-        .exploit-details {
-            margin-bottom: 15px;
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .modal-status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .modal-details {
+            margin-bottom: 20px;
         }
 
         .detail-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -236,16 +299,16 @@
             opacity: 0.7;
         }
 
-        .exploit-links {
+        .modal-links {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
-        .link-btn {
+        .modal-link-btn {
             flex: 1;
             text-align: center;
-            padding: 8px 0;
+            padding: 10px 0;
             border-radius: 5px;
             text-decoration: none;
             color: var(--light);
@@ -265,7 +328,7 @@
             background: var(--undetected);
         }
 
-        .link-btn:hover {
+        .modal-link-btn:hover {
             opacity: 0.9;
             transform: translateY(-3px);
         }
@@ -278,10 +341,6 @@
 
         .pulse {
             animation: pulse 1.5s infinite;
-        }
-
-        .hidden {
-            display: none;
         }
 
         @keyframes fadeInDown {
@@ -315,6 +374,17 @@
             }
         }
 
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         @keyframes pulse {
             0% {
                 opacity: 1;
@@ -333,7 +403,7 @@
             }
             
             .exploits-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
             
             .tabs {
@@ -346,6 +416,11 @@
                 max-width: 300px;
                 justify-content: center;
             }
+
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -353,7 +428,7 @@
     <div class="container">
         <header>
             <h1>WEAO Exploit Status</h1>
-            <p class="subtitle">Отслеживание статуса 30+ эксплойтов Roblox в реальном времени</p>
+            <p class="subtitle">Отслеживание статуса эксплойтов Roblox в реальном времени</p>
         </header>
 
         <div class="tabs">
@@ -381,12 +456,8 @@
 
         <div class="controls">
             <button class="filter-btn active" data-filter="all">Все</button>
-            <button class="filter-btn" data-filter="undetected">Undetected</button>
-            <button class="filter-btn" data-filter="detected">Detected</button>
             <button class="filter-btn" data-filter="updated">Обновленные</button>
             <button class="filter-btn" data-filter="not-updated">Не обновленные</button>
-            <button class="filter-btn" data-filter="free">Бесплатные</button>
-            <button class="filter-btn" data-filter="paid">Платные</button>
         </div>
 
         <div class="search-box">
@@ -424,57 +495,36 @@
         </div>
     </div>
 
+    <!-- Модальное окно -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn">&times;</button>
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">Название</h2>
+                <span id="modal-status" class="modal-status-badge">Статус</span>
+            </div>
+            <div id="modal-details" class="modal-details">
+                <!-- Детали будут заполнены JavaScript -->
+            </div>
+            <div id="modal-links" class="modal-links">
+                <!-- Ссылки будут заполнены JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // Данные для демонстрации (в реальном приложении будут загружаться с API)
         const demoData = [
             {
                 "_id": "67d6005efa8c791236079278",
-                "title": "Potassium",
-                "version": "1.7.9",
-                "updatedDate": "07/24/2025 at 3:47 PM UTC",
-                "uncStatus": true,
-                "free": false,
-                "detected": true,
-                "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": true,
-                "websitelink": "https://potassium.pro",
-                "discordlink": "https://discord.com/invite/potassium",
-                "purchaselink": "https://privana.sell.app/product/potassium?variant=329244&affiliate=weao",
-                "platform": "Windows",
-                "type": "wexecutor",
-                "cost": "$20 Lifetime",
-                "decompiler": true,
-                "multiInject": true,
-                "suncPercentage": 100,
-                "uncPercentage": 99
-            },
-            {
-                "_id": "67e0d0d87d091e8f8b6d2a35",
-                "title": "Matcha",
-                "version": "1.6.0",
-                "updatedDate": "07/24/2025 at 4:30 AM UTC",
-                "uncStatus": false,
-                "free": false,
-                "detected": false,
-                "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": true,
-                "websitelink": "https://discord.gg/AURAHhSMxc",
-                "discordlink": "https://discord.gg/matchalol",
-                "purchaselink": "https://bloxproducts.com/r/weao#Matcha",
-                "platform": "Windows",
-                "type": "wexternal",
-                "cost": "$11.50 Lifetime"
-            },
-            {
-                "_id": "679553cd2eea89d30d0dae57",
                 "title": "Xeno",
                 "version": "1.2.45",
                 "updatedDate": "07/24/2025 at 9:26 AM UTC",
                 "uncStatus": true,
                 "free": true,
-                "detected": true,
+                "detected": false,
                 "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": false,
+                "updateStatus": true,
                 "websitelink": "https://www.xeno.onl/",
                 "discordlink": "https://discord.gg/xe-no",
                 "platform": "Windows",
@@ -483,6 +533,190 @@
                 "multiInject": true,
                 "suncPercentage": 41,
                 "uncPercentage": 81
+            },
+            {
+                "_id": "example_sirhurt",
+                "title": "Sirhurt",
+                "version": "2.7.3",
+                "updatedDate": "07/23/2025 at 5:30 PM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://sirhurt.net",
+                "discordlink": "https://discord.gg/sirhurt",
+                "purchaselink": "https://sirhurt.net/buy",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "cost": "$15 Lifetime",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 95,
+                "uncPercentage": 92
+            },
+            {
+                "_id": "example_seliware",
+                "title": "Seliware",
+                "version": "1.4.2",
+                "updatedDate": "07/22/2025 at 11:20 AM UTC",
+                "uncStatus": false,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://seliware.com",
+                "discordlink": "https://discord.gg/seliware",
+                "purchaselink": "https://seliware.com/purchase",
+                "platform": "Windows",
+                "type": "wexternal",
+                "cost": "$12 Lifetime",
+                "decompiler": false,
+                "multiInject": true
+            },
+            {
+                "_id": "example_volt",
+                "title": "Volt",
+                "version": "4.1.0",
+                "updatedDate": "07/24/2025 at 2:15 PM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://volt-executor.com",
+                "discordlink": "https://discord.gg/volt",
+                "purchaselink": "https://volt-executor.com/buy",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "cost": "$18 Lifetime",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 88,
+                "uncPercentage": 90
+            },
+            {
+                "_id": "example_velocity",
+                "title": "Velocity",
+                "version": "3.2.1",
+                "updatedDate": "07/21/2025 at 8:45 AM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": false,
+                "websitelink": "https://velocityexecutor.com",
+                "discordlink": "https://discord.gg/velocity",
+                "purchaselink": "https://velocityexecutor.com/purchase",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "cost": "$20 Lifetime",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 92,
+                "uncPercentage": 94
+            },
+            {
+                "_id": "example_solara",
+                "title": "Solara",
+                "version": "1.8.5",
+                "updatedDate": "07/24/2025 at 10:30 AM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://solara.cc",
+                "discordlink": "https://discord.gg/solara",
+                "purchaselink": "https://solara.cc/buy",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "cost": "$25 Lifetime",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 96,
+                "uncPercentage": 98
+            },
+            {
+                "_id": "example_wave",
+                "title": "Wave",
+                "version": "2.3.0",
+                "updatedDate": "07/23/2025 at 3:20 PM UTC",
+                "uncStatus": false,
+                "free": true,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://wavex.dev",
+                "discordlink": "https://discord.gg/wave",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "decompiler": false,
+                "multiInject": true,
+                "keysystem": true
+            },
+            {
+                "_id": "example_zenith",
+                "title": "Zenith",
+                "version": "1.5.2",
+                "updatedDate": "07/22/2025 at 6:15 PM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://zenithexecutor.com",
+                "discordlink": "https://discord.gg/zenith",
+                "purchaselink": "https://zenithexecutor.com/purchase",
+                "platform": "Windows",
+                "type": "wexternal",
+                "cost": "$15 Lifetime",
+                "decompiler": false,
+                "multiInject": true,
+                "suncPercentage": 85,
+                "uncPercentage": 88
+            },
+            {
+                "_id": "example_volcano",
+                "title": "Volcano",
+                "version": "2.1.0",
+                "updatedDate": "07/20/2025 at 1:10 PM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": false,
+                "websitelink": "https://volcanoexecutor.com",
+                "discordlink": "https://discord.gg/volcano",
+                "purchaselink": "https://volcanoexecutor.com/buy",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "cost": "$17 Lifetime",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 90,
+                "uncPercentage": 92
+            },
+            {
+                "_id": "example_valex",
+                "title": "Valex",
+                "version": "3.0.1",
+                "updatedDate": "07/24/2025 at 7:45 PM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://valexexecutor.com",
+                "discordlink": "https://discord.gg/valex",
+                "purchaselink": "https://valexexecutor.com/purchase",
+                "platform": "Windows",
+                "type": "wexecutor",
+                "cost": "$22 Lifetime",
+                "decompiler": true,
+                "multiInject": true,
+                "suncPercentage": 94,
+                "uncPercentage": 96
             },
             {
                 "_id": "68084641b50548f01fd62713",
@@ -504,56 +738,6 @@
                 "suncPercentage": 100,
                 "uncPercentage": 99,
                 "keysystem": true
-            },
-            {
-                "_id": "680ab721b50548f01fd62715",
-                "title": "Photon",
-                "version": "5.2",
-                "updatedDate": "07/23/2025 at 11:51 PM UTC",
-                "uncStatus": false,
-                "free": false,
-                "detected": false,
-                "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": false,
-                "websitelink": "https://photonsys.sellpass.io/",
-                "discordlink": "https://discord.gg/vro",
-                "purchaselink": "https://photonsys.sellpass.io/products/Photon-Lifetime",
-                "platform": "Windows",
-                "type": "wexternal",
-                "cost": "$20 Lifetime"
-            },
-            {
-                "_id": "example_android_1",
-                "title": "Arceus X",
-                "version": "3.2.1",
-                "updatedDate": "07/22/2025 at 2:15 PM UTC",
-                "uncStatus": false,
-                "free": true,
-                "detected": true,
-                "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": true,
-                "websitelink": "https://arceusx.com",
-                "discordlink": "https://discord.gg/arceusx",
-                "platform": "Android",
-                "type": "mobile",
-                "keysystem": true
-            },
-            {
-                "_id": "example_ios_1",
-                "title": "Delta Executor",
-                "version": "1.5.3",
-                "updatedDate": "07/21/2025 at 10:30 AM UTC",
-                "uncStatus": false,
-                "free": false,
-                "detected": false,
-                "rbxversion": "version-2a06298afe3947ab",
-                "updateStatus": false,
-                "websitelink": "https://deltaexecutor.com",
-                "discordlink": "https://discord.gg/delta",
-                "purchaselink": "https://deltaexecutor.com/purchase",
-                "platform": "iOS",
-                "type": "mobile",
-                "cost": "$15 Lifetime"
             }
         ];
 
@@ -595,15 +779,39 @@
             }
         }
 
-        // Функция для создания карточки эксплойта
+        // Функция для создания карточки эксплойта (упрощенная версия)
         function createExploitCard(exploit) {
             const card = document.createElement('div');
             card.className = 'exploit-card';
-            card.setAttribute('data-status', exploit.updateStatus ? 'updated' : 'not-updated');
-            card.setAttribute('data-detected', exploit.detected ? 'detected' : 'undetected');
-            card.setAttribute('data-free', exploit.free ? 'free' : 'paid');
+            card.setAttribute('data-id', exploit._id);
             
             // Определяем статус для бейджа
+            const statusClass = exploit.updateStatus ? 'status-updated' : 'status-not-updated';
+            const statusText = exploit.updateStatus ? 'Обновлен' : 'Не обновлен';
+            
+            card.innerHTML = `
+                <h3 class="exploit-title">${exploit.title}</h3>
+                <span class="status-badge ${statusClass}">${statusText}</span>
+            `;
+            
+            // Добавляем обработчик клика для открытия модального окна
+            card.addEventListener('click', () => openModal(exploit));
+            
+            return card;
+        }
+
+        // Функция для открытия модального окна с детальной информацией
+        function openModal(exploit) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalStatus = document.getElementById('modal-status');
+            const modalDetails = document.getElementById('modal-details');
+            const modalLinks = document.getElementById('modal-links');
+            
+            // Заполняем заголовок и статус
+            modalTitle.textContent = exploit.title;
+            
+            // Определяем статус для модального окна
             let statusClass, statusText;
             
             if (exploit.detected) {
@@ -613,63 +821,117 @@
                 statusClass = 'status-not-updated';
                 statusText = 'Не обновлен';
             } else {
-                statusClass = 'status-undetected';
+                statusClass = 'status-updated';
                 statusText = 'Undetected';
             }
             
-            card.innerHTML = `
-                <div class="exploit-header">
-                    <h3 class="exploit-title">${exploit.title}</h3>
-                    <span class="status-badge ${statusClass}">${statusText}</span>
+            modalStatus.textContent = statusText;
+            modalStatus.className = `modal-status-badge ${statusClass}`;
+            
+            // Заполняем детали
+            modalDetails.innerHTML = `
+                <div class="detail-item">
+                    <span class="detail-label">Версия:</span>
+                    <span>${exploit.version}</span>
                 </div>
-                <div class="exploit-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Версия:</span>
-                        <span>${exploit.version}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Обновлено:</span>
-                        <span>${exploit.updatedDate}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Платформа:</span>
-                        <span>${exploit.platform}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Тип:</span>
-                        <span>${exploit.type || exploit.extype || 'Не указан'}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Статус:</span>
-                        <span>${exploit.free ? 'Бесплатный' : 'Платный'}</span>
-                    </div>
-                    ${exploit.cost ? `
-                    <div class="detail-item">
-                        <span class="detail-label">Стоимость:</span>
-                        <span>${exploit.cost}</span>
-                    </div>
-                    ` : ''}
-                    ${exploit.uncPercentage ? `
-                    <div class="detail-item">
-                        <span class="detail-label">UNC:</span>
-                        <span>${exploit.uncPercentage}%</span>
-                    </div>
-                    ` : ''}
-                    ${exploit.suncPercentage ? `
-                    <div class="detail-item">
-                        <span class="detail-label">sUNC:</span>
-                        <span>${exploit.suncPercentage}%</span>
-                    </div>
-                    ` : ''}
+                <div class="detail-item">
+                    <span class="detail-label">Обновлено:</span>
+                    <span>${exploit.updatedDate}</span>
                 </div>
-                <div class="exploit-links">
-                    ${exploit.websitelink ? `<a href="${exploit.websitelink}" target="_blank" class="link-btn website-link">Сайт</a>` : ''}
-                    ${exploit.discordlink ? `<a href="${exploit.discordlink}" target="_blank" class="link-btn discord-link">Discord</a>` : ''}
-                    ${exploit.purchaselink ? `<a href="${exploit.purchaselink}" target="_blank" class="link-btn purchase-link">Купить</a>` : ''}
+                <div class="detail-item">
+                    <span class="detail-label">Платформа:</span>
+                    <span>${exploit.platform}</span>
                 </div>
+                <div class="detail-item">
+                    <span class="detail-label">Тип:</span>
+                    <span>${exploit.type || exploit.extype || 'Не указан'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Статус:</span>
+                    <span>${exploit.free ? 'Бесплатный' : 'Платный'}</span>
+                </div>
+                ${exploit.cost ? `
+                <div class="detail-item">
+                    <span class="detail-label">Стоимость:</span>
+                    <span>${exploit.cost}</span>
+                </div>
+                ` : ''}
+                ${exploit.detected !== undefined ? `
+                <div class="detail-item">
+                    <span class="detail-label">Античит:</span>
+                    <span>${exploit.detected ? 'Detected' : 'Undetected'}</span>
+                </div>
+                ` : ''}
+                ${exploit.uncPercentage ? `
+                <div class="detail-item">
+                    <span class="detail-label">UNC:</span>
+                    <span>${exploit.uncPercentage}%</span>
+                </div>
+                ` : ''}
+                ${exploit.suncPercentage ? `
+                <div class="detail-item">
+                    <span class="detail-label">sUNC:</span>
+                    <span>${exploit.suncPercentage}%</span>
+                </div>
+                ` : ''}
+                ${exploit.decompiler !== undefined ? `
+                <div class="detail-item">
+                    <span class="detail-label">Декомпилятор:</span>
+                    <span>${exploit.decompiler ? 'Есть' : 'Нет'}</span>
+                </div>
+                ` : ''}
+                ${exploit.multiInject !== undefined ? `
+                <div class="detail-item">
+                    <span class="detail-label">Мульти-инжект:</span>
+                    <span>${exploit.multiInject ? 'Поддерживается' : 'Не поддерживается'}</span>
+                </div>
+                ` : ''}
             `;
             
-            return card;
+            // Заполняем ссылки
+            modalLinks.innerHTML = '';
+            if (exploit.websitelink) {
+                const websiteLink = document.createElement('a');
+                websiteLink.href = exploit.websitelink;
+                websiteLink.target = '_blank';
+                websiteLink.className = 'modal-link-btn website-link';
+                websiteLink.textContent = 'Сайт';
+                modalLinks.appendChild(websiteLink);
+            }
+            
+            if (exploit.discordlink) {
+                const discordLink = document.createElement('a');
+                discordLink.href = exploit.discordlink;
+                discordLink.target = '_blank';
+                discordLink.className = 'modal-link-btn discord-link';
+                discordLink.textContent = 'Discord';
+                modalLinks.appendChild(discordLink);
+            }
+            
+            if (exploit.purchaselink) {
+                const purchaseLink = document.createElement('a');
+                purchaseLink.href = exploit.purchaselink;
+                purchaseLink.target = '_blank';
+                purchaseLink.className = 'modal-link-btn purchase-link';
+                purchaseLink.textContent = 'Купить';
+                modalLinks.appendChild(purchaseLink);
+            }
+            
+            // Показываем модальное окно
+            modal.classList.add('active');
+            
+            // Добавляем обработчик для закрытия модального окна
+            const closeBtn = document.querySelector('.close-btn');
+            closeBtn.onclick = () => {
+                modal.classList.remove('active');
+            };
+            
+            // Закрытие модального окна при клике вне его
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            };
         }
 
         // Функция для отображения эксплойтов в конкретной вкладке
@@ -704,18 +966,10 @@
             if (filter !== 'all') {
                 filteredExploits = filteredExploits.filter(exploit => {
                     switch(filter) {
-                        case 'undetected':
-                            return !exploit.detected;
-                        case 'detected':
-                            return exploit.detected;
                         case 'updated':
                             return exploit.updateStatus;
                         case 'not-updated':
                             return !exploit.updateStatus;
-                        case 'free':
-                            return exploit.free;
-                        case 'paid':
-                            return !exploit.free;
                         default:
                             return true;
                     }
