@@ -1237,7 +1237,7 @@
     async function fetchWeaoStatus() {
         try {
             // В идеале через backend-прокси с User-Agent: WEAO-3PService.
-            const resp = await fetch('https://weao.xyz/api/status/exploits');
+            const resp = await fetch('http://localhost:3000/api/status/exploits');
             if (!resp.ok) {
                 console.warn('WEAO API error:', resp.status);
                 return null;
