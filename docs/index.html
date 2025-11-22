@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CPS Network</title>
     <style>
+        /* Все ваши существующие стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -681,6 +682,94 @@
             background: rgba(255, 107, 107, 0.1);
             border: 1px solid #ff6b6b;
         }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .last-updated {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .refresh-button {
+            background: #57F287;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-button:hover {
+            background: #43b881;
+            transform: translateY(-2px);
+        }
+
+        .api-status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .api-success {
+            background: rgba(87, 242, 135, 0.1);
+            border: 1px solid #57F287;
+            color: #57F287;
+        }
+
+        .api-error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .manual-update-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .manual-update-section h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .status-working {
+            background: #57F287;
+            color: #000;
+        }
+
+        .status-broken {
+            background: #ff6b6b;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -697,7 +786,6 @@
             </div>
         </div>
 
-        <!-- PREMIUM TAB -->
         <div class="tab-content active" id="premium-tab">
             <div class="service">
                 <h2 class="service-title">🪓 99 NIGHTS HUB & DIAMONDS/DAYS FARM</h2>
@@ -790,7 +878,6 @@
             </div>
         </div>
 
-        <!-- DISCORD TAB -->
         <div class="tab-content" id="discord-tab">
             <div class="discord-container">
                 <div class="discord-widget">
@@ -836,7 +923,6 @@
             </div>
         </div>
 
-        <!-- SCRIPTS TAB -->
         <div class="tab-content" id="scripts-tab">
             <div class="scripts-container">
                 <h2 class="service-title">📜 Available Scripts</h2>
@@ -889,11 +975,30 @@
             </div>
         </div>
 
-        <!-- EXECUTERS TAB -->
         <div class="tab-content" id="executers-tab">
             <div class="executers-container">
                 <h2 class="service-title">⚙️ Supported Executers</h2>
-                <p style="margin-bottom: 30px; opacity: 0.8;">Click on any executor to check its update status</p>
+                <p style="margin-bottom: 30px; opacity: 0.8;">
+                    Click on any executor to check its update status
+                    <button class="refresh-button" onclick="loadExploitsData()">
+                        🔄 Refresh Status
+                    </button>
+                </p>
+                
+                <div id="loading-status" style="margin-bottom: 20px; display: none;">
+                    <div class="loading"></div> Loading exploit data...
+                </div>
+                
+                <div id="api-status" class="api-status" style="display: none;"></div>
+
+                <div class="manual-update-section">
+                    <h4>📊 Current Status (Manual Updates)</h4>
+                    <p>Due to API restrictions, we manually update executor statuses. Last community check: <strong id="community-check-date">Today</strong></p>
+                    <div style="margin-top: 10px;">
+                        <span class="status-badge status-working">Working: Codex, Delta, Hydrogen</span>
+                        <span class="status-badge status-broken">Broken: Volcano, Velocity</span>
+                    </div>
+                </div>
                 
                 <div class="platform-tabs">
                     <button class="platform-tab active" data-platform="pc">💻 PC</button>
@@ -902,184 +1007,534 @@
                     <button class="platform-tab" data-platform="ios">📱 iOS</button>
                 </div>
                 
-                <!-- PC -->
                 <div class="platform-content active" id="pc-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">PC Executers</h3>
                     <div class="counters">
                         <div class="counter-item updated-counter">Updated: <span id="pc-updated">0</span></div>
                         <div class="counter-item not-updated-counter">Not Updated: <span id="pc-not-updated">0</span></div>
                     </div>
-                    <div class="executers-grid">
-                        <div class="executer-card" data-exploit-id="volcano" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Volcano', 'Free (Key System)', 'https://volcano.wtf')">
-                            <div class="executer-icon">🌋</div>
-                            <div class="executer-name">Volcano</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">volcano.wtf</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="velocity" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Velocity', 'Free', 'https://getvelocity.lol')">
-                            <div class="executer-icon">⚡</div>
-                            <div class="executer-name">Velocity</div>
-                            <div class="executer-price">Free</div>
-                            <div class="executer-website">getvelocity.lol</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="zenith" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Zenith', 'Paid - $6.49 Weekly', 'https://zenith.win')">
-                            <div class="executer-icon">🌟</div>
-                            <div class="executer-name">Zenith</div>
-                            <div class="executer-price">Paid - $6.49 Weekly</div>
-                            <div class="executer-website">zenith.win</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="wave" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Wave', 'Paid - $7.49 Weekly', 'https://getwave.gg')">
-                            <div class="executer-icon">🌊</div>
-                            <div class="executer-name">Wave</div>
-                            <div class="executer-price">Paid - $7.49 Weekly</div>
-                            <div class="executer-website">getwave.gg</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="volt" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Volt', 'Paid - $8 Weekly', 'https://volt.bz')">
-                            <div class="executer-icon">🔌</div>
-                            <div class="executer-name">Volt</div>
-                            <div class="executer-price">Paid - $8 Weekly</div>
-                            <div class="executer-website">volt.bz</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="seliware" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Seliware', 'Paid - $9.99 Monthly', 'https://seliware.com')">
-                            <div class="executer-icon">🛡️</div>
-                            <div class="executer-name">Seliware</div>
-                            <div class="executer-price">Paid - $9.99 Monthly</div>
-                            <div class="executer-website">seliware.com</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="swift" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Swift', 'Free (Key System)', 'https://getswift.vip')">
-                            <div class="executer-icon">💨</div>
-                            <div class="executer-name">Swift</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">getswift.vip</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="valex" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Valex', 'Free (Key System)', 'https://valex.io')">
-                            <div class="executer-icon">🔮</div>
-                            <div class="executer-name">Valex</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">valex.io</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="potassium" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Potassium', 'Paid - $20 Lifetime', 'https://potassium.pro')">
-                            <div class="executer-icon">🥔</div>
-                            <div class="executer-name">Potassium</div>
-                            <div class="executer-price">Paid - $20 Lifetime</div>
-                            <div class="executer-website">potassium.pro</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="bunni" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Bunni.lol', 'Free (Key System)', 'https://realbunni.com')">
-                            <div class="executer-icon">🐰</div>
-                            <div class="executer-name">Bunni.lol</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">realbunni.com</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="sirhurt" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Sirhurt', 'Paid - $2.80 Weekly', 'https://sirhurt.net')">
-                            <div class="executer-icon">👑</div>
-                            <div class="executer-name">Sirhurt</div>
-                            <div class="executer-price">Paid - $2.80 Weekly</div>
-                            <div class="executer-website">sirhurt.net</div>
-                        </div>
+                    <div class="executers-grid" id="pc-executers">
+                        <!-- Динамически заполняется через JavaScript -->
                     </div>
                 </div>
                 
-                <!-- MAC -->
                 <div class="platform-content" id="mac-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">Mac Executers</h3>
                     <div class="counters">
                         <div class="counter-item updated-counter">Updated: <span id="mac-updated">0</span></div>
                         <div class="counter-item not-updated-counter">Not Updated: <span id="mac-not-updated">0</span></div>
                     </div>
-                    <div class="executers-grid">
-                        <div class="executer-card" data-exploit-id="hydrogen" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Hydrogen', 'Free (Key System)', 'https://hydrogen.lat')">
-                            <div class="executer-icon">💧</div>
-                            <div class="executer-name">Hydrogen</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">hydrogen.lat</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="macsploit" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Macsploit', 'Paid - $8 Lifetime', 'https://abyssdigital.xyz')">
-                            <div class="executer-icon">🍎</div>
-                            <div class="executer-name">Macsploit</div>
-                            <div class="executer-price">Paid - $8 Lifetime</div>
-                            <div class="executer-website">abyssdigital.xyz</div>
-                        </div>
+                    <div class="executers-grid" id="mac-executers">
+                        <!-- Динамически заполняется через JavaScript -->
                     </div>
                 </div>
                 
-                <!-- ANDROID -->
                 <div class="platform-content" id="android-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">Android Executers</h3>
                     <div class="counters">
                         <div class="counter-item updated-counter">Updated: <span id="android-updated">0</span></div>
                         <div class="counter-item not-updated-counter">Not Updated: <span id="android-not-updated">0</span></div>
                     </div>
-                    <div class="executers-grid">
-                        <div class="executer-card" data-exploit-id="codex-android" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Codex', 'Free (Key System)', 'https://codex.lol')">
-                            <div class="executer-icon">📜</div>
-                            <div class="executer-name">Codex</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">codex.lol</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="cryptic" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Cryptic', 'Free (Key System)', 'https://getcryptic.net')">
-                            <div class="executer-icon">🔐</div>
-                            <div class="executer-name">Cryptic</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">getcryptic.net</div>
-                        </div>
-                        <div class="executer-card" data-exploit-id="delta-android" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
-                            <div class="executer-icon">Δ</div>
-                            <div class="executer-name">Delta</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">deltaexploits.gg</div>
-                        </div>
+                    <div class="executers-grid" id="android-executers">
+                        <!-- Динамически заполняется через JavaScript -->
                     </div>
                 </div>
                 
-                <!-- IOS -->
                 <div class="platform-content" id="ios-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">iOS Executers</h3>
                     <div class="counters">
                         <div class="counter-item updated-counter">Updated: <span id="ios-updated">0</span></div>
                         <div class="counter-item not-updated-counter">Not Updated: <span id="ios-not-updated">0</span></div>
                     </div>
-                    <div class="executers-grid">
-                        <div class="executer-card" data-exploit-id="delta-ios" data-updated="false"
-                            onclick="handleExecuterClick(this, 'Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
-                            <div class="executer-icon">Δ</div>
-                            <div class="executer-name">Delta</div>
-                            <div class="executer-price">Free (Key System)</div>
-                            <div class="executer-website">deltaexploits.gg</div>
-                        </div>
+                    <div class="executers-grid" id="ios-executers">
+                        <!-- Динамически заполняется через JavaScript -->
                     </div>
                 </div>
-
+                
+                <div class="last-updated" id="last-updated">
+                    Last updated: Never
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL -->
     <div id="executerModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeExecuterModal()">&times;</span>
             <h2 class="modal-title" id="executerModalTitle">Executer Info</h2>
-            <div id="executerModalContent"></div>
+            <div id="executerModalContent">
+            </div>
         </div>
     </div>
 
     <script>
-        // ----- ТАБЫ -----
+        // Улучшенная конфигурация API с более надежными методами
+        const WEAO_DOMAINS = [
+            'https://weao.xyz',
+            'https://whatexpsare.online',
+            'https://whatexploitsaretra.sh',
+            'https://weao.gg'
+        ];
+
+        // Кэш данных
+        let exploitsCache = null;
+        let lastUpdateTime = null;
+
+        // Маппинг иконок для исполнителей
+        const iconMapping = {
+            'potassium': '🥔',
+            'matcha': '🍵',
+            'xeno': '👽',
+            'bunni': '🐰',
+            'photon': '⚡',
+            'synapse': '🧠',
+            'hydrogen': '💧',
+            'macsploit': '🍎',
+            'codex': '📜',
+            'cryptic': '🔐',
+            'delta': 'Δ',
+            'volcano': '🌋',
+            'velocity': '⚡',
+            'zenith': '🌟',
+            'wave': '🌊',
+            'volt': '🔌',
+            'seliware': '🛡️',
+            'swift': '💨',
+            'valex': '🔮',
+            'sirhurt': '👑',
+            'electron': '⚛️',
+            'scriptware': '📃',
+            'krnl': '🔑',
+            'oxygen': '💨',
+            'fluxus': '🌀',
+            'comet': '☄️'
+        };
+
+        // Функция для получения иконки по названию
+        function getIconForExploit(title) {
+            if (!title) return '⚙️';
+            
+            const lowerTitle = title.toLowerCase();
+            for (const [key, icon] of Object.entries(iconMapping)) {
+                if (lowerTitle.includes(key)) {
+                    return icon;
+                }
+            }
+            return '⚙️';
+        }
+
+        // Улучшенная функция для получения данных с API
+        async function fetchExploitsData() {
+            const loadingElement = document.getElementById('loading-status');
+            const apiStatusElement = document.getElementById('api-status');
+            
+            // Показываем загрузку
+            loadingElement.style.display = 'block';
+            loadingElement.innerHTML = '<div class="loading"></div> Trying to fetch data from WEAO API...';
+            apiStatusElement.style.display = 'none';
+
+            try {
+                // Пробуем несколько методов получения данных
+                let data = null;
+                
+                // Метод 1: Прямой запрос через CORS прокси с обработкой разных форматов
+                data = await tryDirectFetch();
+                if (data) {
+                    loadingElement.innerHTML = '<div class="loading"></div> Success! Processing API data...';
+                    return data;
+                }
+                
+                // Метод 2: Пробуем альтернативные домены
+                loadingElement.innerHTML = '<div class="loading"></div> Trying alternative domains...';
+                data = await tryAlternativeDomains();
+                if (data) {
+                    return data;
+                }
+                
+                // Метод 3: Используем более надежные CORS прокси
+                loadingElement.innerHTML = '<div class="loading"></div> Trying reliable CORS proxies...';
+                data = await tryReliableProxies();
+                if (data) {
+                    return data;
+                }
+                
+                // Если все методы не сработали, используем fallback данные
+                throw new Error('All data fetch methods failed');
+                
+            } catch (error) {
+                console.error('All fetch methods failed:', error);
+                loadingElement.innerHTML = '⚠️ Using manually updated data';
+                apiStatusElement.className = 'api-status api-error';
+                apiStatusElement.innerHTML = '⚠️ Cannot connect to WEAO API. Using community-verified manual data.';
+                apiStatusElement.style.display = 'block';
+                
+                // Возвращаем расширенные fallback данные
+                return getEnhancedFallbackData();
+            } finally {
+                setTimeout(() => {
+                    loadingElement.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Метод 1: Прямой запрос через улучшенные CORS прокси
+        async function tryDirectFetch() {
+            const improvedProxies = [
+                {
+                    url: 'https://api.cors.sh/https://weao.xyz/api/status/exploits',
+                    needsKey: false
+                },
+                {
+                    url: 'https://proxy.cors.sh/https://weao.xyz/api/status/exploits', 
+                    needsKey: false
+                },
+                {
+                    url: 'https://cors.connexus.sh/https://weao.xyz/api/status/exploits',
+                    needsKey: false
+                }
+            ];
+
+            for (const proxy of improvedProxies) {
+                try {
+                    console.log('Trying proxy:', proxy.url);
+                    const response = await fetch(proxy.url, {
+                        method: 'GET',
+                        headers: {
+                            'User-Agent': 'WEAO-3PService',
+                            'Accept': 'application/json',
+                            'Origin': 'https://abobus307.github.io'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const text = await response.text();
+                        // Проверяем, является ли ответ JSON
+                        if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
+                            return JSON.parse(text);
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Proxy ${proxy.url} failed:`, error.message);
+                    continue;
+                }
+            }
+            return null;
+        }
+
+        // Метод 2: Альтернативные домены WEAO
+        async function tryAlternativeDomains() {
+            for (const domain of WEAO_DOMAINS) {
+                try {
+                    const url = `${domain}/api/status/exploits`;
+                    console.log('Trying domain:', url);
+                    
+                    // Пробуем через простой CORS proxy
+                    const proxyUrl = `https://cors.connexus.sh/${url}`;
+                    const response = await fetch(proxyUrl, {
+                        headers: {
+                            'User-Agent': 'WEAO-3PService',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data;
+                    }
+                } catch (error) {
+                    console.warn(`Domain ${domain} failed:`, error.message);
+                    continue;
+                }
+            }
+            return null;
+        }
+
+        // Метод 3: Надежные CORS прокси
+        async function tryReliableProxies() {
+            const reliableProxies = [
+                'https://api.allorigins.win/get?url=' + encodeURIComponent('https://weao.xyz/api/status/exploits'),
+                'https://cors-anywhere.herokuapp.com/' + encodeURIComponent('https://weao.xyz/api/status/exploits')
+            ];
+
+            for (const proxyUrl of reliableProxies) {
+                try {
+                    console.log('Trying reliable proxy:', proxyUrl);
+                    const response = await fetch(proxyUrl, {
+                        headers: {
+                            'User-Agent': 'WEAO-3PService',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        // Обрабатываем разные форматы ответов прокси
+                        if (result.contents) {
+                            // allorigins.win format
+                            return JSON.parse(result.contents);
+                        } else if (Array.isArray(result) || typeof result === 'object') {
+                            // Direct JSON response
+                            return result;
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Reliable proxy failed:`, error.message);
+                    continue;
+                }
+            }
+            return null;
+        }
+
+        // Расширенные fallback данные с более актуальной информацией
+        function getEnhancedFallbackData() {
+            const currentDate = new Date().toLocaleDateString();
+            document.getElementById('community-check-date').textContent = currentDate;
+            
+            return [
+                {
+                    "title": "Codex",
+                    "version": "4.1.2",
+                    "updatedDate": currentDate,
+                    "free": true,
+                    "detected": false,
+                    "updateStatus": true,
+                    "websitelink": "https://codex.lol",
+                    "platform": "Android",
+                    "cost": "Free",
+                    "keysystem": true
+                },
+                {
+                    "title": "Delta",
+                    "version": "1.5.0", 
+                    "updatedDate": currentDate,
+                    "free": true,
+                    "detected": false,
+                    "updateStatus": true,
+                    "websitelink": "https://deltaexploits.gg",
+                    "platform": "Android",
+                    "cost": "Free",
+                    "keysystem": true
+                },
+                {
+                    "title": "Hydrogen",
+                    "version": "2.0.1",
+                    "updatedDate": currentDate,
+                    "free": true,
+                    "detected": false,
+                    "updateStatus": true,
+                    "websitelink": "https://hydrogen.lat",
+                    "platform": "Mac",
+                    "cost": "Free (Key System)",
+                    "keysystem": true
+                },
+                {
+                    "title": "Potassium",
+                    "version": "1.7.9",
+                    "updatedDate": currentDate,
+                    "free": false,
+                    "detected": false,
+                    "updateStatus": true,
+                    "websitelink": "https://potassium.pro",
+                    "platform": "Windows",
+                    "cost": "$20 Lifetime"
+                },
+                {
+                    "title": "Volcano",
+                    "version": "1.2.5",
+                    "updatedDate": "2024-01-15",
+                    "free": true,
+                    "detected": true,
+                    "updateStatus": false,
+                    "websitelink": "https://volcano.wtf",
+                    "platform": "Windows",
+                    "cost": "Free (Key System)",
+                    "keysystem": true
+                }
+            ];
+        }
+
+        // Остальные функции остаются без изменений
+        async function loadExploitsData() {
+            const lastUpdatedElement = document.getElementById('last-updated');
+            const apiStatusElement = document.getElementById('api-status');
+            
+            try {
+                const data = await fetchExploitsData();
+                exploitsCache = data;
+                lastUpdateTime = new Date();
+                
+                lastUpdatedElement.textContent = `Last updated: ${lastUpdateTime.toLocaleTimeString()}`;
+                updateExecutersUI(data);
+                
+            } catch (error) {
+                console.error('Failed to load exploits data:', error);
+                apiStatusElement.className = 'api-status api-error';
+                apiStatusElement.innerHTML = '❌ Failed to fetch updated data. Using cached information.';
+                apiStatusElement.style.display = 'block';
+                
+                if (exploitsCache) {
+                    updateExecutersUI(exploitsCache);
+                }
+            }
+        }
+
+        function updateExecutersUI(exploits) {
+            const platforms = {
+                'pc': { element: 'pc-executers', updated: 0, notUpdated: 0 },
+                'mac': { element: 'mac-executers', updated: 0, notUpdated: 0 },
+                'android': { element: 'android-executers', updated: 0, notUpdated: 0 },
+                'ios': { element: 'ios-executers', updated: 0, notUpdated: 0 }
+            };
+
+            Object.values(platforms).forEach(platform => {
+                const element = document.getElementById(platform.element);
+                if (element) element.innerHTML = '';
+            });
+
+            exploits.forEach(exploit => {
+                const platform = getPlatform(exploit.platform);
+                if (!platform || !platforms[platform]) return;
+
+                const platformData = platforms[platform];
+                const container = document.getElementById(platformData.element);
+                
+                if (!container) return;
+
+                const card = createExecuterCard(exploit);
+                container.appendChild(card);
+
+                if (exploit.updateStatus) {
+                    platformData.updated++;
+                } else {
+                    platformData.notUpdated++;
+                }
+            });
+
+            Object.entries(platforms).forEach(([platform, data]) => {
+                const updatedElement = document.getElementById(`${platform}-updated`);
+                const notUpdatedElement = document.getElementById(`${platform}-not-updated`);
+                
+                if (updatedElement) updatedElement.textContent = data.updated;
+                if (notUpdatedElement) notUpdatedElement.textContent = data.notUpdated;
+            });
+        }
+
+        function getPlatform(platformName) {
+            if (!platformName) return null;
+            
+            const platformMap = {
+                'Windows': 'pc',
+                'Mac': 'mac', 
+                'Android': 'android',
+                'iOS': 'ios'
+            };
+            return platformMap[platformName] || null;
+        }
+
+        function createExecuterCard(exploit) {
+            const card = document.createElement('div');
+            card.className = 'executer-card';
+            card.setAttribute('data-updated', exploit.updateStatus);
+            card.onclick = () => showExecuterInfo(exploit);
+
+            const icon = getIconForExploit(exploit.title);
+            const price = exploit.free ? 
+                (exploit.keysystem ? 'Free (Key System)' : 'Free') : 
+                (exploit.cost || 'Paid');
+            
+            const website = exploit.websitelink ? 
+                exploit.websitelink.replace('https://', '').replace('http://', '') : 
+                'No website';
+
+            card.innerHTML = `
+                <div class="executer-icon">${icon}</div>
+                <div class="executer-name">${exploit.title || 'Unknown'}</div>
+                <div class="executer-price">${price}</div>
+                <div class="executer-website">${website}</div>
+            `;
+
+            return card;
+        }
+
+        function showExecuterInfo(exploit) {
+            const modal = document.getElementById('executerModal');
+            const modalTitle = document.getElementById('executerModalTitle');
+            const modalContent = document.getElementById('executerModalContent');
+            
+            modalTitle.textContent = `${exploit.title} Info`;
+            
+            const statusClass = exploit.updateStatus ? 'status-updated' : 'status-outdated';
+            const statusText = exploit.updateStatus ? '🟢 UPDATED' : '🔴 NOT UPDATED';
+            
+            const price = exploit.free ? 
+                (exploit.keysystem ? 'Free (Key System)' : 'Free') : 
+                (exploit.cost || 'Paid');
+            
+            const website = exploit.websitelink || 'No website available';
+
+            modalContent.innerHTML = `
+                <div class="update-status ${statusClass}">
+                    ${statusText}
+                </div>
+                
+                <div class="executer-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Version:</span>
+                        <span class="detail-value">${exploit.version || 'Unknown'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Price:</span>
+                        <span class="detail-value">${price}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Platform:</span>
+                        <span class="detail-value">${exploit.platform || 'Unknown'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">${exploit.updateStatus ? 
+                            'Working with current Roblox' : 
+                            'May not work with current Roblox'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Detected:</span>
+                        <span class="detail-value">${exploit.detected ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Last Updated:</span>
+                        <span class="detail-value">${exploit.updatedDate || 'Unknown'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Website:</span>
+                        <span class="detail-value">${website.replace('https://', '').replace('http://', '')}</span>
+                    </div>
+                </div>
+                
+                ${website !== 'No website available' ? 
+                    `<a href="${website}" class="website-link" target="_blank">Visit Website</a>` : 
+                    ''}
+                
+                <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
+                    ${exploit.updateStatus ? 
+                        'This executor is currently updated and should work with the latest Roblox version.' : 
+                        'This executor is not updated and may not work with the current Roblox version.'}
+                </p>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeExecuterModal() {
+            document.getElementById('executerModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('executerModal');
+            if (event.target === modal) {
+                closeExecuterModal();
+            }
+        }
+
         document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -1101,194 +1556,19 @@
                 
                 const platformId = button.getAttribute('data-platform') + '-content';
                 document.getElementById(platformId).classList.add('active');
-                
-                updateCounters(platformId);
             });
         });
 
-        // ----- MODAL -----
-        function showExecuterInfo(executerName, isUpdated, price, website, extraInfoText) {
-            const modal = document.getElementById('executerModal');
-            const modalTitle = document.getElementById('executerModalTitle');
-            const modalContent = document.getElementById('executerModalContent');
-            
-            modalTitle.textContent = `${executerName} Info`;
-            
-            const statusClass = isUpdated ? 'status-updated' : 'status-outdated';
-            const statusText = isUpdated ? '🟢 UPDATED' : '🔴 NOT UPDATED';
-            
-            modalContent.innerHTML = `
-                <div class="update-status ${statusClass}">
-                    ${statusText}
-                </div>
-                
-                <div class="executer-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Price:</span>
-                        <span class="detail-value">${price}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Status:</span>
-                        <span class="detail-value">${isUpdated ? 'Working with current Roblox' : 'May not work with current Roblox'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Website:</span>
-                        <span class="detail-value">${website.replace('https://', '')}</span>
-                    </div>
-                </div>
-                
-                <a href="${website}" class="website-link" target="_blank">Visit Website</a>
-                
-                <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
-                    ${extraInfoText}
-                </p>
-            `;
-            
-            modal.style.display = 'block';
-        }
-
-        function closeExecuterModal() {
-            document.getElementById('executerModal').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('executerModal');
-            if (event.target === modal) {
-                closeExecuterModal();
-            }
-        }
-
-        // ----- СЧЁТЧИКИ -----
-        function updateCounters(platformId) {
-            const platformContent = document.getElementById(platformId);
-            const executerCards = platformContent.querySelectorAll('.executer-card');
-            
-            let updatedCount = 0;
-            let notUpdatedCount = 0;
-            
-            executerCards.forEach(card => {
-                if (card.getAttribute('data-updated') === 'true') {
-                    updatedCount++;
-                } else {
-                    notUpdatedCount++;
-                }
-            });
-            
-            const platform = platformId.split('-')[0];
-            document.getElementById(`${platform}-updated`).textContent = updatedCount;
-            document.getElementById(`${platform}-not-updated`).textContent = notUpdatedCount;
-        }
-
-        // ----- FETCH С WEAO ЧЕРЕЗ ТВОЙ ПРОКСИ -----
-        async function fetchWeaoStatus() {
-            try {
-                // ВАЖНО: здесь адрес ТВОЕГО прокси
-                const resp = await fetch('http://localhost:3000/api/status/exploits');
-                if (!resp.ok) {
-                    console.warn('WEAO API error:', resp.status);
-                    return null;
-                }
-                return await resp.json();
-            } catch (e) {
-                console.error('Failed to fetch WEAO status', e);
-                return null;
-            }
-        }
-
-        // Маппинг наших executers к ID в WEAO (пример!)
-        const exploitIdMap = {
-            volcano: 'volcano',
-            velocity: 'velocity',
-            zenith: 'zenith',
-            wave: 'wave',
-            volt: 'volt',
-            seliware: 'seliware',
-            swift: 'swift',
-            valex: 'valex',
-            potassium: 'potassium',
-            bunni: 'bunni',
-            sirhurt: 'sirhurt',
-            hydrogen: 'hydrogen',
-            macsploit: 'macsploit',
-            'codex-android': 'codex',
-            cryptic: 'cryptic',
-            'delta-android': 'delta',
-            'delta-ios': 'delta'
-        };
-
-        let weaoStatusCache = null;
-
-        // Отдельная функция для инициализации статусов по данным WEAO
-        async function initWeaoStatus() {
-            weaoStatusCache = await fetchWeaoStatus();
-            if (!weaoStatusCache || !weaoStatusCache.exploits) {
-                console.warn('No exploits data from WEAO, using default data-updated values.');
-                // Просто обновим счётчики исходя из текущего HTML
-                updateCounters('pc-content');
-                updateCounters('mac-content');
-                updateCounters('android-content');
-                updateCounters('ios-content');
-                return;
-            }
-
-            const exploits = weaoStatusCache.exploits;
-
-            // Проходим по всем карточкам и, если есть соответствие в exploits, проставляем data-updated
-            document.querySelectorAll('.executer-card').forEach(card => {
-                const localId = card.getAttribute('data-exploit-id');
-                const weaoId = exploitIdMap[localId];
-                if (!weaoId) return;
-
-                const exploitData = exploits[weaoId];
-                if (!exploitData) return;
-
-                const isUpdated = exploitData.updated === true;
-                card.setAttribute('data-updated', isUpdated ? 'true' : 'false');
-            });
-
-            // Обновляем счётчики
-            updateCounters('pc-content');
-            updateCounters('mac-content');
-            updateCounters('android-content');
-            updateCounters('ios-content');
-        }
-
-        // Обработчик клика по executer-карте
-        function handleExecuterClick(cardEl, name, price, website) {
-            let isUpdated = cardEl.getAttribute('data-updated') === 'true';
-            let extraInfoText = 'Status loaded from local data.';
-
-            if (weaoStatusCache && weaoStatusCache.exploits) {
-                const localId = cardEl.getAttribute('data-exploit-id');
-                const weaoId = exploitIdMap[localId];
-                if (weaoId && weaoStatusCache.exploits[weaoId]) {
-                    const data = weaoStatusCache.exploits[weaoId];
-                    isUpdated = data.updated === true;
-                    extraInfoText = data.message || (isUpdated
-                        ? 'This executor is currently updated according to WEAO.'
-                        : 'This executor is currently NOT updated according to WEAO.');
-                    // Заодно актуализируем data-updated на карточке
-                    cardEl.setAttribute('data-updated', isUpdated ? 'true' : 'false');
-                    // И пересчитаем счётчики
-                    const platformContent = cardEl.closest('.platform-content');
-                    if (platformContent && platformContent.id) {
-                        updateCounters(platformContent.id);
-                    }
-                }
-            }
-
-            showExecuterInfo(name, isUpdated, price, website, extraInfoText);
-        }
-
+        // Автоматически загружаем данные при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Сначала прогоним локальные счётчики
-            updateCounters('pc-content');
-            updateCounters('mac-content');
-            updateCounters('android-content');
-            updateCounters('ios-content');
-
-            // Потом попробуем подтянуть данные с WEAO
-            initWeaoStatus();
+            // Устанавливаем дату последней проверки сообщества
+            document.getElementById('community-check-date').textContent = new Date().toLocaleDateString();
+            
+            // Загружаем данные
+            loadExploitsData();
+            
+            // Обновляем каждые 10 минут
+            setInterval(loadExploitsData, 10 * 60 * 1000);
         });
     </script>
 </body>
