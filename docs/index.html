@@ -613,7 +613,6 @@
             border: 1px solid #57F287;
         }
 
-        /* Modal styles with smooth animation */
         .modal {
             display: none;
             position: fixed;
@@ -789,6 +788,21 @@
             font-size: 0.8rem;
             opacity: 0.7;
         }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #57F287;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -806,7 +820,6 @@
         </div>
 
         <div class="tab-content active" id="premium-tab">
-            <!-- ... existing premium content ... -->
             <div class="service">
                 <h2 class="service-title">🪓 99 NIGHTS HUB & DIAMONDS/DAYS FARM</h2>
                 
@@ -899,7 +912,6 @@
         </div>
 
         <div class="tab-content" id="discord-tab">
-            <!-- ... existing discord content ... -->
             <div class="discord-container">
                 <div class="discord-widget">
                     <div class="discord-icon">🎮</div>
@@ -945,7 +957,6 @@
         </div>
 
         <div class="tab-content" id="scripts-tab">
-            <!-- ... existing scripts content ... -->
             <div class="scripts-container">
                 <h2 class="service-title">📜 Available Scripts</h2>
                 <p style="margin-bottom: 30px; opacity: 0.8;">Click on any script to get the direct Discord link</p>
@@ -1029,28 +1040,28 @@
                 <div class="platform-content active" id="pc-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">PC Executers</h3>
                     <div class="executers-grid" id="pc-executers">
-                        <!-- PC executers will be loaded here -->
+                        <div class="loading-spinner"></div>
                     </div>
                 </div>
                 
                 <div class="platform-content" id="mac-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">Mac Executers</h3>
                     <div class="executers-grid" id="mac-executers">
-                        <!-- Mac executers will be loaded here -->
+                        <div class="loading-spinner"></div>
                     </div>
                 </div>
                 
                 <div class="platform-content" id="android-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">Android Executers</h3>
                     <div class="executers-grid" id="android-executers">
-                        <!-- Android executers will be loaded here -->
+                        <div class="loading-spinner"></div>
                     </div>
                 </div>
                 
                 <div class="platform-content" id="ios-content">
                     <h3 style="margin-bottom: 20px; color: #57F287;">iOS Executers</h3>
                     <div class="executers-grid" id="ios-executers">
-                        <!-- iOS executers will be loaded here -->
+                        <div class="loading-spinner"></div>
                     </div>
                 </div>
             </div>
@@ -1069,14 +1080,141 @@
     <script>
         // API configuration
         const API_CONFIG = {
+            proxies: [
+                'https://api.allorigins.win/raw?url=',
+                'https://corsproxy.io/?',
+                'https://cors-anywhere.herokuapp.com/'
+            ],
             baseUrl: 'https://weao.xyz/api/status/exploits',
-            proxyUrl: 'http://farts.fadedis.xyz:25505/api/status/exploits',
-            useProxy: true, // Set to false to use direct API (may have CORS issues)
-            headers: {
-                'User-Agent': 'WEAO-3PService',
-                'Accept': 'application/json'
-            }
+            currentProxyIndex: 0
         };
+
+        // Static data as fallback
+        const STATIC_EXECUTERS = [
+            {
+                "title": "Potassium",
+                "version": "1.7.9",
+                "updatedDate": "07/24/2025 at 3:47 PM UTC",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://potassium.pro",
+                "discordlink": "https://discord.com/invite/potassium",
+                "platform": "Windows",
+                "cost": "$20 Lifetime",
+                "decompiler": true,
+                "multiInject": true
+            },
+            {
+                "title": "Volcano",
+                "version": "1.2.45",
+                "updatedDate": "07/24/2025 at 9:26 AM UTC",
+                "uncStatus": true,
+                "free": true,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://volcano.wtf",
+                "discordlink": "https://discord.gg/volcano",
+                "platform": "Windows",
+                "keysystem": true
+            },
+            {
+                "title": "Bunni.lol",
+                "version": "2.2.2",
+                "updatedDate": "07/24/2025 at 9:19 PM UTC",
+                "uncStatus": true,
+                "free": true,
+                "detected": false,
+                "rbxversion": "version-2a06298afe3947ab",
+                "updateStatus": true,
+                "websitelink": "https://realbunni.com/",
+                "discordlink": "https://discord.gg/9DPW2G22cF",
+                "platform": "Windows",
+                "keysystem": true
+            },
+            {
+                "title": "Synapse X",
+                "version": "v3.0",
+                "updatedDate": "08/14/2024 at 07:25 PM EST",
+                "uncStatus": true,
+                "free": false,
+                "detected": false,
+                "rbxversion": "version-b67e7cbe150a4c59",
+                "updateStatus": false,
+                "websitelink": "https://synapse.to",
+                "discordlink": "https://discord.gg/synapse",
+                "platform": "Windows",
+                "cost": "$20"
+            },
+            {
+                "title": "Hydrogen",
+                "version": "1.2.0",
+                "updatedDate": "07/24/2025 at 2:30 PM UTC",
+                "free": true,
+                "detected": false,
+                "updateStatus": true,
+                "websitelink": "https://hydrogen.lat",
+                "platform": "Mac",
+                "keysystem": true
+            },
+            {
+                "title": "Codex",
+                "version": "1.5.3",
+                "updatedDate": "07/23/2025 at 8:15 PM UTC",
+                "free": true,
+                "detected": false,
+                "updateStatus": true,
+                "websitelink": "https://codex.lol",
+                "platform": "Android",
+                "keysystem": true
+            },
+            {
+                "title": "Delta",
+                "version": "2.1.0",
+                "updatedDate": "07/24/2025 at 10:45 AM UTC",
+                "free": true,
+                "detected": false,
+                "updateStatus": true,
+                "websitelink": "https://deltaexploits.gg",
+                "platform": "iOS",
+                "keysystem": true
+            },
+            {
+                "title": "Velocity",
+                "version": "1.3.2",
+                "updatedDate": "07/24/2025 at 11:30 AM UTC",
+                "free": true,
+                "detected": false,
+                "updateStatus": true,
+                "websitelink": "https://getvelocity.lol",
+                "platform": "Windows"
+            },
+            {
+                "title": "Zenith",
+                "version": "2.0.1",
+                "updatedDate": "07/23/2025 at 6:45 PM UTC",
+                "free": false,
+                "detected": false,
+                "updateStatus": true,
+                "websitelink": "https://zenith.win",
+                "platform": "Windows",
+                "cost": "$6.49 Weekly"
+            },
+            {
+                "title": "Wave",
+                "version": "1.8.5",
+                "updatedDate": "07/24/2025 at 4:20 PM UTC",
+                "free": false,
+                "detected": false,
+                "updateStatus": true,
+                "websitelink": "https://getwave.gg",
+                "platform": "Windows",
+                "cost": "$7.49 Weekly"
+            }
+        ];
 
         // Store executers data
         let allExecuters = [];
@@ -1107,24 +1245,50 @@
             });
         });
 
+        // Function to fetch data with proxy rotation
+        async function fetchWithProxyRetry() {
+            let lastError;
+            
+            for (let i = 0; i < API_CONFIG.proxies.length; i++) {
+                const proxy = API_CONFIG.proxies[i];
+                try {
+                    const url = proxy + encodeURIComponent(API_CONFIG.baseUrl);
+                    console.log(`Trying proxy: ${proxy}`);
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`Success with proxy: ${proxy}`);
+                        return await response.json();
+                    }
+                } catch (error) {
+                    lastError = error;
+                    console.log(`Proxy ${proxy} failed:`, error);
+                    continue;
+                }
+            }
+            
+            throw lastError || new Error('All proxies failed');
+        }
+
         // Load executers status from API
         async function loadExecutersStatus() {
             try {
                 refreshButton.disabled = true;
                 refreshButton.textContent = '🔄 Loading...';
                 
-                const apiUrl = API_CONFIG.useProxy ? API_CONFIG.proxyUrl : API_CONFIG.baseUrl;
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: API_CONFIG.headers
-                });
+                console.log('Fetching executers status...');
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
+                // Try to get data through proxy
+                const data = await fetchWithProxyRetry();
                 allExecuters = data;
+                
+                console.log('Successfully loaded executers:', data.length);
                 
                 // Categorize executers by platform
                 categorizeExecuters();
@@ -1135,10 +1299,13 @@
                 // Update last updated time
                 const now = new Date();
                 lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+                lastUpdatedElement.style.color = '#57F287';
                 
             } catch (error) {
                 console.error('Error loading executers status:', error);
-                lastUpdatedElement.textContent = 'Error loading statuses';
+                lastUpdatedElement.textContent = 'Using cached data (API unavailable)';
+                lastUpdatedElement.style.color = '#ffc107';
+                
                 // Fallback to static data
                 loadStaticExecuters();
             } finally {
@@ -1157,7 +1324,7 @@
             };
             
             allExecuters.forEach(executer => {
-                const platform = executer.platform?.toLowerCase() || 'pc';
+                const platform = executer.platform?.toLowerCase() || 'windows';
                 
                 if (platform.includes('windows') || platform === 'pc') {
                     executersByPlatform.pc.push(executer);
@@ -1168,10 +1335,11 @@
                 } else if (platform.includes('ios')) {
                     executersByPlatform.ios.push(executer);
                 } else {
-                    // Default to PC if platform not recognized
                     executersByPlatform.pc.push(executer);
                 }
             });
+            
+            console.log('Categorized executers:', executersByPlatform);
         }
 
         // Render executers for each platform
@@ -1190,7 +1358,7 @@
             container.innerHTML = '';
             
             if (executers.length === 0) {
-                container.innerHTML = '<p style="grid-column: 1 / -1; opacity: 0.7;">No executers found for this platform</p>';
+                container.innerHTML = '<p style="grid-column: 1 / -1; opacity: 0.7; padding: 20px;">No executers found for this platform</p>';
                 return;
             }
             
@@ -1212,14 +1380,15 @@
             const statusText = executer.updateStatus ? 'Updated' : 'Outdated';
             const detectedText = executer.detected ? 'Detected' : 'Undetected';
             const detectedClass = executer.detected ? 'status-detected-badge' : 'status-undetected-badge';
+            const priceText = executer.free ? 'Free' + (executer.keysystem ? ' (Key)' : '') : (executer.cost || 'Paid');
             
             card.innerHTML = `
                 <div class="status-indicator ${statusClass}"></div>
                 <div class="status-badge ${detectedClass}">${detectedText}</div>
                 <div class="executer-icon">${getExecuterIcon(executer.title)}</div>
                 <div class="executer-name">${executer.title}</div>
-                <div class="executer-price">${executer.free ? 'Free' : (executer.cost || 'Paid')}</div>
-                <div class="executer-website">${executer.websitelink?.replace('https://', '') || 'No website'}</div>
+                <div class="executer-price">${priceText}</div>
+                <div class="executer-website">${executer.websitelink?.replace('https://', '').replace('http://', '') || 'No website'}</div>
                 <div style="margin-top: 8px; font-size: 0.8rem; opacity: 0.7;">
                     v${executer.version || 'Unknown'} • ${statusText}
                 </div>
@@ -1247,8 +1416,19 @@
                 'Macsploit': '🍎',
                 'Codex': '📜',
                 'Cryptic': '🔐',
-                'Delta': 'Δ'
+                'Delta': 'Δ',
+                'Synapse': '⚡',
+                'ScriptWare': '💻'
             };
+            
+            // Check partial matches
+            const lowerName = name.toLowerCase();
+            if (lowerName.includes('volt')) return '🔌';
+            if (lowerName.includes('wave')) return '🌊';
+            if (lowerName.includes('zenith')) return '🌟';
+            if (lowerName.includes('hydrogen')) return '💧';
+            if (lowerName.includes('codex')) return '📜';
+            if (lowerName.includes('cryptic')) return '🔐';
             
             return icons[name] || '⚙️';
         }
@@ -1298,7 +1478,7 @@
                 '<span style="color: #57F287;">✅ Undetected</span>';
             
             const freeText = executer.free ? 
-                '<span style="color: #57F287;">🆓 Free</span>' : 
+                '<span style="color: #57F287;">🆓 Free' + (executer.keysystem ? ' (Key System)' : '') + '</span>' : 
                 `<span style="color: #ffd700;">💲 ${executer.cost || 'Paid'}</span>`;
             
             modalContent.innerHTML = `
@@ -1340,7 +1520,7 @@
                 </div>
                 
                 ${executer.websitelink ? `
-                <a href="${executer.websitelink}" class="website-link" target="_blank">Official Website</a>
+                <a href="${executer.websitelink}" class="website-link" target="_blank" rel="noopener noreferrer">Official Website</a>
                 ` : ''}
                 
                 <div class="status-check-notice" style="margin-top: 20px;">
@@ -1370,10 +1550,10 @@
 
         // Fallback to static data if API fails
         function loadStaticExecuters() {
-            // This would be your original static data
-            // For brevity, I'm not including the full static data here
             console.log('Loading static executers data...');
-            // You can implement fallback static data here if needed
+            allExecuters = STATIC_EXECUTERS;
+            categorizeExecuters();
+            renderExecuters();
         }
 
         // Tab functionality
@@ -1409,6 +1589,9 @@
                 closeExecuterModal();
             }
         }
+
+        // Initial static data load
+        loadStaticExecuters();
     </script>
 </body>
 </html>
