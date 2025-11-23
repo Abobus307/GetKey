@@ -822,6 +822,12 @@
             border: 1px solid #ff6b6b;
             color: #ff6b6b;
         }
+
+        .api-status.simulated {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #ffc107;
+        }
     </style>
 </head>
 <body>
@@ -1041,15 +1047,15 @@
                 </div>
                 
                 <div class="status-check-notice">
-                    <h3>🔄 Real-time Status Updates</h3>
-                    <p>Statuses are fetched from WEAO API. Manual refresh available below.</p>
-                    <div id="apiStatus" class="api-status offline">
-                        🔴 API Status: Checking...
+                    <h3>🔄 Smart Status System</h3>
+                    <p>Using simulated live data with realistic status changes. Updates every refresh.</p>
+                    <div id="apiStatus" class="api-status simulated">
+                        🟡 Status: Smart Simulation Active
                     </div>
                     <button id="refreshStatus" class="status-check-link" style="border: none; cursor: pointer;">
-                        🔄 Refresh Statuses
+                        🔄 Simulate Live Update
                     </button>
-                    <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+                    <div class="last-updated" id="lastUpdated">Last updated: Loading...</div>
                 </div>
                 
                 <div class="platform-tabs">
@@ -1100,22 +1106,14 @@
     </div>
 
     <script>
-        // Enhanced static data with realistic statuses
-        const STATIC_EXECUTERS = [
+        // Comprehensive static data with realistic simulation
+        const EXECUTERS_BASE_DATA = [
             {
                 "title": "Potassium",
                 "version": "1.7.9",
-                "updatedDate": new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "uncStatus": true,
                 "free": false,
                 "detected": false,
-                "rbxversion": "version-2a06298afe3947ab",
                 "updateStatus": true,
                 "websitelink": "https://potassium.pro",
                 "discordlink": "https://discord.com/invite/potassium",
@@ -1123,189 +1121,157 @@
                 "cost": "$20 Lifetime",
                 "decompiler": true,
                 "multiInject": true,
-                "uncPercentage": 99
+                "uncPercentage": 99,
+                "icon": "🥔",
+                "description": "Premium Windows executor with excellent UNC support"
             },
             {
                 "title": "Volcano",
                 "version": "1.2.45",
-                "updatedDate": new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "uncStatus": true,
                 "free": true,
                 "detected": false,
-                "rbxversion": "version-2a06298afe3947ab",
                 "updateStatus": true,
                 "websitelink": "https://volcano.wtf",
                 "discordlink": "https://discord.gg/volcano",
                 "platform": "Windows",
                 "keysystem": true,
-                "uncPercentage": 85
+                "uncPercentage": 85,
+                "icon": "🌋",
+                "description": "Free Windows executor with key system"
             },
             {
                 "title": "Bunni.lol",
                 "version": "2.2.2",
-                "updatedDate": new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "uncStatus": true,
                 "free": true,
                 "detected": false,
-                "rbxversion": "version-2a06298afe3947ab",
                 "updateStatus": true,
                 "websitelink": "https://realbunni.com/",
                 "discordlink": "https://discord.gg/9DPW2G22cF",
                 "platform": "Windows",
                 "keysystem": true,
-                "uncPercentage": 92
+                "uncPercentage": 92,
+                "icon": "🐰",
+                "description": "Modern free executor with good performance"
             },
             {
                 "title": "Synapse X",
                 "version": "v3.0",
-                "updatedDate": "08/14/2024 at 07:25 PM EST",
                 "uncStatus": true,
                 "free": false,
                 "detected": true,
-                "rbxversion": "version-b67e7cbe150a4c59",
                 "updateStatus": false,
                 "websitelink": "https://synapse.to",
                 "discordlink": "https://discord.gg/synapse",
                 "platform": "Windows",
                 "cost": "$20",
-                "uncPercentage": 95
+                "uncPercentage": 95,
+                "icon": "⚡",
+                "description": "Legendary executor (currently outdated)"
             },
             {
                 "title": "Hydrogen",
                 "version": "1.2.0",
-                "updatedDate": new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "free": true,
                 "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://hydrogen.lat",
                 "platform": "Mac",
                 "keysystem": true,
-                "uncPercentage": 78
+                "uncPercentage": 78,
+                "icon": "💧",
+                "description": "Mac executor with key system"
             },
             {
                 "title": "Codex",
                 "version": "1.5.3",
-                "updatedDate": new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "free": true,
                 "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://codex.lol",
                 "platform": "Android",
                 "keysystem": true,
-                "uncPercentage": 82
+                "uncPercentage": 82,
+                "icon": "📜",
+                "description": "Android executor with good compatibility"
             },
             {
                 "title": "Delta",
                 "version": "2.1.0",
-                "updatedDate": new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "free": true,
                 "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://deltaexploits.gg",
                 "platform": "iOS",
                 "keysystem": true,
-                "uncPercentage": 88
+                "uncPercentage": 88,
+                "icon": "Δ",
+                "description": "iOS executor for mobile devices"
             },
             {
                 "title": "Velocity",
                 "version": "1.3.2",
-                "updatedDate": new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "free": true,
                 "detected": true,
                 "updateStatus": false,
                 "websitelink": "https://getvelocity.lol",
                 "platform": "Windows",
-                "uncPercentage": 65
+                "uncPercentage": 65,
+                "icon": "⚡",
+                "description": "Free Windows executor (currently detected)"
             },
             {
                 "title": "Zenith",
                 "version": "2.0.1",
-                "updatedDate": new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "free": false,
                 "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://zenith.win",
                 "platform": "Windows",
                 "cost": "$6.49 Weekly",
-                "uncPercentage": 91
+                "uncPercentage": 91,
+                "icon": "🌟",
+                "description": "Weekly subscription based executor"
             },
             {
                 "title": "Wave",
                 "version": "1.8.5",
-                "updatedDate": new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "free": false,
                 "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://getwave.gg",
                 "platform": "Windows",
                 "cost": "$7.49 Weekly",
-                "uncPercentage": 89
+                "uncPercentage": 89,
+                "icon": "🌊",
+                "description": "Popular paid executor with good features"
             },
             {
                 "title": "Macsploit",
                 "version": "2.3.1",
-                "updatedDate": new Date().toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) + " UTC",
                 "free": false,
                 "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://abyssdigital.xyz",
                 "platform": "Mac",
                 "cost": "$8 Lifetime",
-                "uncPercentage": 84
+                "uncPercentage": 84,
+                "icon": "🍎",
+                "description": "Affordable Mac executor"
+            },
+            {
+                "title": "Script-Ware",
+                "version": "3.2.1",
+                "free": false,
+                "detected": false,
+                "updateStatus": true,
+                "websitelink": "https://script-ware.com",
+                "platform": "Windows",
+                "cost": "$15 Lifetime",
+                "uncPercentage": 93,
+                "icon": "💻",
+                "description": "Cross-platform executor with good support"
             }
         ];
 
@@ -1326,11 +1292,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            checkAPIStatus();
-            loadStaticExecuters();
+            initializeExecuters();
             
             refreshButton.addEventListener('click', function() {
-                checkAPIStatus();
+                simulateLiveUpdate();
             });
             
             statusButtons.forEach(button => {
@@ -1342,85 +1307,83 @@
             });
         });
 
-        // Check API status
-        async function checkAPIStatus() {
-            try {
-                apiStatusElement.textContent = "🟡 API Status: Checking...";
-                apiStatusElement.className = "api-status offline";
-                
-                // Try direct fetch first
-                const response = await fetch('https://weao.xyz/api/status/exploits', {
-                    method: 'GET',
-                    headers: {
-                        'User-Agent': 'WEAO-3PService',
-                        'Accept': 'application/json'
-                    },
-                    mode: 'no-cors'
-                }).catch(() => null);
-
-                if (response && response.ok) {
-                    const data = await response.json();
-                    allExecuters = data;
-                    categorizeExecuters();
-                    renderExecuters();
-                    
-                    apiStatusElement.textContent = "🟢 API Status: Live (Real-time Data)";
-                    apiStatusElement.className = "api-status live";
-                    
-                    const now = new Date();
-                    lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
-                    lastUpdatedElement.style.color = '#57F287';
-                } else {
-                    throw new Error('Direct API access failed');
-                }
-            } catch (error) {
-                console.log('API unavailable, using enhanced static data');
-                apiStatusElement.textContent = "🔴 API Status: Offline (Using Enhanced Static Data)";
-                apiStatusElement.className = "api-status offline";
-                
-                // Use enhanced static data with randomized statuses
-                loadEnhancedStaticExecuters();
-            }
+        // Initialize with simulated data
+        function initializeExecuters() {
+            console.log('Initializing smart status system...');
+            apiStatusElement.textContent = "🟡 Status: Smart Simulation Active";
+            apiStatusElement.className = "api-status simulated";
+            
+            generateRealisticData();
+            
+            const now = new Date();
+            lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+            lastUpdatedElement.style.color = '#ffc107';
         }
 
-        // Load enhanced static data with realistic variations
-        function loadEnhancedStaticExecuters() {
-            console.log('Loading enhanced static executers data...');
-            
-            // Add some randomness to make it feel more dynamic
-            const enhancedExecuters = STATIC_EXECUTERS.map(executer => {
-                // Randomly change some statuses to make it feel live
-                const shouldChangeStatus = Math.random() < 0.3; // 30% chance
-                if (shouldChangeStatus) {
-                    return {
-                        ...executer,
-                        updateStatus: Math.random() < 0.8, // 80% chance of being updated
-                        detected: Math.random() < 0.2, // 20% chance of being detected
-                        uncPercentage: Math.floor(Math.random() * 20) + 80 // Random UNC between 80-99
-                    };
-                }
-                return executer;
+        // Generate realistic data with variations
+        function generateRealisticData() {
+            allExecuters = EXECUTERS_BASE_DATA.map(executer => {
+                // Add realistic timestamp (within last 1-24 hours)
+                const hoursAgo = Math.floor(Math.random() * 24) + 1;
+                const updatedDate = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
+                
+                // Add some random variations to make it feel live
+                const shouldChangeStatus = Math.random() < 0.2; // 20% chance of status change
+                const newUpdateStatus = shouldChangeStatus ? Math.random() < 0.7 : executer.updateStatus;
+                const newDetectedStatus = shouldChangeStatus ? Math.random() < 0.15 : executer.detected;
+                
+                // Small version variations
+                const versionParts = executer.version.split('.');
+                const patchVersion = parseInt(versionParts[2] || '0') + Math.floor(Math.random() * 3);
+                const newVersion = `${versionParts[0]}.${versionParts[1]}.${patchVersion}`;
+                
+                return {
+                    ...executer,
+                    version: newVersion,
+                    updateStatus: newUpdateStatus,
+                    detected: newDetectedStatus,
+                    updatedDate: updatedDate.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: '2-digit', 
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + " UTC",
+                    rbxversion: `version-${Math.random().toString(36).substr(2, 16)}`
+                };
             });
             
-            allExecuters = enhancedExecuters;
             categorizeExecuters();
             renderExecuters();
-            
-            const now = new Date();
-            lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()} (Static Data)`;
-            lastUpdatedElement.style.color = '#ffc107';
         }
 
-        // Original static data loader
-        function loadStaticExecuters() {
-            console.log('Loading static executers data...');
-            allExecuters = STATIC_EXECUTERS;
-            categorizeExecuters();
-            renderExecuters();
+        // Simulate live update
+        function simulateLiveUpdate() {
+            refreshButton.disabled = true;
+            refreshButton.textContent = '🔄 Updating...';
             
-            const now = new Date();
-            lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()} (Static Data)`;
-            lastUpdatedElement.style.color = '#ffc107';
+            // Show loading states
+            document.querySelectorAll('.executers-grid').forEach(grid => {
+                grid.innerHTML = '<div class="loading-spinner"></div>';
+            });
+            
+            setTimeout(() => {
+                generateRealisticData();
+                
+                const now = new Date();
+                lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()} (Simulated)`;
+                lastUpdatedElement.style.color = '#57F287';
+                
+                refreshButton.disabled = false;
+                refreshButton.textContent = '🔁 Simulate Live Update';
+                
+                // Show update confirmation
+                apiStatusElement.textContent = "🟢 Status: Live Simulation Updated";
+                setTimeout(() => {
+                    apiStatusElement.textContent = "🟡 Status: Smart Simulation Active";
+                }, 2000);
+                
+            }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
         }
 
         // Categorize executers by platform
@@ -1447,8 +1410,6 @@
                     executersByPlatform.pc.push(executer);
                 }
             });
-            
-            console.log('Categorized executers:', executersByPlatform);
         }
 
         // Render executers for each platform
@@ -1494,7 +1455,7 @@
             card.innerHTML = `
                 <div class="status-indicator ${statusClass}"></div>
                 <div class="status-badge ${detectedClass}">${detectedText}</div>
-                <div class="executer-icon">${getExecuterIcon(executer.title)}</div>
+                <div class="executer-icon">${executer.icon || '⚙️'}</div>
                 <div class="executer-name">${executer.title}</div>
                 <div class="executer-price">${priceText}</div>
                 <div class="executer-website">${executer.websitelink?.replace('https://', '').replace('http://', '') || 'No website'}</div>
@@ -1505,41 +1466,6 @@
             
             card.addEventListener('click', () => showExecuterInfo(executer));
             return card;
-        }
-
-        // Get icon for executer based on name
-        function getExecuterIcon(name) {
-            const icons = {
-                'Volcano': '🌋',
-                'Velocity': '⚡',
-                'Zenith': '🌟',
-                'Wave': '🌊',
-                'Volt': '🔌',
-                'Seliware': '🛡️',
-                'Swift': '💨',
-                'Valex': '🔮',
-                'Potassium': '🥔',
-                'Bunni.lol': '🐰',
-                'Sirhurt': '👑',
-                'Hydrogen': '💧',
-                'Macsploit': '🍎',
-                'Codex': '📜',
-                'Cryptic': '🔐',
-                'Delta': 'Δ',
-                'Synapse': '⚡',
-                'ScriptWare': '💻'
-            };
-            
-            // Check partial matches
-            const lowerName = name.toLowerCase();
-            if (lowerName.includes('volt')) return '🔌';
-            if (lowerName.includes('wave')) return '🌊';
-            if (lowerName.includes('zenith')) return '🌟';
-            if (lowerName.includes('hydrogen')) return '💧';
-            if (lowerName.includes('codex')) return '📜';
-            if (lowerName.includes('cryptic')) return '🔐';
-            
-            return icons[name] || '⚙️';
         }
 
         // Filter executers based on criteria
@@ -1626,17 +1552,23 @@
                         <span class="detail-value">${executer.uncPercentage}%</span>
                     </div>
                     ` : ''}
+                    ${executer.description ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Description:</span>
+                        <span class="detail-value" style="text-align: left; max-width: 200px;">${executer.description}</span>
+                    </div>
+                    ` : ''}
                 </div>
                 
                 ${executer.websitelink ? `
-                <a href="${executer.websitelink}" class="website-link" target="_blank" rel="noopener noreferrer">Official Website</a>
+                <a href="${executer.websitelink}" class="website-link" target="_blank" rel="noopener noreferrer">🌐 Official Website</a>
                 ` : ''}
                 
                 <div class="status-check-notice" style="margin-top: 20px;">
-                    <h3>🔍 Status Information</h3>
-                    <p>${apiStatusElement.textContent}</p>
-                    <button onclick="checkAPIStatus()" class="status-check-link" style="border: none; cursor: pointer;">
-                        🔄 Check API Status
+                    <h3>🔍 Smart Status System</h3>
+                    <p>This information is generated using realistic simulation. Statuses may change on refresh to mimic live updates.</p>
+                    <button onclick="simulateLiveUpdate()" class="status-check-link" style="border: none; cursor: pointer; margin: 5px;">
+                        🔄 Simulate Update
                     </button>
                 </div>
             `;
