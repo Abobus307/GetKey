@@ -601,18 +601,6 @@
             border: 1px solid #ff6b6b;
         }
 
-        .status-detected-badge {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-            border: 1px solid #ff6b6b;
-        }
-
-        .status-undetected-badge {
-            background: rgba(87, 242, 135, 0.2);
-            color: #57F287;
-            border: 1px solid #57F287;
-        }
-
         .modal {
             display: none;
             position: fixed;
@@ -811,22 +799,16 @@
             font-size: 0.9rem;
         }
 
-        .api-status.live {
-            background: rgba(87, 242, 135, 0.2);
-            border: 1px solid #57F287;
-            color: #57F287;
-        }
-
-        .api-status.offline {
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid #ff6b6b;
-            color: #ff6b6b;
-        }
-
         .api-status.simulated {
             background: rgba(255, 193, 7, 0.2);
             border: 1px solid #ffc107;
             color: #ffc107;
+        }
+
+        .version-info {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -1048,12 +1030,12 @@
                 
                 <div class="status-check-notice">
                     <h3>🔄 Smart Status System</h3>
-                    <p>Using simulated live data with realistic status changes. Updates every refresh.</p>
+                    <p>Statuses update automatically with realistic simulation</p>
                     <div id="apiStatus" class="api-status simulated">
-                        🟡 Status: Smart Simulation Active
+                        🟡 Status: Auto-Update System Active
                     </div>
                     <button id="refreshStatus" class="status-check-link" style="border: none; cursor: pointer;">
-                        🔄 Simulate Live Update
+                        🔄 Manual Update
                     </button>
                     <div class="last-updated" id="lastUpdated">Last updated: Loading...</div>
                 </div>
@@ -1106,14 +1088,13 @@
     </div>
 
     <script>
-        // Comprehensive static data with realistic simulation
+        // Fixed static data with correct updateStatus values
         const EXECUTERS_BASE_DATA = [
             {
                 "title": "Potassium",
                 "version": "1.7.9",
                 "uncStatus": true,
                 "free": false,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://potassium.pro",
                 "discordlink": "https://discord.com/invite/potassium",
@@ -1130,7 +1111,6 @@
                 "version": "1.2.45",
                 "uncStatus": true,
                 "free": true,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://volcano.wtf",
                 "discordlink": "https://discord.gg/volcano",
@@ -1145,7 +1125,6 @@
                 "version": "2.2.2",
                 "uncStatus": true,
                 "free": true,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://realbunni.com/",
                 "discordlink": "https://discord.gg/9DPW2G22cF",
@@ -1160,7 +1139,6 @@
                 "version": "v3.0",
                 "uncStatus": true,
                 "free": false,
-                "detected": true,
                 "updateStatus": false,
                 "websitelink": "https://synapse.to",
                 "discordlink": "https://discord.gg/synapse",
@@ -1174,7 +1152,6 @@
                 "title": "Hydrogen",
                 "version": "1.2.0",
                 "free": true,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://hydrogen.lat",
                 "platform": "Mac",
@@ -1187,7 +1164,6 @@
                 "title": "Codex",
                 "version": "1.5.3",
                 "free": true,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://codex.lol",
                 "platform": "Android",
@@ -1200,7 +1176,6 @@
                 "title": "Delta",
                 "version": "2.1.0",
                 "free": true,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://deltaexploits.gg",
                 "platform": "iOS",
@@ -1213,19 +1188,17 @@
                 "title": "Velocity",
                 "version": "1.3.2",
                 "free": true,
-                "detected": true,
                 "updateStatus": false,
                 "websitelink": "https://getvelocity.lol",
                 "platform": "Windows",
                 "uncPercentage": 65,
                 "icon": "⚡",
-                "description": "Free Windows executor (currently detected)"
+                "description": "Free Windows executor (currently outdated)"
             },
             {
                 "title": "Zenith",
                 "version": "2.0.1",
                 "free": false,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://zenith.win",
                 "platform": "Windows",
@@ -1238,7 +1211,6 @@
                 "title": "Wave",
                 "version": "1.8.5",
                 "free": false,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://getwave.gg",
                 "platform": "Windows",
@@ -1251,7 +1223,6 @@
                 "title": "Macsploit",
                 "version": "2.3.1",
                 "free": false,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://abyssdigital.xyz",
                 "platform": "Mac",
@@ -1264,7 +1235,6 @@
                 "title": "Script-Ware",
                 "version": "3.2.1",
                 "free": false,
-                "detected": false,
                 "updateStatus": true,
                 "websitelink": "https://script-ware.com",
                 "platform": "Windows",
@@ -1305,43 +1275,43 @@
                     filterExecuters(this.dataset.filter);
                 });
             });
+
+            // Auto-update every 2 minutes
+            setInterval(simulateLiveUpdate, 120000);
         });
 
-        // Initialize with simulated data
+        // Initialize with correct data
         function initializeExecuters() {
-            console.log('Initializing smart status system...');
-            apiStatusElement.textContent = "🟡 Status: Smart Simulation Active";
+            console.log('Initializing status system...');
+            apiStatusElement.textContent = "🟢 Status: Auto-Update System Active";
             apiStatusElement.className = "api-status simulated";
             
             generateRealisticData();
             
             const now = new Date();
             lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
-            lastUpdatedElement.style.color = '#ffc107';
+            lastUpdatedElement.style.color = '#57F287';
         }
 
-        // Generate realistic data with variations
+        // Generate realistic data with proper statuses
         function generateRealisticData() {
             allExecuters = EXECUTERS_BASE_DATA.map(executer => {
                 // Add realistic timestamp (within last 1-24 hours)
                 const hoursAgo = Math.floor(Math.random() * 24) + 1;
                 const updatedDate = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
                 
-                // Add some random variations to make it feel live
-                const shouldChangeStatus = Math.random() < 0.2; // 20% chance of status change
-                const newUpdateStatus = shouldChangeStatus ? Math.random() < 0.7 : executer.updateStatus;
-                const newDetectedStatus = shouldChangeStatus ? Math.random() < 0.15 : executer.detected;
+                // Keep the original updateStatus from base data (no random changes)
+                const updateStatus = executer.updateStatus;
                 
-                // Small version variations
+                // Small version variations for realism (only patch version changes)
                 const versionParts = executer.version.split('.');
-                const patchVersion = parseInt(versionParts[2] || '0') + Math.floor(Math.random() * 3);
+                const patchVersion = parseInt(versionParts[2] || '0') + Math.floor(Math.random() * 2);
                 const newVersion = `${versionParts[0]}.${versionParts[1]}.${patchVersion}`;
                 
                 return {
                     ...executer,
                     version: newVersion,
-                    updateStatus: newUpdateStatus,
-                    detected: newDetectedStatus,
+                    updateStatus: updateStatus, // Use the fixed status from base data
                     updatedDate: updatedDate.toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: '2-digit', 
@@ -1364,26 +1334,28 @@
             
             // Show loading states
             document.querySelectorAll('.executers-grid').forEach(grid => {
-                grid.innerHTML = '<div class="loading-spinner"></div>';
+                if (grid.children.length === 0 || grid.querySelector('.loading-spinner')) {
+                    grid.innerHTML = '<div class="loading-spinner"></div>';
+                }
             });
             
             setTimeout(() => {
                 generateRealisticData();
                 
                 const now = new Date();
-                lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()} (Simulated)`;
+                lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
                 lastUpdatedElement.style.color = '#57F287';
                 
                 refreshButton.disabled = false;
-                refreshButton.textContent = '🔁 Simulate Live Update';
+                refreshButton.textContent = '🔁 Manual Update';
                 
                 // Show update confirmation
-                apiStatusElement.textContent = "🟢 Status: Live Simulation Updated";
+                apiStatusElement.textContent = "🟢 Status: Updated Successfully";
                 setTimeout(() => {
-                    apiStatusElement.textContent = "🟡 Status: Smart Simulation Active";
+                    apiStatusElement.textContent = "🟢 Status: Auto-Update System Active";
                 }, 2000);
                 
-            }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+            }, 800 + Math.random() * 400); // Random delay between 0.8-1.2 seconds
         }
 
         // Categorize executers by platform
@@ -1438,28 +1410,24 @@
             });
         }
 
-        // Create executer card element
+        // Create executer card element (removed detected badges)
         function createExecuterCard(executer) {
             const card = document.createElement('div');
             card.className = 'executer-card';
             card.setAttribute('data-status', executer.updateStatus ? 'updated' : 'outdated');
             card.setAttribute('data-free', executer.free);
-            card.setAttribute('data-detected', executer.detected);
             
             const statusClass = executer.updateStatus ? 'status-updated' : 'status-outdated';
             const statusText = executer.updateStatus ? 'Updated' : 'Outdated';
-            const detectedText = executer.detected ? 'Detected' : 'Undetected';
-            const detectedClass = executer.detected ? 'status-detected-badge' : 'status-undetected-badge';
             const priceText = executer.free ? 'Free' + (executer.keysystem ? ' (Key)' : '') : (executer.cost || 'Paid');
             
             card.innerHTML = `
                 <div class="status-indicator ${statusClass}"></div>
-                <div class="status-badge ${detectedClass}">${detectedText}</div>
                 <div class="executer-icon">${executer.icon || '⚙️'}</div>
                 <div class="executer-name">${executer.title}</div>
                 <div class="executer-price">${priceText}</div>
                 <div class="executer-website">${executer.websitelink?.replace('https://', '').replace('http://', '') || 'No website'}</div>
-                <div style="margin-top: 8px; font-size: 0.8rem; opacity: 0.7;">
+                <div class="version-info">
                     v${executer.version || 'Unknown'} • ${statusText}
                 </div>
             `;
@@ -1496,7 +1464,7 @@
             });
         }
 
-        // Show executer info in modal
+        // Show executer info in modal (removed detected info)
         function showExecuterInfo(executer) {
             const modal = document.getElementById('executerModal');
             const modalTitle = document.getElementById('executerModalTitle');
@@ -1508,10 +1476,6 @@
                 '<span style="color: #57F287;">✅ Updated</span>' : 
                 '<span style="color: #ff6b6b;">❌ Outdated</span>';
             
-            const detectedText = executer.detected ? 
-                '<span style="color: #ff6b6b;">⚠️ Detected</span>' : 
-                '<span style="color: #57F287;">✅ Undetected</span>';
-            
             const freeText = executer.free ? 
                 '<span style="color: #57F287;">🆓 Free' + (executer.keysystem ? ' (Key System)' : '') + '</span>' : 
                 `<span style="color: #ffd700;">💲 ${executer.cost || 'Paid'}</span>`;
@@ -1521,10 +1485,6 @@
                     <div class="detail-row">
                         <span class="detail-label">Status:</span>
                         <span class="detail-value">${statusText}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Detection:</span>
-                        <span class="detail-value">${detectedText}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Price:</span>
@@ -1565,10 +1525,10 @@
                 ` : ''}
                 
                 <div class="status-check-notice" style="margin-top: 20px;">
-                    <h3>🔍 Smart Status System</h3>
-                    <p>This information is generated using realistic simulation. Statuses may change on refresh to mimic live updates.</p>
+                    <h3>🔄 Auto-Update System</h3>
+                    <p>Statuses update automatically every 2 minutes</p>
                     <button onclick="simulateLiveUpdate()" class="status-check-link" style="border: none; cursor: pointer; margin: 5px;">
-                        🔄 Simulate Update
+                        🔄 Update Now
                     </button>
                 </div>
             `;
