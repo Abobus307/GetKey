@@ -1210,7 +1210,7 @@
         // Функция для получения статусов исполнителей через рабочий прокси
         async function fetchExecutorStatuses() {
             // Используем рабочий прокси для обхода CORS
-            const proxyUrl = 'https://api.codetabs.com/v1/proxy?quest=http://farts.fadedis.xyz:25505/api/status/exploits';
+            const proxyUrl = 'http://farts.fadedis.xyz:25505/api/status/exploits';
             
             try {
                 // Показываем состояние загрузки
@@ -1232,6 +1232,7 @@
                 }
                 
                 const data = await response.json();
+                console.log('Data received from API:', data); // Для отладки
                 updateExecutorStatuses(data);
                 
                 // Обновляем время последнего обновления
@@ -1269,6 +1270,8 @@
 
         // Функция для обновления статусов на странице
         function updateExecutorStatuses(statusData) {
+            console.log('Updating statuses with data:', statusData); // Для отладки
+            
             Object.keys(executorMappings).forEach(executorId => {
                 const executorName = executorMappings[executorId];
                 const indicator = document.getElementById(`status-${executorId}`);
@@ -1277,18 +1280,37 @@
                 if (!indicator || !text) return;
                 
                 // Ищем статус в данных API
-                const executorStatus = statusData.find(item => 
-                    item.name && item.name.toLowerCase().includes(executorId.toLowerCase())
+                let executorStatus = null;
+                
+                // Попробуем найти по точному совпадению имени
+                executorStatus = statusData.find(item => 
+                    item.name && item.name.toLowerCase() === executorName.toLowerCase()
                 );
                 
+                // Если не нашли, попробуем найти по частичному совпадению
+                if (!executorStatus) {
+                    executorStatus = statusData.find(item => 
+                        item.name && item.name.toLowerCase().includes(executorName.toLowerCase())
+                    );
+                }
+                
+                // Если не нашли, попробуем найти по ключу (ID)
+                if (!executorStatus) {
+                    executorStatus = statusData.find(item => 
+                        item.name && item.name.toLowerCase().includes(executorId.toLowerCase())
+                    );
+                }
+                
                 if (executorStatus) {
+                    console.log(`Found status for ${executorName}:`, executorStatus); // Для отладки
+                    
                     // Обновляем статус на основе данных API
                     const status = executorStatus.status ? executorStatus.status.toLowerCase() : 'unknown';
                     
-                    if (status.includes('updated') || status.includes('working') || status.includes('online')) {
+                    if (status.includes('updated') || status.includes('working') || status.includes('online') || status === 'updated') {
                         indicator.className = 'status-indicator status-updated';
                         text.textContent = 'Updated';
-                    } else if (status.includes('patched') || status.includes('down') || status.includes('offline')) {
+                    } else if (status.includes('patched') || status.includes('down') || status.includes('offline') || status === 'patched') {
                         indicator.className = 'status-indicator status-patched';
                         text.textContent = 'Patched';
                     } else {
@@ -1296,6 +1318,7 @@
                         text.textContent = 'Unknown';
                     }
                 } else {
+                    console.log(`No status found for ${executorName}`); // Для отладки
                     // Если данные не найдены
                     indicator.className = 'status-indicator status-unknown';
                     text.textContent = 'No data';
