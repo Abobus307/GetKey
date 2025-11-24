@@ -545,7 +545,6 @@
             transition: all 0.3s ease;
             border: 1px solid rgba(70, 30, 30, 0.2);
             cursor: pointer;
-            position: relative;
         }
 
         .executer-card:hover {
@@ -718,7 +717,6 @@
             margin-top: 15px;
             transition: all 0.3s ease;
             border: 1px solid rgba(179, 142, 93, 0.3);
-            cursor: pointer;
         }
 
         .status-check-link:hover {
@@ -727,58 +725,53 @@
             box-shadow: 0 4px 15px rgba(179, 142, 93, 0.2);
         }
 
-        /* Status indicator styles */
-        .executer-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1;
+        /* Status indicators */
+        .status-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+            flex-wrap: wrap;
         }
 
         .status-indicator {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            backdrop-filter: blur(5px);
-        }
-
-        .status-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Update status colors */
+        .status-updated {
+            background: rgba(40, 167, 69, 0.3);
+            color: #6bff8d;
+            border: 1px solid rgba(40, 167, 69, 0.5);
         }
 
-        .proxy-status {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9rem;
+        .status-not-updated {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff6b7a;
+            border: 1px solid rgba(220, 53, 69, 0.5);
         }
 
-        .proxy-status.working {
-            background: rgba(76, 175, 80, 0.2);
-            border: 1px solid #4CAF50;
+        .status-unknown-update {
+            background: rgba(108, 117, 125, 0.3);
+            color: #b8c2cc;
+            border: 1px solid rgba(108, 117, 125, 0.5);
         }
 
-        .proxy-status.error {
-            background: rgba(244, 67, 54, 0.2);
-            border: 1px solid #f44336;
+        /* Detect status colors */
+        .status-detect {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffd966;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .status-undetect {
+            background: rgba(111, 66, 193, 0.3);
+            color: #b28cff;
+            border: 1px solid rgba(111, 66, 193, 0.5);
         }
     </style>
 </head>
@@ -993,12 +986,11 @@
                 <p style="margin-bottom: 30px; opacity: 0.8; color: #c0c0c0;">Click on any executor to get more information</p>
                 
                 <div class="status-check-notice">
-                    <h3>🔍 Автоматическая проверка статусов</h3>
-                    <p>Статусы исполнителей обновляются автоматически</p>
-                    <div id="proxyStatus"></div>
-                    <button onclick="manualStatusUpdate()" class="status-check-link">
-                        🔄 Обновить статусы сейчас
-                    </button>
+                    <h3>🔍 Status Information</h3>
+                    <p>Statuses are not updated automatically and may not be accurate. Always check <strong>weao.xyz</strong> for accurate and current executor statuses.</p>
+                    <a href="https://weao.xyz/" class="status-check-link" target="_blank">
+                        📊 Check accurate statuses on weao.xyz
+                    </a>
                 </div>
                 
                 <div class="platform-tabs">
@@ -1012,80 +1004,80 @@
                     <h3 style="margin-bottom: 20px; color: #b38e5d;">PC Executers</h3>
                     <div class="executers-grid">
                         <div class="executer-card" onclick="showExecuterInfo('Volcano', 'Free (Key System)', 'https://volcano.wtf')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🌋</div>
                             <div class="executer-name">Volcano</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Volcano"></div>
                             <div class="executer-website">volcano.wtf</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Velocity', 'Free', 'https://getvelocity.lol')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">⚡</div>
                             <div class="executer-name">Velocity</div>
                             <div class="executer-price">Free</div>
+                            <div class="status-container" id="status-Velocity"></div>
                             <div class="executer-website">getvelocity.lol</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Zenith', 'Paid - $6.49 Weekly', 'https://zenith.win')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🌟</div>
                             <div class="executer-name">Zenith</div>
                             <div class="executer-price">Paid - $6.49 Weekly</div>
+                            <div class="status-container" id="status-Zenith"></div>
                             <div class="executer-website">zenith.win</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Wave', 'Paid - $7.49 Weekly', 'https://getwave.gg')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🌊</div>
                             <div class="executer-name">Wave</div>
                             <div class="executer-price">Paid - $7.49 Weekly</div>
+                            <div class="status-container" id="status-Wave"></div>
                             <div class="executer-website">getwave.gg</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Volt', 'Paid - $8 Weekly', 'https://volt.bz')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🔌</div>
                             <div class="executer-name">Volt</div>
                             <div class="executer-price">Paid - $8 Weekly</div>
+                            <div class="status-container" id="status-Volt"></div>
                             <div class="executer-website">volt.bz</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Seliware', 'Paid - $9.99 Monthly', 'https://seliware.com')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🛡️</div>
                             <div class="executer-name">Seliware</div>
                             <div class="executer-price">Paid - $9.99 Monthly</div>
+                            <div class="status-container" id="status-Seliware"></div>
                             <div class="executer-website">seliware.com</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Swift', 'Free (Key System)', 'https://getswift.vip')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">💨</div>
                             <div class="executer-name">Swift</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Swift"></div>
                             <div class="executer-website">getswift.vip</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Valex', 'Free (Key System)', 'https://valex.io')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🔮</div>
                             <div class="executer-name">Valex</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Valex"></div>
                             <div class="executer-website">valex.io</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Potassium', 'Paid - $20 Lifetime', 'https://potassium.pro')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🥔</div>
                             <div class="executer-name">Potassium</div>
                             <div class="executer-price">Paid - $20 Lifetime</div>
+                            <div class="status-container" id="status-Potassium"></div>
                             <div class="executer-website">potassium.pro</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Bunni.lol', 'Free (Key System)', 'https://realbunni.com')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🐰</div>
                             <div class="executer-name">Bunni.lol</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Bunni.lol"></div>
                             <div class="executer-website">realbunni.com</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Sirhurt', 'Paid - $2.80 Weekly', 'https://sirhurt.net')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">👑</div>
                             <div class="executer-name">Sirhurt</div>
                             <div class="executer-price">Paid - $2.80 Weekly</div>
+                            <div class="status-container" id="status-Sirhurt"></div>
                             <div class="executer-website">sirhurt.net</div>
                         </div>
                     </div>
@@ -1095,17 +1087,17 @@
                     <h3 style="margin-bottom: 20px; color: #b38e5d;">Mac Executers</h3>
                     <div class="executers-grid">
                         <div class="executer-card" onclick="showExecuterInfo('Hydrogen', 'Free (Key System)', 'https://hydrogen.lat')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">💧</div>
                             <div class="executer-name">Hydrogen</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Hydrogen"></div>
                             <div class="executer-website">hydrogen.lat</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Macsploit', 'Paid - $8 Lifetime', 'https://abyssdigital.xyz')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🍎</div>
                             <div class="executer-name">Macsploit</div>
                             <div class="executer-price">Paid - $8 Lifetime</div>
+                            <div class="status-container" id="status-Macsploit"></div>
                             <div class="executer-website">abyssdigital.xyz</div>
                         </div>
                     </div>
@@ -1115,24 +1107,24 @@
                     <h3 style="margin-bottom: 20px; color: #b38e5d;">Android Executers</h3>
                     <div class="executers-grid">
                         <div class="executer-card" onclick="showExecuterInfo('Codex', 'Free (Key System)', 'https://codex.lol')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">📜</div>
                             <div class="executer-name">Codex</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Codex"></div>
                             <div class="executer-website">codex.lol</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Cryptic', 'Free (Key System)', 'https://getcryptic.net')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">🔐</div>
                             <div class="executer-name">Cryptic</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Cryptic"></div>
                             <div class="executer-website">getcryptic.net</div>
                         </div>
                         <div class="executer-card" onclick="showExecuterInfo('Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">Δ</div>
                             <div class="executer-name">Delta</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Delta"></div>
                             <div class="executer-website">deltaexploits.gg</div>
                         </div>
                     </div>
@@ -1142,10 +1134,10 @@
                     <h3 style="margin-bottom: 20px; color: #b38e5d;">iOS Executers</h3>
                     <div class="executers-grid">
                         <div class="executer-card" onclick="showExecuterInfo('Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
-                            <div class="executer-status"></div>
                             <div class="executer-icon">Δ</div>
                             <div class="executer-name">Delta</div>
                             <div class="executer-price">Free (Key System)</div>
+                            <div class="status-container" id="status-Delta-iOS"></div>
                             <div class="executer-website">deltaexploits.gg</div>
                         </div>
                     </div>
@@ -1164,281 +1156,91 @@
     </div>
 
     <script>
-        // Глобальная переменная для хранения данных о статусах
-        window.currentStatusData = null;
-        window.currentProxy = '';
+        // ==================== STATUS CONFIGURATION ====================
+        // Update Status Configuration (Green, Red, Gray)
+        let UpdateStatus = {
+            "Volcano": "Updated",
+            "Velocity": "Not Updated", 
+            "Zenith": "Updated",
+            "Wave": "Not Updated",
+            "Volt": "Unknown",
+            "Seliware": "Updated",
+            "Swift": "Updated",
+            "Valex": "Not Updated",
+            "Potassium": "Updated",
+            "Bunni.lol": "Not Updated",
+            "Sirhurt": "Unknown",
+            "Hydrogen": "Updated",
+            "Macsploit": "Updated",
+            "Codex": "Not Updated",
+            "Cryptic": "Updated",
+            "Delta": "Updated",
+            "Delta-iOS": "Not Updated"
+        };
 
-        // Функция для получения статусов через ваш прокси
-        async function fetchExecuterStatuses() {
-            try {
-                const proxyUrl = 'https://weao-proxy.onrender.com/api/status/exploits';
-                console.log('Запрос к прокси:', proxyUrl);
-                
-                const response = await fetch(proxyUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('Данные получены через прокси');
-                updateProxyStatus(true, 'weao-proxy.onrender.com');
-                return data;
-                
-            } catch (error) {
-                console.error('Ошибка при получении статусов через основной прокси:', error);
-                
-                // Fallback: пробуем CORS прокси как запасной вариант
-                return await tryFallbackProxies();
+        // Detect Status Configuration (Yellow, Purple)
+        let DetectStatus = {
+            "Volcano": "Undetect",
+            "Velocity": "Detect",
+            "Zenith": "Undetect",
+            "Wave": "Detect",
+            "Volt": "Undetect",
+            "Seliware": "Undetect",
+            "Swift": "Undetect",
+            "Valex": "Detect",
+            "Potassium": "Undetect",
+            "Bunni.lol": "Detect",
+            "Sirhurt": "Undetect",
+            "Hydrogen": "Undetect",
+            "Macsploit": "Undetect",
+            "Codex": "Detect",
+            "Cryptic": "Undetect",
+            "Delta": "Undetect",
+            "Delta-iOS": "Detect"
+        };
+
+        // Function to create status indicator
+        function createStatusIndicator(type, status) {
+            const indicator = document.createElement('div');
+            indicator.className = `status-indicator status-${type}-${status.toLowerCase().replace(' ', '-')}`;
+            
+            if (type === 'update') {
+                if (status === 'Updated') indicator.textContent = 'Updated';
+                else if (status === 'Not Updated') indicator.textContent = 'Not Updated';
+                else indicator.textContent = 'Unknown';
+            } else {
+                indicator.textContent = status;
             }
+            
+            return indicator;
         }
 
-        // Fallback: пробуем другие CORS прокси
-        async function tryFallbackProxies() {
-            const corsProxies = [
-                'https://cors-anywhere.herokuapp.com/',
-                'https://api.allorigins.win/raw?url=',
-                'https://corsproxy.io/?',
-            ];
-
-            for (let proxy of corsProxies) {
-                try {
-                    const targetUrl = 'https://weao.xyz/api/status/exploits';
-                    const proxyUrl = proxy + encodeURIComponent(targetUrl);
+        // Function to initialize statuses
+        function initializeStatuses() {
+            // Update status indicators for all executers
+            for (const [executerName, updateStatus] of Object.entries(UpdateStatus)) {
+                const statusContainer = document.getElementById(`status-${executerName}`);
+                if (statusContainer) {
+                    statusContainer.innerHTML = '';
                     
-                    console.log('Пробуем fallback прокси:', proxy);
-                    const response = await fetch(proxyUrl, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                        },
-                    });
+                    // Add update status
+                    const updateIndicator = createStatusIndicator('update', updateStatus);
+                    statusContainer.appendChild(updateIndicator);
                     
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Данные получены через fallback прокси:', proxy);
-                        updateProxyStatus(true, `fallback: ${proxy}`);
-                        return data;
+                    // Add detect status if available
+                    const detectStatus = DetectStatus[executerName];
+                    if (detectStatus) {
+                        const detectIndicator = createStatusIndicator('detect', detectStatus);
+                        statusContainer.appendChild(detectIndicator);
                     }
-                } catch (error) {
-                    console.warn(`Fallback прокси ${proxy} не сработал:`, error.message);
-                    continue;
-                }
-            }
-            
-            console.error('Все прокси не сработали');
-            updateProxyStatus(false, '');
-            return getFallbackData();
-        }
-
-        // Fallback данные на случай недоступности API
-        function getFallbackData() {
-            return [
-                { name: 'volcano', status: 'unknown', version: 'N/A' },
-                { name: 'velocity', status: 'unknown', version: 'N/A' },
-                { name: 'zenith', status: 'unknown', version: 'N/A' },
-                { name: 'wave', status: 'unknown', version: 'N/A' },
-                { name: 'volt', status: 'unknown', version: 'N/A' },
-                { name: 'seliware', status: 'unknown', version: 'N/A' },
-                { name: 'swift', status: 'unknown', version: 'N/A' },
-                { name: 'valex', status: 'unknown', version: 'N/A' },
-                { name: 'potassium', status: 'unknown', version: 'N/A' },
-                { name: 'bunni', status: 'unknown', version: 'N/A' },
-                { name: 'sirhurt', status: 'unknown', version: 'N/A' },
-                { name: 'hydrogen', status: 'unknown', version: 'N/A' },
-                { name: 'macsploit', status: 'unknown', version: 'N/A' },
-                { name: 'codex', status: 'unknown', version: 'N/A' },
-                { name: 'cryptic', status: 'unknown', version: 'N/A' },
-                { name: 'delta', status: 'unknown', version: 'N/A' }
-            ];
-        }
-
-        // Обновляем статус прокси в интерфейсе
-        function updateProxyStatus(isWorking, proxy) {
-            const statusElement = document.getElementById('proxyStatus');
-            if (isWorking) {
-                statusElement.innerHTML = `<div class="proxy-status working">✅ Используется прокси: ${proxy}</div>`;
-            } else {
-                statusElement.innerHTML = `<div class="proxy-status error">❌ Прокси недоступны. Используются локальные данные.</div>`;
-            }
-        }
-
-        // Функция для обновления статусов на странице
-        function updateExecuterStatuses(statusData) {
-            if (!statusData) return;
-
-            const executerElements = document.querySelectorAll('.executer-card');
-            
-            executerElements.forEach(element => {
-                const executerName = element.querySelector('.executer-name').textContent;
-                let statusElement = element.querySelector('.executer-status');
-                
-                if (!statusElement) {
-                    statusElement = document.createElement('div');
-                    statusElement.className = 'executer-status';
-                    element.appendChild(statusElement);
-                }
-                
-                const executerStatus = findExecuterStatus(statusData, executerName);
-                
-                if (executerStatus) {
-                    updateStatusElement(statusElement, executerStatus);
-                } else {
-                    updateStatusElement(statusElement, { status: 'unknown' });
-                }
-            });
-        }
-
-        // Ищем статус исполнителя в данных
-        function findExecuterStatus(statusData, executerName) {
-            const nameMapping = {
-                'Volcano': 'volcano',
-                'Velocity': 'velocity',
-                'Zenith': 'zenith',
-                'Wave': 'wave',
-                'Volt': 'volt',
-                'Seliware': 'seliware',
-                'Swift': 'swift',
-                'Valex': 'valex',
-                'Potassium': 'potassium',
-                'Bunni.lol': 'bunni',
-                'Sirhurt': 'sirhurt',
-                'Hydrogen': 'hydrogen',
-                'Macsploit': 'macsploit',
-                'Codex': 'codex',
-                'Cryptic': 'cryptic',
-                'Delta': 'delta'
-            };
-            
-            const apiName = nameMapping[executerName];
-            if (!apiName) return null;
-            
-            return statusData.find(item => {
-                if (!item.name) return false;
-                const itemName = item.name.toLowerCase();
-                return itemName.includes(apiName.toLowerCase());
-            });
-        }
-
-        // Обновляем элемент статуса
-        function updateStatusElement(element, status) {
-            element.innerHTML = '';
-            
-            const statusIndicator = document.createElement('div');
-            statusIndicator.className = 'status-indicator';
-            
-            let statusColor, statusText;
-            if (status.status === 'updated' || status.status === 'working') {
-                statusColor = '#4CAF50';
-                statusText = '🟢 Работает';
-            } else if (status.status === 'patched' || status.status === 'down') {
-                statusColor = '#f44336';
-                statusText = '🔴 Не работает';
-            } else {
-                statusColor = '#FF9800';
-                statusText = '🟡 Неизвестно';
-            }
-            
-            statusIndicator.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 5px; font-size: 0.8rem;">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background-color: ${statusColor};"></div>
-                    <span>${statusText}</span>
-                </div>
-            `;
-            
-            element.appendChild(statusIndicator);
-        }
-
-        // Функция для обновления модального окна с дополнительной информацией
-        function updateModalWithStatus(executerName, modalContent) {
-            const statusData = window.currentStatusData;
-            if (!statusData) return;
-            
-            const executerStatus = findExecuterStatus(statusData, executerName);
-            if (executerStatus) {
-                const statusSection = document.createElement('div');
-                statusSection.className = 'status-section';
-                statusSection.innerHTML = `
-                    <div class="detail-row">
-                        <span class="detail-label">Текущий статус:</span>
-                        <span class="detail-value" style="color: ${
-                            executerStatus.status === 'updated' ? '#4CAF50' : 
-                            executerStatus.status === 'patched' ? '#f44336' : '#FF9800'
-                        };">
-                            ${executerStatus.status === 'updated' ? '🟢 Работает' : 
-                              executerStatus.status === 'patched' ? '🔴 Не работает' : '🟡 Неизвестно'}
-                        </span>
-                    </div>
-                    ${executerStatus.version ? `
-                    <div class="detail-row">
-                        <span class="detail-label">Версия:</span>
-                        <span class="detail-value">${executerStatus.version}</span>
-                    </div>
-                    ` : ''}
-                    ${executerStatus.updated ? `
-                    <div class="detail-row">
-                        <span class="detail-label">Обновлено:</span>
-                        <span class="detail-value">${new Date(executerStatus.updated).toLocaleDateString()}</span>
-                    </div>
-                    ` : ''}
-                `;
-                
-                const detailsContainer = modalContent.querySelector('.executer-details');
-                if (detailsContainer) {
-                    detailsContainer.appendChild(statusSection);
                 }
             }
         }
 
-        // Функция для ручного обновления статусов
-        async function manualStatusUpdate() {
-            const button = event.target;
-            const originalText = button.textContent;
-            
-            button.innerHTML = '<span class="loading-spinner"></span> Обновление...';
-            button.disabled = true;
-            
-            const data = await fetchExecuterStatuses();
-            if (data) {
-                window.currentStatusData = data;
-                updateExecuterStatuses(data);
-                button.textContent = '✅ Обновлено!';
-            } else {
-                button.textContent = '❌ Ошибка';
-            }
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.disabled = false;
-            }, 2000);
-        }
+        // Initialize statuses when page loads
+        document.addEventListener('DOMContentLoaded', initializeStatuses);
 
-        // Функция для периодического обновления статусов
-        function startStatusUpdates() {
-            // Первоначальная загрузка
-            fetchExecuterStatuses().then(data => {
-                if (data) {
-                    window.currentStatusData = data;
-                    updateExecuterStatuses(data);
-                }
-            });
-            
-            // Обновление каждые 10 минут
-            setInterval(async () => {
-                const data = await fetchExecuterStatuses();
-                if (data) {
-                    window.currentStatusData = data;
-                    updateExecuterStatuses(data);
-                }
-            }, 10 * 60 * 1000);
-        }
-
-        // Оригинальные функции для работы с табами и модальными окнами
+        // Tab functionality
         document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -1451,6 +1253,7 @@
             });
         });
 
+        // Platform tab functionality
         document.querySelectorAll('.platform-tab').forEach(button => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
@@ -1463,12 +1266,16 @@
             });
         });
 
+        // Executer modal functionality
         function showExecuterInfo(executerName, price, website) {
             const modal = document.getElementById('executerModal');
             const modalTitle = document.getElementById('executerModalTitle');
             const modalContent = document.getElementById('executerModalContent');
             
             modalTitle.textContent = `${executerName} Info`;
+            
+            const updateStatus = UpdateStatus[executerName] || 'Unknown';
+            const detectStatus = DetectStatus[executerName] || 'Detect';
             
             modalContent.innerHTML = `
                 <div class="executer-details">
@@ -1477,15 +1284,37 @@
                         <span class="detail-value">${price}</span>
                     </div>
                     <div class="detail-row">
+                        <span class="detail-label">Update Status:</span>
+                        <span class="detail-value">
+                            ${createStatusIndicator('update', updateStatus).outerHTML}
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Detect Status:</span>
+                        <span class="detail-value">
+                            ${createStatusIndicator('detect', detectStatus).outerHTML}
+                        </span>
+                    </div>
+                    <div class="detail-row">
                         <span class="detail-label">Website:</span>
                         <span class="detail-value">${website.replace('https://', '')}</span>
                     </div>
                 </div>
                 
                 <a href="${website}" class="website-link" target="_blank">Official Website</a>
+                
+                <div class="status-check-notice" style="margin-top: 20px;">
+                    <h3>🔍 Important Notice</h3>
+                    <p>Statuses are not updated automatically and may not be accurate. Always check <strong>weao.xyz</strong> for accurate and current executor statuses.</p>
+                    <a href="https://weao.xyz/" class="status-check-link" target="_blank">
+                        📊 Check accurate statuses on weao.xyz
+                    </a>
+                </div>
+                
+                <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem; color: #c0c0c0;">
+                    We do not track executor update statuses automatically. Always check the official website for current status.
+                </p>
             `;
-            
-            updateModalWithStatus(executerName, modalContent);
             
             modal.style.display = 'flex';
             setTimeout(() => {
@@ -1508,11 +1337,6 @@
                 closeExecuterModal();
             }
         }
-
-        // Запускаем при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            startStatusUpdates();
-        });
     </script>
 </body>
 </html>
