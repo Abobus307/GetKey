@@ -797,6 +797,22 @@
             opacity: 0.7;
             color: #b0b0b0;
         }
+        
+        .cors-warning {
+            background: rgba(179, 142, 93, 0.1);
+            border: 2px solid rgba(179, 142, 93, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .proxy-status {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -1009,13 +1025,22 @@
                 <h2 class="service-title">⚙️ Supported Executers</h2>
                 <p style="margin-bottom: 30px; opacity: 0.8; color: #c0c0c0;">Click on any executor to get more information</p>
                 
+                <div id="corsWarning" class="cors-warning" style="display: none;">
+                    <h3>⚠️ CORS Issue Detected</h3>
+                    <p>Due to browser security restrictions, we cannot fetch real-time status updates directly. Please visit the status page below for current executor statuses.</p>
+                    <a href="https://weao.xyz/" class="status-check-link" target="_blank">
+                        📊 Check statuses on weao.xyz
+                    </a>
+                </div>
+                
                 <div class="status-check-notice">
                     <h3>🔍 Check Executor Statuses</h3>
-                    <p>Real-time status updates from our API</p>
+                    <p>Real-time status updates (when available)</p>
                     <button id="refreshStatusButton" class="status-check-link">
-                        🔄 Refresh Statuses
+                        🔄 Try to Refresh Statuses
                     </button>
                     <div id="lastUpdated" class="last-updated"></div>
+                    <div id="proxyStatus" class="proxy-status"></div>
                 </div>
                 
                 <div class="platform-tabs">
@@ -1164,32 +1189,6 @@
     </div>
 
     <script>
-        // Табы навигации
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                
-                button.classList.add('active');
-                
-                const tabId = button.getAttribute('data-tab') + '-tab';
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-
-        // Табы платформ
-        document.querySelectorAll('.platform-tab').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.platform-content').forEach(content => content.classList.remove('active'));
-                
-                button.classList.add('active');
-                
-                const platformId = button.getAttribute('data-platform') + '-content';
-                document.getElementById(platformId).classList.add('active');
-            });
-        });
-
         // Маппинг исполнителей для API
         const executorMappings = {
             'volcano': 'Volcano',
@@ -1211,22 +1210,46 @@
             'delta-ios': 'Delta'
         };
 
-        // Функция для получения статусов исполнителей
+        // Список CORS-прокси для попыток подключения
+        const proxyList = [
+            'https://api.allorigins.win/raw?url=',
+            'https://cors-anywhere.herokuapp.com/',
+            'https://cors-proxy.htmldriven.com/?url=',
+            'https://cors.bridged.cc/',
+            '' // Прямое подключение (последняя попытка)
+        ];
+
+        let currentProxyIndex = 0;
+
+        // Функция для получения статусов исполнителей с использованием CORS-прокси
         async function fetchExecutorStatuses() {
             const apiUrl = 'https://weao.xyz/api/status/exploits';
             
-            try {
-                // Показываем состояние загрузки
-                Object.keys(executorMappings).forEach(executorId => {
-                    const indicator = document.getElementById(`status-${executorId}`);
-                    const text = document.getElementById(`status-text-${executorId}`);
-                    if (indicator && text) {
-                        indicator.className = 'status-indicator status-loading';
-                        text.textContent = 'Loading...';
-                    }
-                });
+            // Показываем состояние загрузки
+            Object.keys(executorMappings).forEach(executorId => {
+                const indicator = document.getElementById(`status-${executorId}`);
+                const text = document.getElementById(`status-text-${executorId}`);
+                if (indicator && text) {
+                    indicator.className = 'status-indicator status-loading';
+                    text.textContent = 'Loading...';
+                }
+            });
 
-                const response = await fetch(apiUrl);
+            // Показываем используемый прокси
+            document.getElementById('proxyStatus').textContent = `Trying proxy: ${currentProxyIndex + 1}/${proxyList.length}`;
+            
+            // Формируем URL с текущим прокси
+            const proxyUrl = proxyList[currentProxyIndex];
+            const finalUrl = proxyUrl ? proxyUrl + encodeURIComponent(apiUrl) : apiUrl;
+            
+            try {
+                const response = await fetch(finalUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1238,23 +1261,44 @@
                 // Обновляем время последнего обновления
                 const now = new Date();
                 document.getElementById('lastUpdated').textContent = 
-                    `Last updated: ${now.toLocaleTimeString()}`;
+                    `Last updated: ${now.toLocaleTimeString()} (via proxy ${currentProxyIndex + 1})`;
+                
+                // Скрываем предупреждение о CORS
+                document.getElementById('corsWarning').style.display = 'none';
+                
+                // Сбрасываем индекс прокси для следующего запроса
+                currentProxyIndex = 0;
                     
             } catch (error) {
-                console.error('Error fetching executor statuses:', error);
+                console.error(`Error with proxy ${currentProxyIndex}:`, error);
                 
-                // Показываем ошибку для всех исполнителей
-                Object.keys(executorMappings).forEach(executorId => {
-                    const indicator = document.getElementById(`status-${executorId}`);
-                    const text = document.getElementById(`status-text-${executorId}`);
-                    if (indicator && text) {
-                        indicator.className = 'status-indicator status-unknown';
-                        text.textContent = 'Error loading';
-                    }
-                });
+                // Пробуем следующий прокси
+                currentProxyIndex++;
                 
-                document.getElementById('lastUpdated').textContent = 
-                    'Error fetching statuses';
+                if (currentProxyIndex < proxyList.length) {
+                    // Пробуем следующий прокси
+                    setTimeout(fetchExecutorStatuses, 500);
+                } else {
+                    // Все прокси не сработали
+                    Object.keys(executorMappings).forEach(executorId => {
+                        const indicator = document.getElementById(`status-${executorId}`);
+                        const text = document.getElementById(`status-text-${executorId}`);
+                        if (indicator && text) {
+                            indicator.className = 'status-indicator status-unknown';
+                            text.textContent = 'No data';
+                        }
+                    });
+                    
+                    document.getElementById('lastUpdated').textContent = 
+                        'Status updates unavailable due to CORS restrictions';
+                    document.getElementById('proxyStatus').textContent = 'All proxy attempts failed';
+                    
+                    // Показываем предупреждение о CORS
+                    document.getElementById('corsWarning').style.display = 'block';
+                    
+                    // Сбрасываем индекс прокси для следующей попытки
+                    currentProxyIndex = 0;
+                }
             }
         }
 
@@ -1293,6 +1337,32 @@
                 }
             });
         }
+
+        // Табы навигации
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                button.classList.add('active');
+                
+                const tabId = button.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Табы платформ
+        document.querySelectorAll('.platform-tab').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.platform-content').forEach(content => content.classList.remove('active'));
+                
+                button.classList.add('active');
+                
+                const platformId = button.getAttribute('data-platform') + '-content';
+                document.getElementById(platformId).classList.add('active');
+            });
+        });
 
         // Функции для модального окна
         function showExecuterInfo(executerName, price, website) {
@@ -1356,8 +1426,8 @@
             // Добавляем обработчик для кнопки обновления
             document.getElementById('refreshStatusButton').addEventListener('click', fetchExecutorStatuses);
             
-            // Автоматическое обновление каждые 5 минут
-            setInterval(fetchExecutorStatuses, 5 * 60 * 1000);
+            // Автоматическое обновление каждые 10 минут
+            setInterval(fetchExecutorStatuses, 10 * 60 * 1000);
         });
 
         // Закрытие модального окна при клике вне его
