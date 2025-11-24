@@ -13,8 +13,8 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #1a0a0a 0%, #0f0714 100%);
+            color: #e0e0e0;
             min-height: 100vh;
             padding: 20px;
         }
@@ -23,17 +23,32 @@
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 10;
         }
 
         .header {
             margin-bottom: 30px;
             padding: 20px;
+            position: relative;
         }
 
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
-            background: linear-gradient(45deg, #ffd700, #ff6b6b);
+            background: linear-gradient(45deg, #b38e5d, #a86b6b);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -44,6 +59,7 @@
             font-size: 1.2rem;
             opacity: 0.8;
             margin-bottom: 30px;
+            color: #b0b0b0;
         }
 
         .tabs {
@@ -55,8 +71,8 @@
         }
 
         .tab-button {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(40, 15, 15, 0.4);
+            color: #d0d0d0;
             border: none;
             padding: 12px 30px;
             font-size: 1rem;
@@ -64,26 +80,28 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(80, 30, 30, 0.3);
         }
 
         .tab-button.active {
-            background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(45deg, #2a0f0f 0%, #1a0a1a 100%);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 1px solid rgba(120, 60, 60, 0.3);
         }
 
         .tab-button:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(60, 25, 25, 0.4);
         }
 
         .tab-content {
             display: none;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 10, 10, 0.3);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(70, 30, 30, 0.2);
             animation: fadeIn 0.5s ease;
         }
 
@@ -104,23 +122,24 @@
         .service-title {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            color: #ffd700;
+            color: #b38e5d;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .plan {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(25, 10, 20, 0.4);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             transition: transform 0.3s ease;
+            border: 1px solid rgba(70, 30, 60, 0.2);
         }
 
         .plan:hover {
             transform: translateX(10px);
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(35, 15, 25, 0.4);
         }
 
         .plan-header {
@@ -133,6 +152,7 @@
         .plan-name {
             font-size: 1.3rem;
             font-weight: bold;
+            color: #d0d0d0;
         }
 
         .price {
@@ -141,6 +161,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            color: #e0e0e0;
         }
 
         .features {
@@ -153,6 +174,7 @@
             gap: 10px;
             margin-bottom: 8px;
             opacity: 0.9;
+            color: #c0c0c0;
         }
 
         .notes-container {
@@ -172,29 +194,30 @@
             flex: 1;
             min-width: 200px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(60, 20, 20, 0.4);
             border-radius: 10px;
             font-size: 0.9rem;
-            border-left: 3px solid #ff6b6b;
+            border-left: 3px solid #a86b6b;
+            color: #e0e0e0;
         }
 
         .purchase-info {
             flex: 2;
             min-width: 300px;
-            background: #ffd700;
-            color: #000;
+            background: rgba(179, 142, 93, 0.2);
+            color: #e0e0e0;
             padding: 15px;
             border-radius: 10px;
             font-weight: bold;
             text-align: center;
-            border-left: 3px solid #ffc400;
+            border-left: 3px solid rgba(179, 142, 93, 0.5);
         }
 
         .support-button {
             flex: 1;
             min-width: 200px;
-            background: #5865F2;
-            color: white;
+            background: rgba(60, 20, 20, 0.6);
+            color: #e0e0e0;
             padding: 15px;
             border-radius: 10px;
             font-weight: bold;
@@ -205,19 +228,20 @@
             justify-content: center;
             gap: 8px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(100, 40, 40, 0.3);
         }
 
         .support-button:hover {
-            background: #4752c4;
+            background: rgba(80, 30, 30, 0.6);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .main-server-button {
             flex: 1;
             min-width: 200px;
-            background: #57F287;
-            color: #000;
+            background: rgba(40, 20, 40, 0.6);
+            color: #e0e0e0;
             padding: 15px;
             border-radius: 10px;
             font-weight: bold;
@@ -228,26 +252,27 @@
             justify-content: center;
             gap: 8px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(80, 40, 80, 0.3);
         }
 
         .main-server-button:hover {
-            background: #43b881;
+            background: rgba(60, 30, 60, 0.6);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(87, 242, 135, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .premium-perks {
             margin-top: 40px;
             padding: 30px;
-            background: rgba(255, 215, 0, 0.1);
+            background: rgba(179, 142, 93, 0.1);
             border-radius: 15px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(179, 142, 93, 0.2);
         }
 
         .perks-title {
             font-size: 1.8rem;
             margin-bottom: 25px;
-            color: #ffd700;
+            color: #b38e5d;
             text-align: center;
         }
 
@@ -258,10 +283,11 @@
         }
 
         .perk-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(30, 10, 10, 0.3);
             border-radius: 10px;
             padding: 20px;
             text-align: center;
+            border: 1px solid rgba(70, 30, 30, 0.2);
         }
 
         .perk-icon {
@@ -273,7 +299,7 @@
             font-size: 1.3rem;
             font-weight: bold;
             margin-bottom: 15px;
-            color: #ffd700;
+            color: #b38e5d;
         }
 
         .perk-features {
@@ -286,6 +312,7 @@
             gap: 10px;
             margin-bottom: 8px;
             opacity: 0.9;
+            color: #c0c0c0;
         }
 
         .discord-container {
@@ -293,11 +320,11 @@
         }
 
         .discord-widget {
-            background: rgba(88, 101, 242, 0.1);
+            background: rgba(40, 15, 15, 0.4);
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 25px;
-            border: 2px solid #5865F2;
+            border: 2px solid rgba(80, 30, 30, 0.4);
         }
 
         .discord-icon {
@@ -308,7 +335,7 @@
         .discord-title {
             font-size: 2rem;
             margin-bottom: 15px;
-            color: #5865F2;
+            color: #a86b6b;
         }
 
         .discord-description {
@@ -316,49 +343,52 @@
             margin-bottom: 30px;
             opacity: 0.9;
             line-height: 1.6;
+            color: #d0d0d0;
         }
 
         .discord-button {
-            background: #5865F2;
-            color: white;
+            background: rgba(60, 20, 20, 0.6);
+            color: #e0e0e0;
             border: none;
             padding: 15px 40px;
             font-size: 1.1rem;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             text-decoration: none;
             display: inline-block;
             margin: 10px 5px;
+            border: 1px solid rgba(100, 40, 40, 0.3);
         }
 
         .discord-button:hover {
-            background: #4752c4;
+            background: rgba(80, 30, 30, 0.6);
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
         }
 
         .support-server-button {
-            background: #57F287;
-            color: #000;
+            background: rgba(40, 20, 40, 0.6);
+            color: #e0e0e0;
             border: none;
             padding: 15px 30px;
             font-size: 1.1rem;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(87, 242, 135, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             text-decoration: none;
             display: inline-block;
             margin: 10px 5px;
             font-weight: bold;
+            border: 1px solid rgba(80, 40, 80, 0.3);
         }
 
         .support-server-button:hover {
-            background: #43b881;
+            background: rgba(60, 30, 60, 0.6);
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(87, 242, 135, 0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
         }
 
         .button-group {
@@ -377,10 +407,11 @@
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(30, 10, 10, 0.3);
             border-radius: 10px;
             padding: 20px;
             text-align: center;
+            border: 1px solid rgba(70, 30, 30, 0.2);
         }
 
         .feature-icon {
@@ -400,8 +431,8 @@
         }
 
         .script-button {
-            background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
+            background: linear-gradient(45deg, #2a0f0f 0%, #1a0a1a 100%);
+            color: #e0e0e0;
             border: none;
             padding: 25px 20px;
             border-radius: 15px;
@@ -413,11 +444,13 @@
             align-items: center;
             gap: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(80, 30, 30, 0.3);
         }
 
         .script-button:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #3a1f1f 0%, #2a1a2a 100%);
         }
 
         .script-icon {
@@ -430,8 +463,8 @@
         }
 
         .script-warning {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid #ff6b6b;
+            background: rgba(60, 20, 20, 0.4);
+            border: 1px solid #a86b6b;
             border-radius: 10px;
             padding: 20px;
             margin: 25px 0;
@@ -439,7 +472,7 @@
         }
 
         .script-warning h3 {
-            color: #ff6b6b;
+            color: #a86b6b;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -465,8 +498,8 @@
         }
 
         .platform-tab {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(40, 15, 15, 0.4);
+            color: #d0d0d0;
             border: none;
             padding: 12px 25px;
             font-size: 1rem;
@@ -474,16 +507,18 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(80, 30, 30, 0.3);
         }
 
         .platform-tab.active {
-            background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(45deg, #2a0f0f 0%, #1a0a1a 100%);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 1px solid rgba(120, 60, 60, 0.3);
         }
 
         .platform-tab:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(60, 25, 25, 0.4);
         }
 
         .platform-content {
@@ -503,18 +538,18 @@
         }
 
         .executer-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(30, 10, 10, 0.3);
             border-radius: 10px;
             padding: 20px;
             text-align: center;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(70, 30, 30, 0.2);
             cursor: pointer;
         }
 
         .executer-card:hover {
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(40, 15, 15, 0.4);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
@@ -527,21 +562,28 @@
             font-size: 1.1rem;
             font-weight: bold;
             margin-bottom: 8px;
+            color: #d0d0d0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .executer-price {
             font-size: 0.9rem;
             opacity: 0.8;
             margin-bottom: 5px;
+            color: #c0c0c0;
         }
 
         .executer-website {
             font-size: 0.8rem;
             opacity: 0.7;
             word-break: break-word;
+            color: #b0b0b0;
         }
 
-        /* Modal styles */
+        /* Modal styles with smooth animation */
         .modal {
             display: none;
             position: fixed;
@@ -564,14 +606,14 @@
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #1a0a0a 0%, #0f0714 100%);
             margin: 5% auto;
             padding: 30px;
             border-radius: 20px;
             width: 90%;
             max-width: 500px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(70, 30, 30, 0.3);
             position: relative;
             text-align: center;
             transform: scale(0.8);
@@ -589,18 +631,18 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            color: #fff;
+            color: #e0e0e0;
             transition: color 0.3s ease;
         }
 
         .close-button:hover {
-            color: #ff6b6b;
+            color: #a86b6b;
         }
 
         .modal-title {
             text-align: center;
             margin-bottom: 25px;
-            color: #ffd700;
+            color: #b38e5d;
             font-size: 1.8rem;
         }
 
@@ -619,26 +661,28 @@
 
         .detail-label {
             font-weight: bold;
-            color: #57F287;
+            color: #b38e5d;
         }
 
         .detail-value {
             text-align: right;
+            color: #e0e0e0;
         }
 
         .website-link {
             display: inline-block;
-            background: #5865F2;
-            color: white;
+            background: rgba(60, 20, 20, 0.6);
+            color: #e0e0e0;
             padding: 8px 15px;
             border-radius: 20px;
             text-decoration: none;
             margin-top: 10px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(100, 40, 40, 0.3);
         }
 
         .website-link:hover {
-            background: #4752c4;
+            background: rgba(80, 30, 30, 0.6);
             transform: translateY(-2px);
         }
 
@@ -649,8 +693,8 @@
         }
 
         .status-check-notice {
-            background: rgba(255, 193, 7, 0.2);
-            border: 2px solid #ffc107;
+            background: rgba(179, 142, 93, 0.1);
+            border: 2px solid rgba(179, 142, 93, 0.4);
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
@@ -658,7 +702,7 @@
         }
 
         .status-check-notice h3 {
-            color: #ffc107;
+            color: #b38e5d;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -668,855 +712,661 @@
 
         .status-check-link {
             display: inline-block;
-            background: #ffc107;
-            color: #000;
+            background: rgba(179, 142, 93, 0.2);
+            color: #e0e0e0;
             padding: 12px 25px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
             margin-top: 15px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(179, 142, 93, 0.3);
+            cursor: pointer;
         }
 
         .status-check-link:hover {
-            background: #ffb300;
+            background: rgba(179, 142, 93, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+            box-shadow: 0 4px 15px rgba(179, 142, 93, 0.2);
         }
 
-        /* === LIVE STATUS UI === */
-        .status-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .status-controls input[type="text"],
-        .status-controls input[type="number"] {
-            padding: 8px 12px;
-            border-radius: 20px;
-            border: none;
-            outline: none;
-            min-width: 220px;
-        }
-
-        .status-controls label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-refresh-button {
-            background: #57F287;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .status-refresh-button:hover {
-            background: #43b881;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(87, 242, 135, 0.3);
-        }
-
-        .status-summary {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .status-error {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #ff6b6b;
-        }
-
-        .status-list {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .status-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .status-card:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-2px);
-        }
-
-        .status-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status-card-title {
-            font-weight: bold;
-        }
-
-        .status-badge {
+        /* Добавляем новые стили для статусов */
+        .status-indicator {
             display: inline-block;
-            padding: 2px 8px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .status-updated {
+            background-color: #4CAF50;
+            box-shadow: 0 0 8px #4CAF50;
+        }
+
+        .status-patched {
+            background-color: #f44336;
+            box-shadow: 0 0 8px #f44336;
+        }
+
+        .status-unknown {
+            background-color: #ff9800;
+            box-shadow: 0 0 8px #ff9800;
+        }
+
+        .status-loading {
+            background-color: #2196F3;
+            box-shadow: 0 0 8px #2196F3;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            margin-left: 5px;
+            opacity: 0.9;
+        }
+
+        .refresh-button {
+            background: rgba(60, 20, 20, 0.6);
+            color: #e0e0e0;
+            border: none;
+            padding: 8px 15px;
             border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(100, 40, 40, 0.3);
         }
 
-        .badge-updated {
-            background: #57F287;
-            color: #000;
+        .refresh-button:hover {
+            background: rgba(80, 30, 30, 0.6);
+            transform: translateY(-2px);
         }
 
-        .badge-outdated {
-            background: #ff6b6b;
-            color: #fff;
-        }
-
-        .badge-detected {
-            background: #ff6b6b;
-            color: #fff;
-        }
-
-        .badge-undetected {
-            background: #57F287;
-            color: #000;
-        }
-
-        .badge-free {
-            background: #00bcd4;
-            color: #000;
-        }
-
-        .badge-paid {
-            background: #ffd700;
-            color: #000;
-        }
-
-        .status-card-meta {
-            margin-top: 8px;
-            font-size: 0.85rem;
-            opacity: 0.85;
-        }
-
-        .status-card-meta span {
-            margin-right: 10px;
-        }
-
-        .status-card-footer {
-            margin-top: 6px;
+        .last-updated {
+            text-align: center;
+            margin-top: 15px;
             font-size: 0.8rem;
             opacity: 0.7;
+            color: #b0b0b0;
         }
-
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>💸 CPS Network</h1>
-        <p class="subtitle">Premium Services & Community</p>
-
-        <div class="tabs">
-            <button class="tab-button active" data-tab="premium">Premium</button>
-            <button class="tab-button" data-tab="discord">Discord Info</button>
-            <button class="tab-button" data-tab="scripts">Script List</button>
-            <button class="tab-button" data-tab="executers">Supported Executers</button>
-        </div>
-    </div>
-
-    <!-- PREMIUM TAB -->
-    <div class="tab-content active" id="premium-tab">
-        <div class="service">
-            <h2 class="service-title">🪓 99 NIGHTS HUB & DIAMONDS/DAYS FARM</h2>
-
-            <div class="plan">
-                <div class="plan-header">
-                    <span class="plan-name">👑 Lifetime Plan</span>
-                </div>
-                <div class="price">💲 950 Robux</div>
-            </div>
-
-            <div class="plan">
-                <div class="plan-header">
-                    <span class="plan-name">✨ Monthly Plan</span>
-                </div>
-                <div class="price">💲 550 Robux</div>
-                <div class="features">
-                    <div class="feature">💎 2 Server Boosts</div>
-                </div>
+    <div class="container">
+        <img src="https://cdn.discordapp.com/attachments/1427720582216159324/1442110870946709536/1760377122964.png?ex=69243de8&is=6922ec68&hm=669ec25d058e4b3ef700e51c8f351bd2e317475df4b3cd16b47f88bac39378b1&" alt="CPS Network Logo" class="logo">
+        
+        <div class="header">
+            <h1>💸 CPS Network</h1>
+            <p class="subtitle">Premium Services & Community</p>
+            
+            <div class="tabs">
+                <button class="tab-button active" data-tab="premium">Premium</button>
+                <button class="tab-button" data-tab="discord">Discord Info</button>
+                <button class="tab-button" data-tab="scripts">Script List</button>
+                <button class="tab-button" data-tab="executers">Supported Executers</button>
             </div>
         </div>
 
-        <div class="service">
-            <h2 class="service-title">⚽ TOUCH FOOTBALL KEYLESS</h2>
-
-            <div class="plan">
-                <div class="plan-header">
-                    <span class="plan-name">👑 Lifetime Plan</span>
-                </div>
-                <div class="price">💲 1450 Robux</div>
-                <div class="price">💸 $13.99 PayPal</div>
-            </div>
-
-            <div class="plan">
-                <div class="plan-header">
-                    <span class="plan-name">✨ Monthly Plan</span>
-                </div>
-                <div class="price">💲 550 Robux</div>
-                <div class="price">💸 $4.99 PayPal</div>
-                <div class="features">
-                    <div class="feature">💎 2 Server Boosts</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="premium-perks">
-            <h2 class="perks-title">✨ Premium Perks</h2>
-            <div class="perks-grid">
-                <div class="perk-card">
-                    <div class="perk-icon">🪓</div>
-                    <div class="perk-name">99 Nights Hub Gui</div>
-                    <div class="perk-features">
-                        <div class="perk-feature">✅ Keyless</div>
-                        <div class="perk-feature">✅ Priority Support</div>
+        <div class="tab-content active" id="premium-tab">
+            <div class="service">
+                <h2 class="service-title">🪓 99 NIGHTS HUB & DIAMONDS/DAYS FARM</h2>
+                
+                <div class="plan">
+                    <div class="plan-header">
+                        <span class="plan-name">👑 Lifetime Plan</span>
                     </div>
+                    <div class="price">💲 950 Robux</div>
                 </div>
-
-                <div class="perk-card">
-                    <div class="perk-icon">💎</div>
-                    <div class="perk-name">Diamonds & Days Farm</div>
-                    <div class="perk-features">
-                        <div class="perk-feature">✅ Keyless</div>
-                        <div class="perk-feature">✅ Priority Support</div>
+                
+                <div class="plan">
+                    <div class="plan-header">
+                        <span class="plan-name">✨ Monthly Plan</span>
                     </div>
-                </div>
-
-                <div class="perk-card">
-                    <div class="perk-icon">⚽</div>
-                    <div class="perk-name">Touch Football</div>
-                    <div class="perk-features">
-                        <div class="perk-feature">✅ Keyless</div>
-                        <div class="perk-feature">✅ Priority Support</div>
+                    <div class="price">💲 550 Robux</div>
+                    <div class="features">
+                        <div class="feature">💎 2 Server Boosts</div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="notes-container">
-            <div class="note-row">
-                <div class="warning">⚠️ All robux payments are done "tax covered"!</div>
-                <div class="warning">ℹ️ No refunds.</div>
-                <div class="purchase-info">💸 Open A Ticket To Purchase In Discord Server</div>
-                <a href="https://discord.gg/uCq6dNAfRV" class="main-server-button" target="_blank">
-                    🏠 Main Server
-                </a>
-                <a href="https://discord.gg/FhK8UGTtU8" class="support-button" target="_blank">
-                    🛠️ Support Server
-                </a>
+            <div class="service">
+                <h2 class="service-title">⚽ TOUCH FOOTBALL KEYLESS</h2>
+                
+                <div class="plan">
+                    <div class="plan-header">
+                        <span class="plan-name">👑 Lifetime Plan</span>
+                    </div>
+                    <div class="price">💲 1450 Robux</div>
+                    <div class="price">💸 $13.99 PayPal</div>
+                </div>
+                
+                <div class="plan">
+                    <div class="plan-header">
+                        <span class="plan-name">✨ Monthly Plan</span>
+                    </div>
+                    <div class="price">💲 550 Robux</div>
+                    <div class="price">💸 $4.99 PayPal</div>
+                    <div class="features">
+                        <div class="feature">💎 2 Server Boosts</div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- DISCORD TAB -->
-    <div class="tab-content" id="discord-tab">
-        <div class="discord-container">
-            <div class="discord-widget">
-                <div class="discord-icon">🎮</div>
-                <h2 class="discord-title">Join Our Discord Community</h2>
-                <p class="discord-description">
-                    Connect with our growing community of gamers, get support for our products,
-                    stay updated with the latest news, and participate in exclusive events!
-                </p>
+            <div class="premium-perks">
+                <h2 class="perks-title">✨ Premium Perks</h2>
+                <div class="perks-grid">
+                    <div class="perk-card">
+                        <div class="perk-icon">🪓</div>
+                        <div class="perk-name">99 Nights Hub Gui</div>
+                        <div class="perk-features">
+                            <div class="perk-feature">✅ Keyless</div>
+                            <div class="perk-feature">✅ Priority Support</div>
+                        </div>
+                    </div>
+                    
+                    <div class="perk-card">
+                        <div class="perk-icon">💎</div>
+                        <div class="perk-name">Diamonds & Days Farm</div>
+                        <div class="perk-features">
+                            <div class="perk-feature">✅ Keyless</div>
+                            <div class="perk-feature">✅ Priority Support</div>
+                        </div>
+                    </div>
+                    
+                    <div class="perk-card">
+                        <div class="perk-icon">⚽</div>
+                        <div class="perk-name">Touch Football</div>
+                        <div class="perk-features">
+                            <div class="perk-feature">✅ Keyless</div>
+                            <div class="perk-feature">✅ Priority Support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <div class="button-group">
-                    <a href="https://discord.gg/uCq6dNAfRV" class="discord-button" target="_blank">
-                        Join Discord Server
+            <div class="notes-container">
+                <div class="note-row">
+                    <div class="warning">⚠️ All robux payments are done "tax covered"!</div>
+                    <div class="warning">ℹ️ No refunds.</div>
+                    <div class="purchase-info">💸 Open A Ticket To Purchase In Discord Server</div>
+                    <a href="https://discord.gg/uCq6dNAfRV" class="main-server-button" target="_blank">
+                        🏠 Main Server
                     </a>
-                    <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
+                    <a href="https://discord.gg/FhK8UGTtU8" class="support-button" target="_blank">
                         🛠️ Support Server
                     </a>
                 </div>
             </div>
+        </div>
 
-            <div class="discord-features">
-                <div class="feature-card">
-                    <div class="feature-icon">💬</div>
-                    <h3>Active Community</h3>
-                    <p>Chat with other members and share your experiences</p>
+        <div class="tab-content" id="discord-tab">
+            <div class="discord-container">
+                <div class="discord-widget">
+                    <div class="discord-icon">🎮</div>
+                    <h2 class="discord-title">Join Our Discord Community</h2>
+                    <p class="discord-description">
+                        Connect with our growing community of gamers, get support for our products, 
+                        stay updated with the latest news, and participate in exclusive events!
+                    </p>
+                    
+                    <div class="button-group">
+                        <a href="https://discord.gg/uCq6dNAfRV" class="discord-button" target="_blank">
+                            Join Discord Server
+                        </a>
+                        <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
+                            🛠️ Support Server
+                        </a>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🛠️</div>
-                    <h3>Quick Support</h3>
-                    <p>Get help with any issues or questions you might have</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>Latest Updates</h3>
-                    <p>Be the first to know about new features and products</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Exclusive Content</h3>
-                    <p>Access special channels and content for members</p>
+                
+                <div class="discord-features">
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3>Active Community</h3>
+                        <p>Chat with other members and share your experiences</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛠️</div>
+                        <h3>Quick Support</h3>
+                        <p>Get help with any issues or questions you might have</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Latest Updates</h3>
+                        <p>Be the first to know about new features and products</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Exclusive Content</h3>
+                        <p>Access special channels and content for members</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- SCRIPTS TAB -->
-    <div class="tab-content" id="scripts-tab">
-        <div class="scripts-container">
-            <h2 class="service-title">📜 Available Scripts</h2>
-            <p style="margin-bottom: 30px; opacity: 0.8;">Click on any script to get the direct Discord link</p>
-
-            <div class="script-grid">
-                <div class="script-item">
-                    <a href="https://discordapp.com/channels/1400295038285512864/1440706256263319672" class="script-button" target="_blank">
-                        <div class="script-icon">🌐</div>
-                        <div class="script-name">Universal GUI Script</div>
+        <div class="tab-content" id="scripts-tab">
+            <div class="scripts-container">
+                <h2 class="service-title">📜 Available Scripts</h2>
+                <p style="margin-bottom: 30px; opacity: 0.8; color: #c0c0c0;">Click on any script to get the direct Discord link</p>
+                
+                <div class="script-grid">
+                    <div class="script-item">
+                        <a href="https://discordapp.com/channels/1400295038285512864/1440706256263319672" class="script-button" target="_blank">
+                            <div class="script-icon">🌐</div>
+                            <div class="script-name">Universal GUI Script</div>
+                        </a>
+                    </div>
+                    
+                    <a href="https://discordapp.com/channels/1400295038285512864/1441769355393106030" class="script-button" target="_blank">
+                        <div class="script-icon">⚽</div>
+                        <div class="script-name">Touch Football Script</div>
+                    </a>
+                    
+                    <a href="https://discordapp.com/channels/1400295038285512864/1440710857154891898" class="script-button" target="_blank">
+                        <div class="script-icon">🛡️</div>
+                        <div class="script-name">PVB Script</div>
+                    </a>
+                    
+                    <div class="script-item">
+                        <a href="https://discordapp.com/channels/1400295038285512864/1440690028274782219" class="script-button" target="_blank">
+                            <div class="script-icon">🌙</div>
+                            <div class="script-name">99 Nights Farm Script</div>
+                        </a>
+                    </div>
+                    
+                    <a href="https://discordapp.com/channels/1400295038285512864/1440689938944495686" class="script-button" target="_blank">
+                        <div class="script-icon">🏈</div>
+                        <div class="script-name">TSB Script</div>
                     </a>
                 </div>
 
-                <a href="https://discordapp.com/channels/1400295038285512864/1441769355393106030" class="script-button" target="_blank">
-                    <div class="script-icon">⚽</div>
-                    <div class="script-name">Touch Football Script</div>
-                </a>
-
-                <a href="https://discordapp.com/channels/1400295038285512864/1440710857154891898" class="script-button" target="_blank">
-                    <div class="script-icon">🛡️</div>
-                    <div class="script-name">PVB Script</div>
-                </a>
-
-                <div class="script-item">
-                    <a href="https://discordapp.com/channels/1400295038285512864/1440690028274782219" class="script-button" target="_blank">
-                        <div class="script-icon">🌙</div>
-                        <div class="script-name">99 Nights Farm Script</div>
-                    </a>
-                </div>
-
-                <a href="https://discordapp.com/channels/1400295038285512864/1440689938944495686" class="script-button" target="_blank">
-                    <div class="script-icon">🏈</div>
-                    <div class="script-name">TSB Script</div>
-                </a>
-            </div>
-
-            <div class="script-warning">
-                <h3>⚠️ Important Notice</h3>
-                <p>This list is NOT automatically updated and may not include newly added scripts.
+                <div class="script-warning">
+                    <h3>⚠️ Important Notice</h3>
+                    <p>This list is NOT automatically updated and may not include newly added scripts. 
                     Always check the Discord server for the most current script list and updates.</p>
-            </div>
+                </div>
 
-            <div class="script-support">
-                <h3 style="margin-bottom: 15px;">🐛 Found a bug or script not working?</h3>
-                <p style="margin-bottom: 20px; opacity: 0.8;">Open a ticket on our support server and our team will help you!</p>
-                <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
-                    🛠️ Open Support Ticket
-                </a>
+                <div class="script-support">
+                    <h3 style="margin-bottom: 15px; color: #b38e5d;">🐛 Found a bug or script not working?</h3>
+                    <p style="margin-bottom: 20px; opacity: 0.8; color: #c0c0c0;">Open a ticket on our support server and our team will help you!</p>
+                    <a href="https://discord.gg/FhK8UGTtU8" class="support-server-button" target="_blank">
+                        🛠️ Open Support Ticket
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- EXECUTERS TAB -->
-    <div class="tab-content" id="executers-tab">
-        <div class="executers-container">
-            <h2 class="service-title">⚙️ Supported Executers</h2>
-            <p style="margin-bottom: 10px; opacity: 0.8;">Click on any executor to get more information</p>
-
-            <!-- Блок "статусы с weao" -->
-            <div class="status-check-notice">
-                <h3>🔍 Live Executor Statuses (WEAO API)</h3>
-                <p>Statuses are fetched from WhatExpsAre.Online / WEAO via proxy API.</p>
-                <div class="status-controls">
-                    <input id="proxyUrlInput" type="text"
-                           value="http://farts.fadedis.xyz:25505"
-                           placeholder="Proxy URL, например http://your-ip:25505">
-                    <input id="searchInput" type="text" placeholder="Filter by name (e.g. Potassium, Bunni)">
-                    <button id="refreshButton" class="status-refresh-button">🔄 Refresh now</button>
-                    <label>
-                        <input id="autoRefreshCheckbox" type="checkbox" checked>
-                        Auto refresh
-                    </label>
-                    <label>
-                        Interval (sec):
-                        <input id="refreshIntervalInput" type="number" min="5" value="60">
-                    </label>
+        <div class="tab-content" id="executers-tab">
+            <div class="executers-container">
+                <h2 class="service-title">⚙️ Supported Executers</h2>
+                <p style="margin-bottom: 30px; opacity: 0.8; color: #c0c0c0;">Click on any executor to get more information</p>
+                
+                <div class="status-check-notice">
+                    <h3>🔍 Check Executor Statuses</h3>
+                    <p>Real-time status updates from our API</p>
+                    <button id="refreshStatusButton" class="status-check-link">
+                        🔄 Refresh Statuses
+                    </button>
+                    <div id="lastUpdated" class="last-updated"></div>
                 </div>
-                <div id="statusSummary" class="status-summary"></div>
-                <div id="statusError" class="status-error"></div>
-                <div id="statusList" class="status-list"></div>
-            </div>
-
-            <p style="margin-bottom: 10px; opacity: 0.7; font-size: 0.85rem;">
-                If live statuses fail, you can still check manually on:
-                <a href="https://weao.xyz/" class="status-check-link" target="_blank" style="padding:4px 10px; border-radius:20px; font-size:0.85rem;">
-                    weao.xyz
-                </a>
-            </p>
-
-            <div class="platform-tabs">
-                <button class="platform-tab active" data-platform="pc">💻 PC</button>
-                <button class="platform-tab" data-platform="mac">🍎 Mac</button>
-                <button class="platform-tab" data-platform="android">📱 Android</button>
-                <button class="platform-tab" data-platform="ios">📱 iOS</button>
-            </div>
-
-            <div class="platform-content active" id="pc-content">
-                <h3 style="margin-bottom: 20px; color: #57F287;">PC Executers</h3>
-                <div class="executers-grid">
-                    <div class="executer-card" onclick="showExecuterInfo('Volcano', 'Free (Key System)', 'https://volcano.wtf')">
-                        <div class="executer-icon">🌋</div>
-                        <div class="executer-name">Volcano</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">volcano.wtf</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Velocity', 'Free', 'https://getvelocity.lol')">
-                        <div class="executer-icon">⚡</div>
-                        <div class="executer-name">Velocity</div>
-                        <div class="executer-price">Free</div>
-                        <div class="executer-website">getvelocity.lol</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Zenith', 'Paid - $6.49 Weekly', 'https://zenith.win')">
-                        <div class="executer-icon">🌟</div>
-                        <div class="executer-name">Zenith</div>
-                        <div class="executer-price">Paid - $6.49 Weekly</div>
-                        <div class="executer-website">zenith.win</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Wave', 'Paid - $7.49 Weekly', 'https://getwave.gg')">
-                        <div class="executer-icon">🌊</div>
-                        <div class="executer-name">Wave</div>
-                        <div class="executer-price">Paid - $7.49 Weekly</div>
-                        <div class="executer-website">getwave.gg</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Volt', 'Paid - $8 Weekly', 'https://volt.bz')">
-                        <div class="executer-icon">🔌</div>
-                        <div class="executer-name">Volt</div>
-                        <div class="executer-price">Paid - $8 Weekly</div>
-                        <div class="executer-website">volt.bz</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Seliware', 'Paid - $9.99 Monthly', 'https://seliware.com')">
-                        <div class="executer-icon">🛡️</div>
-                        <div class="executer-name">Seliware</div>
-                        <div class="executer-price">Paid - $9.99 Monthly</div>
-                        <div class="executer-website">seliware.com</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Swift', 'Free (Key System)', 'https://getswift.vip')">
-                        <div class="executer-icon">💨</div>
-                        <div class="executer-name">Swift</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">getswift.vip</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Valex', 'Free (Key System)', 'https://valex.io')">
-                        <div class="executer-icon">🔮</div>
-                        <div class="executer-name">Valex</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">valex.io</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Potassium', 'Paid - $20 Lifetime', 'https://potassium.pro')">
-                        <div class="executer-icon">🥔</div>
-                        <div class="executer-name">Potassium</div>
-                        <div class="executer-price">Paid - $20 Lifetime</div>
-                        <div class="executer-website">potassium.pro</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Bunni.lol', 'Free (Key System)', 'https://realbunni.com')">
-                        <div class="executer-icon">🐰</div>
-                        <div class="executer-name">Bunni.lol</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">realbunni.com</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Sirhurt', 'Paid - $2.80 Weekly', 'https://sirhurt.net')">
-                        <div class="executer-icon">👑</div>
-                        <div class="executer-name">Sirhurt</div>
-                        <div class="executer-price">Paid - $2.80 Weekly</div>
-                        <div class="executer-website">sirhurt.net</div>
+                
+                <div class="platform-tabs">
+                    <button class="platform-tab active" data-platform="pc">💻 PC</button>
+                    <button class="platform-tab" data-platform="mac">🍎 Mac</button>
+                    <button class="platform-tab" data-platform="android">📱 Android</button>
+                    <button class="platform-tab" data-platform="ios">📱 iOS</button>
+                </div>
+                
+                <div class="platform-content active" id="pc-content">
+                    <h3 style="margin-bottom: 20px; color: #b38e5d;">PC Executers</h3>
+                    <div class="executers-grid">
+                        <div class="executer-card" onclick="showExecuterInfo('Volcano', 'Free (Key System)', 'https://volcano.wtf')">
+                            <div class="executer-icon">🌋</div>
+                            <div class="executer-name">Volcano <span class="status-indicator status-loading" id="status-volcano"></span><span class="status-text" id="status-text-volcano">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">volcano.wtf</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Velocity', 'Free', 'https://getvelocity.lol')">
+                            <div class="executer-icon">⚡</div>
+                            <div class="executer-name">Velocity <span class="status-indicator status-loading" id="status-velocity"></span><span class="status-text" id="status-text-velocity">Loading...</span></div>
+                            <div class="executer-price">Free</div>
+                            <div class="executer-website">getvelocity.lol</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Zenith', 'Paid - $6.49 Weekly', 'https://zenith.win')">
+                            <div class="executer-icon">🌟</div>
+                            <div class="executer-name">Zenith <span class="status-indicator status-loading" id="status-zenith"></span><span class="status-text" id="status-text-zenith">Loading...</span></div>
+                            <div class="executer-price">Paid - $6.49 Weekly</div>
+                            <div class="executer-website">zenith.win</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Wave', 'Paid - $7.49 Weekly', 'https://getwave.gg')">
+                            <div class="executer-icon">🌊</div>
+                            <div class="executer-name">Wave <span class="status-indicator status-loading" id="status-wave"></span><span class="status-text" id="status-text-wave">Loading...</span></div>
+                            <div class="executer-price">Paid - $7.49 Weekly</div>
+                            <div class="executer-website">getwave.gg</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Volt', 'Paid - $8 Weekly', 'https://volt.bz')">
+                            <div class="executer-icon">🔌</div>
+                            <div class="executer-name">Volt <span class="status-indicator status-loading" id="status-volt"></span><span class="status-text" id="status-text-volt">Loading...</span></div>
+                            <div class="executer-price">Paid - $8 Weekly</div>
+                            <div class="executer-website">volt.bz</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Seliware', 'Paid - $9.99 Monthly', 'https://seliware.com')">
+                            <div class="executer-icon">🛡️</div>
+                            <div class="executer-name">Seliware <span class="status-indicator status-loading" id="status-seliware"></span><span class="status-text" id="status-text-seliware">Loading...</span></div>
+                            <div class="executer-price">Paid - $9.99 Monthly</div>
+                            <div class="executer-website">seliware.com</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Swift', 'Free (Key System)', 'https://getswift.vip')">
+                            <div class="executer-icon">💨</div>
+                            <div class="executer-name">Swift <span class="status-indicator status-loading" id="status-swift"></span><span class="status-text" id="status-text-swift">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">getswift.vip</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Valex', 'Free (Key System)', 'https://valex.io')">
+                            <div class="executer-icon">🔮</div>
+                            <div class="executer-name">Valex <span class="status-indicator status-loading" id="status-valex"></span><span class="status-text" id="status-text-valex">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">valex.io</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Potassium', 'Paid - $20 Lifetime', 'https://potassium.pro')">
+                            <div class="executer-icon">🥔</div>
+                            <div class="executer-name">Potassium <span class="status-indicator status-loading" id="status-potassium"></span><span class="status-text" id="status-text-potassium">Loading...</span></div>
+                            <div class="executer-price">Paid - $20 Lifetime</div>
+                            <div class="executer-website">potassium.pro</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Bunni.lol', 'Free (Key System)', 'https://realbunni.com')">
+                            <div class="executer-icon">🐰</div>
+                            <div class="executer-name">Bunni.lol <span class="status-indicator status-loading" id="status-bunni"></span><span class="status-text" id="status-text-bunni">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">realbunni.com</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Sirhurt', 'Paid - $2.80 Weekly', 'https://sirhurt.net')">
+                            <div class="executer-icon">👑</div>
+                            <div class="executer-name">Sirhurt <span class="status-indicator status-loading" id="status-sirhurt"></span><span class="status-text" id="status-text-sirhurt">Loading...</span></div>
+                            <div class="executer-price">Paid - $2.80 Weekly</div>
+                            <div class="executer-website">sirhurt.net</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="platform-content" id="mac-content">
-                <h3 style="margin-bottom: 20px; color: #57F287;">Mac Executers</h3>
-                <div class="executers-grid">
-                    <div class="executer-card" onclick="showExecuterInfo('Hydrogen', 'Free (Key System)', 'https://hydrogen.lat')">
-                        <div class="executer-icon">💧</div>
-                        <div class="executer-name">Hydrogen</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">hydrogen.lat</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Macsploit', 'Paid - $8 Lifetime', 'https://abyssdigital.xyz')">
-                        <div class="executer-icon">🍎</div>
-                        <div class="executer-name">Macsploit</div>
-                        <div class="executer-price">Paid - $8 Lifetime</div>
-                        <div class="executer-website">abyssdigital.xyz</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="platform-content" id="android-content">
-                <h3 style="margin-bottom: 20px; color: #57F287;">Android Executers</h3>
-                <div class="executers-grid">
-                    <div class="executer-card" onclick="showExecuterInfo('Codex', 'Free (Key System)', 'https://codex.lol')">
-                        <div class="executer-icon">📜</div>
-                        <div class="executer-name">Codex</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">codex.lol</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Cryptic', 'Free (Key System)', 'https://getcryptic.net')">
-                        <div class="executer-icon">🔐</div>
-                        <div class="executer-name">Cryptic</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">getcryptic.net</div>
-                    </div>
-                    <div class="executer-card" onclick="showExecuterInfo('Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
-                        <div class="executer-icon">Δ</div>
-                        <div class="executer-name">Delta</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">deltaexploits.gg</div>
+                
+                <div class="platform-content" id="mac-content">
+                    <h3 style="margin-bottom: 20px; color: #b38e5d;">Mac Executers</h3>
+                    <div class="executers-grid">
+                        <div class="executer-card" onclick="showExecuterInfo('Hydrogen', 'Free (Key System)', 'https://hydrogen.lat')">
+                            <div class="executer-icon">💧</div>
+                            <div class="executer-name">Hydrogen <span class="status-indicator status-loading" id="status-hydrogen"></span><span class="status-text" id="status-text-hydrogen">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">hydrogen.lat</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Macsploit', 'Paid - $8 Lifetime', 'https://abyssdigital.xyz')">
+                            <div class="executer-icon">🍎</div>
+                            <div class="executer-name">Macsploit <span class="status-indicator status-loading" id="status-macsploit"></span><span class="status-text" id="status-text-macsploit">Loading...</span></div>
+                            <div class="executer-price">Paid - $8 Lifetime</div>
+                            <div class="executer-website">abyssdigital.xyz</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="platform-content" id="ios-content">
-                <h3 style="margin-bottom: 20px; color: #57F287;">iOS Executers</h3>
-                <div class="executers-grid">
-                    <div class="executer-card" onclick="showExecuterInfo('Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
-                        <div class="executer-icon">Δ</div>
-                        <div class="executer-name">Delta</div>
-                        <div class="executer-price">Free (Key System)</div>
-                        <div class="executer-website">deltaexploits.gg</div>
+                
+                <div class="platform-content" id="android-content">
+                    <h3 style="margin-bottom: 20px; color: #b38e5d;">Android Executers</h3>
+                    <div class="executers-grid">
+                        <div class="executer-card" onclick="showExecuterInfo('Codex', 'Free (Key System)', 'https://codex.lol')">
+                            <div class="executer-icon">📜</div>
+                            <div class="executer-name">Codex <span class="status-indicator status-loading" id="status-codex"></span><span class="status-text" id="status-text-codex">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">codex.lol</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Cryptic', 'Free (Key System)', 'https://getcryptic.net')">
+                            <div class="executer-icon">🔐</div>
+                            <div class="executer-name">Cryptic <span class="status-indicator status-loading" id="status-cryptic"></span><span class="status-text" id="status-text-cryptic">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">getcryptic.net</div>
+                        </div>
+                        <div class="executer-card" onclick="showExecuterInfo('Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
+                            <div class="executer-icon">Δ</div>
+                            <div class="executer-name">Delta <span class="status-indicator status-loading" id="status-delta"></span><span class="status-text" id="status-text-delta">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">deltaexploits.gg</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="platform-content" id="ios-content">
+                    <h3 style="margin-bottom: 20px; color: #b38e5d;">iOS Executers</h3>
+                    <div class="executers-grid">
+                        <div class="executer-card" onclick="showExecuterInfo('Delta', 'Free (Key System)', 'https://deltaexploits.gg')">
+                            <div class="executer-icon">Δ</div>
+                            <div class="executer-name">Delta <span class="status-indicator status-loading" id="status-delta-ios"></span><span class="status-text" id="status-text-delta-ios">Loading...</span></div>
+                            <div class="executer-price">Free (Key System)</div>
+                            <div class="executer-website">deltaexploits.gg</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- MODAL -->
-<div id="executerModal" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeExecuterModal()">&times;</span>
-        <h2 class="modal-title" id="executerModalTitle">Executer Info</h2>
-        <div id="executerModalContent"></div>
-    </div>
-</div>
-
-<script>
-    // Tabs
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            button.classList.add('active');
-            const tabId = button.getAttribute('data-tab') + '-tab';
-            document.getElementById(tabId).classList.add('active');
-        });
-    });
-
-    // Platform tabs
-    document.querySelectorAll('.platform-tab').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.platform-content').forEach(content => content.classList.remove('active'));
-
-            button.classList.add('active');
-            const platformId = button.getAttribute('data-platform') + '-content';
-            document.getElementById(platformId).classList.add('active');
-        });
-    });
-
-    // Old static modal info (для карточек, которые ты сам указал)
-    function showExecuterInfo(executerName, price, website) {
-        const modal = document.getElementById('executerModal');
-        const modalTitle = document.getElementById('executerModalTitle');
-        const modalContent = document.getElementById('executerModalContent');
-
-        modalTitle.textContent = executerName + ' Info';
-
-        modalContent.innerHTML = `
-            <div class="executer-details">
-                <div class="detail-row">
-                    <span class="detail-label">Price:</span>
-                    <span class="detail-value">${escapeHtml(price)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Status:</span>
-                    <span class="detail-value">Open official website or use live status above</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Website:</span>
-                    <span class="detail-value">${escapeHtml(website.replace(/^https?:\/\//, ''))}</span>
-                </div>
+    <div id="executerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeExecuterModal()">&times;</span>
+            <h2 class="modal-title" id="executerModalTitle">Executer Info</h2>
+            <div id="executerModalContent">
             </div>
+        </div>
+    </div>
 
-            <a href="${escapeAttr(website)}" class="website-link" target="_blank">Official Website</a>
-        `;
-
-        modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.classList.add('active');
-        }, 10);
-    }
-
-    function closeExecuterModal() {
-        const modal = document.getElementById('executerModal');
-        modal.classList.remove('active');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('executerModal');
-        if (event.target === modal) {
-            closeExecuterModal();
-        }
-    };
-
-    // === LIVE STATUS LOGIC (WEAO через прокси) ===
-
-    const proxyUrlInput = document.getElementById('proxyUrlInput');
-    const searchInput = document.getElementById('searchInput');
-    const refreshButton = document.getElementById('refreshButton');
-    const autoRefreshCheckbox = document.getElementById('autoRefreshCheckbox');
-    const refreshIntervalInput = document.getElementById('refreshIntervalInput');
-    const statusSummary = document.getElementById('statusSummary');
-    const statusError = document.getElementById('statusError');
-    const statusList = document.getElementById('statusList');
-
-    let allExploits = [];
-    let autoRefreshTimer = null;
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function escapeAttr(str) {
-        // для href и т.п.
-        return escapeHtml(str).replace(/"/g, '&quot;');
-    }
-
-    async function fetchAndRender() {
-        const proxyUrl = proxyUrlInput.value.trim().replace(/\/+$/, '');
-        statusError.textContent = '';
-        statusSummary.textContent = 'Loading...';
-
-        if (!proxyUrl) {
-            statusSummary.textContent = '';
-            statusError.textContent = 'Please enter a valid proxy URL.';
-            return;
-        }
-
-        try {
-            const endpoint = proxyUrl + '/api/status/exploits';
-            const res = await fetch(endpoint, {
-                method: 'GET'
-                // заголовок User-Agent нельзя задать с фронта, это делает прокси
+    <script>
+        // Табы навигации
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                button.classList.add('active');
+                
+                const tabId = button.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
             });
-
-            if (!res.ok) {
-                throw new Error('HTTP ' + res.status + ' from proxy');
-            }
-
-            const data = await res.json();
-
-            if (!Array.isArray(data)) {
-                throw new Error('Unexpected response format (expected array).');
-            }
-
-            allExploits = data;
-            renderStatusList();
-            const updatedCount = allExploits.filter(e => e.updateStatus === true).length;
-            statusSummary.textContent = `Loaded ${allExploits.length} exploits. Updated: ${updatedCount}.`;
-        } catch (err) {
-            console.error(err);
-            statusSummary.textContent = '';
-            statusError.textContent =
-                'Error loading statuses from proxy. Check proxy URL, CORS and that it forwards to weao.xyz correctly.';
-            statusList.innerHTML = '';
-        }
-    }
-
-    function renderStatusList() {
-        const filter = searchInput.value.trim().toLowerCase();
-        const filtered = allExploits.filter(e => {
-            if (!filter) return true;
-            const title = (e.title || '').toLowerCase();
-            return title.includes(filter);
         });
 
-        if (!filtered.length) {
-            statusList.innerHTML = '<p style="opacity:0.8;font-size:0.9rem;">No exploits found for this filter.</p>';
-            return;
+        // Табы платформ
+        document.querySelectorAll('.platform-tab').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.platform-content').forEach(content => content.classList.remove('active'));
+                
+                button.classList.add('active');
+                
+                const platformId = button.getAttribute('data-platform') + '-content';
+                document.getElementById(platformId).classList.add('active');
+            });
+        });
+
+        // Маппинг исполнителей для API
+        const executorMappings = {
+            'volcano': 'Volcano',
+            'velocity': 'Velocity',
+            'zenith': 'Zenith',
+            'wave': 'Wave',
+            'volt': 'Volt',
+            'seliware': 'Seliware',
+            'swift': 'Swift',
+            'valex': 'Valex',
+            'potassium': 'Potassium',
+            'bunni': 'Bunni.lol',
+            'sirhurt': 'Sirhurt',
+            'hydrogen': 'Hydrogen',
+            'macsploit': 'Macsploit',
+            'codex': 'Codex',
+            'cryptic': 'Cryptic',
+            'delta': 'Delta',
+            'delta-ios': 'Delta'
+        };
+
+        // Функция для получения статусов исполнителей
+        async function fetchExecutorStatuses() {
+            const apiUrl = 'https://weao.xyz/api/status/exploits';
+            
+            try {
+                // Показываем состояние загрузки
+                Object.keys(executorMappings).forEach(executorId => {
+                    const indicator = document.getElementById(`status-${executorId}`);
+                    const text = document.getElementById(`status-text-${executorId}`);
+                    if (indicator && text) {
+                        indicator.className = 'status-indicator status-loading';
+                        text.textContent = 'Loading...';
+                    }
+                });
+
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                updateExecutorStatuses(data);
+                
+                // Обновляем время последнего обновления
+                const now = new Date();
+                document.getElementById('lastUpdated').textContent = 
+                    `Last updated: ${now.toLocaleTimeString()}`;
+                    
+            } catch (error) {
+                console.error('Error fetching executor statuses:', error);
+                
+                // Показываем ошибку для всех исполнителей
+                Object.keys(executorMappings).forEach(executorId => {
+                    const indicator = document.getElementById(`status-${executorId}`);
+                    const text = document.getElementById(`status-text-${executorId}`);
+                    if (indicator && text) {
+                        indicator.className = 'status-indicator status-unknown';
+                        text.textContent = 'Error loading';
+                    }
+                });
+                
+                document.getElementById('lastUpdated').textContent = 
+                    'Error fetching statuses';
+            }
         }
 
-        statusList.innerHTML = filtered.map(e => {
-            const title = e.title || 'Unknown';
-            const updated = !!e.updateStatus;
-            const detected = !!e.detected;
-            const free = !!e.free;
-            const platform = e.platform || 'Unknown';
-            const version = e.version || 'n/a';
-            const updatedDate = e.updatedDate || 'Unknown date';
+        // Функция для обновления статусов на странице
+        function updateExecutorStatuses(statusData) {
+            Object.keys(executorMappings).forEach(executorId => {
+                const executorName = executorMappings[executorId];
+                const indicator = document.getElementById(`status-${executorId}`);
+                const text = document.getElementById(`status-text-${executorId}`);
+                
+                if (!indicator || !text) return;
+                
+                // Ищем статус в данных API
+                const executorStatus = statusData.find(item => 
+                    item.name && item.name.toLowerCase().includes(executorId.toLowerCase())
+                );
+                
+                if (executorStatus) {
+                    // Обновляем статус на основе данных API
+                    const status = executorStatus.status ? executorStatus.status.toLowerCase() : 'unknown';
+                    
+                    if (status.includes('updated') || status.includes('working') || status.includes('online')) {
+                        indicator.className = 'status-indicator status-updated';
+                        text.textContent = 'Updated';
+                    } else if (status.includes('patched') || status.includes('down') || status.includes('offline')) {
+                        indicator.className = 'status-indicator status-patched';
+                        text.textContent = 'Patched';
+                    } else {
+                        indicator.className = 'status-indicator status-unknown';
+                        text.textContent = 'Unknown';
+                    }
+                } else {
+                    // Если данные не найдены
+                    indicator.className = 'status-indicator status-unknown';
+                    text.textContent = 'No data';
+                }
+            });
+        }
 
-            const badges = `
-                <span class="status-badge ${updated ? 'badge-updated' : 'badge-outdated'}">
-                    ${updated ? 'Updated' : 'Not Updated'}
-                </span>
-                <span class="status-badge ${detected ? 'badge-detected' : 'badge-undetected'}">
-                    ${detected ? 'Detected' : 'Undetected'}
-                </span>
-                <span class="status-badge ${free ? 'badge-free' : 'badge-paid'}">
-                    ${free ? 'Free' : 'Paid'}
-                </span>
-            `;
-
-            return `
-                <div class="status-card" onclick="showLiveExploitModal('${encodeURIComponent(title)}')">
-                    <div class="status-card-header">
-                        <div class="status-card-title">${escapeHtml(title)}</div>
-                        <div>${badges}</div>
-                    </div>
-                    <div class="status-card-meta">
-                        <span>Platform: ${escapeHtml(platform)}</span>
-                        <span>Version: ${escapeHtml(version)}</span>
-                    </div>
-                    <div class="status-card-footer">
-                        Last updated: ${escapeHtml(updatedDate)}
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function showLiveExploitModal(encodedTitle) {
-        const title = decodeURIComponent(encodedTitle);
-        const exploit = allExploits.find(e => (e.title || '') === title);
-        if (!exploit) return;
-
-        const modal = document.getElementById('executerModal');
-        const modalTitle = document.getElementById('executerModalTitle');
-        const modalContent = document.getElementById('executerModalContent');
-
-        modalTitle.textContent = exploit.title + ' — Live Status';
-
-        const updated = !!exploit.updateStatus;
-        const detected = !!exploit.detected;
-        const free = !!exploit.free;
-
-        modalContent.innerHTML = `
-            <div class="executer-details">
-                <div class="detail-row">
-                    <span class="detail-label">Title:</span>
-                    <span class="detail-value">${escapeHtml(exploit.title || '')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Version:</span>
-                    <span class="detail-value">${escapeHtml(exploit.version || 'n/a')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Updated:</span>
-                    <span class="detail-value">
-                        ${updated ? '<span class="status-badge badge-updated">Updated</span>' : '<span class="status-badge badge-outdated">Not Updated</span>'}
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Detected:</span>
-                    <span class="detail-value">
-                        ${detected ? '<span class="status-badge badge-detected">Detected</span>' : '<span class="status-badge badge-undetected">Undetected</span>'}
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Free / Paid:</span>
-                    <span class="detail-value">
-                        ${free ? '<span class="status-badge badge-free">Free</span>' : '<span class="status-badge badge-paid">Paid</span>'}
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Platform:</span>
-                    <span class="detail-value">${escapeHtml(exploit.platform || 'Unknown')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">RBX Version:</span>
-                    <span class="detail-value">${escapeHtml(exploit.rbxversion || 'n/a')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Updated Date:</span>
-                    <span class="detail-value">${escapeHtml(exploit.updatedDate || 'n/a')}</span>
-                </div>
-                ${exploit.cost ? `
+        // Функции для модального окна
+        function showExecuterInfo(executerName, price, website) {
+            const modal = document.getElementById('executerModal');
+            const modalTitle = document.getElementById('executerModalTitle');
+            const modalContent = document.getElementById('executerModalContent');
+            
+            modalTitle.textContent = `${executerName} Info`;
+            
+            modalContent.innerHTML = `
+                <div class="executer-details">
                     <div class="detail-row">
-                        <span class="detail-label">Cost:</span>
-                        <span class="detail-value">${escapeHtml(exploit.cost)}</span>
-                    </div>` : ''}
-                ${exploit.websitelink ? `
+                        <span class="detail-label">Price:</span>
+                        <span class="detail-value">${price}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">Check website for current status</span>
+                    </div>
                     <div class="detail-row">
                         <span class="detail-label">Website:</span>
-                        <span class="detail-value">${escapeHtml(exploit.websitelink)}</span>
-                    </div>` : ''}
-                ${exploit.discordlink ? `
-                    <div class="detail-row">
-                        <span class="detail-label">Discord:</span>
-                        <span class="detail-value">${escapeHtml(exploit.discordlink)}</span>
-                    </div>` : ''}
-            </div>
-
-            ${exploit.websitelink ? `
-                <a href="${escapeAttr(exploit.websitelink)}" class="website-link" target="_blank">Official Website</a>
-            ` : ''}
-        `;
-
-        modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.classList.add('active');
-        }, 10);
-    }
-
-    function setupAutoRefresh() {
-        if (autoRefreshTimer) {
-            clearInterval(autoRefreshTimer);
-            autoRefreshTimer = null;
+                        <span class="detail-value">${website.replace('https://', '')}</span>
+                    </div>
+                </div>
+                
+                <a href="${website}" class="website-link" target="_blank">Official Website</a>
+                
+                <div class="status-check-notice" style="margin-top: 20px;">
+                    <h3>🔍 Check Update Status</h3>
+                    <p>To check if this executor is currently updated, visit:</p>
+                    <a href="https://weao.xyz/" class="status-check-link" target="_blank">
+                        📊 weao.xyz
+                    </a>
+                </div>
+                
+                <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem; color: #c0c0c0;">
+                    We do not track executor update statuses. Always check the official website for current status.
+                </p>
+            `;
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
         }
-        if (!autoRefreshCheckbox.checked) return;
 
-        let sec = parseInt(refreshIntervalInput.value, 10);
-        if (isNaN(sec) || sec < 5) sec = 5;
-        refreshIntervalInput.value = sec;
+        function closeExecuterModal() {
+            const modal = document.getElementById('executerModal');
+            
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
 
-        autoRefreshTimer = setInterval(fetchAndRender, sec * 1000);
-    }
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем статусы при первом открытии страницы
+            fetchExecutorStatuses();
+            
+            // Добавляем обработчик для кнопки обновления
+            document.getElementById('refreshStatusButton').addEventListener('click', fetchExecutorStatuses);
+            
+            // Автоматическое обновление каждые 5 минут
+            setInterval(fetchExecutorStatuses, 5 * 60 * 1000);
+        });
 
-    refreshButton.addEventListener('click', fetchAndRender);
-    autoRefreshCheckbox.addEventListener('change', setupAutoRefresh);
-    refreshIntervalInput.addEventListener('change', setupAutoRefresh);
-    searchInput.addEventListener('input', () => {
-        renderStatusList();
-    });
-
-    // первый автозапрос при загрузке
-    fetchAndRender();
-    setupAutoRefresh();
-
-</script>
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            const modal = document.getElementById('executerModal');
+            if (event.target === modal) {
+                closeExecuterModal();
+            }
+        }
+    </script>
 </body>
 </html>
