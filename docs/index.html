@@ -772,24 +772,6 @@
             opacity: 0.9;
         }
 
-        .refresh-button {
-            background: rgba(60, 20, 20, 0.6);
-            color: #e0e0e0;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-left: 10px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(100, 40, 40, 0.3);
-        }
-
-        .refresh-button:hover {
-            background: rgba(80, 30, 30, 0.6);
-            transform: translateY(-2px);
-        }
-
         .last-updated {
             text-align: center;
             margin-top: 15px;
@@ -812,6 +794,16 @@
             margin-top: 15px;
             font-size: 0.8rem;
             opacity: 0.7;
+        }
+        
+        .success-message {
+            background: rgba(76, 175, 80, 0.1);
+            border: 2px solid rgba(76, 175, 80, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -1033,11 +1025,16 @@
                     </a>
                 </div>
                 
+                <div id="successMessage" class="success-message" style="display: none;">
+                    <h3>✅ Status Updates Active</h3>
+                    <p>Real-time status updates are now working via proxy server!</p>
+                </div>
+                
                 <div class="status-check-notice">
                     <h3>🔍 Check Executor Statuses</h3>
-                    <p>Real-time status updates (when available)</p>
+                    <p>Real-time status updates via working proxy</p>
                     <button id="refreshStatusButton" class="status-check-link">
-                        🔄 Try to Refresh Statuses
+                        🔄 Refresh Statuses
                     </button>
                     <div id="lastUpdated" class="last-updated"></div>
                     <div id="proxyStatus" class="proxy-status"></div>
@@ -1210,46 +1207,25 @@
             'delta-ios': 'Delta'
         };
 
-        // Список CORS-прокси для попыток подключения
-        const proxyList = [
-            'https://api.allorigins.win/raw?url=',
-            'https://cors-anywhere.herokuapp.com/',
-            'https://cors-proxy.htmldriven.com/?url=',
-            'https://cors.bridged.cc/',
-            '' // Прямое подключение (последняя попытка)
-        ];
-
-        let currentProxyIndex = 0;
-
-        // Функция для получения статусов исполнителей с использованием CORS-прокси
+        // Функция для получения статусов исполнителей через рабочий прокси
         async function fetchExecutorStatuses() {
-            const apiUrl = 'https://weao.xyz/api/status/exploits';
-            
-            // Показываем состояние загрузки
-            Object.keys(executorMappings).forEach(executorId => {
-                const indicator = document.getElementById(`status-${executorId}`);
-                const text = document.getElementById(`status-text-${executorId}`);
-                if (indicator && text) {
-                    indicator.className = 'status-indicator status-loading';
-                    text.textContent = 'Loading...';
-                }
-            });
-
-            // Показываем используемый прокси
-            document.getElementById('proxyStatus').textContent = `Trying proxy: ${currentProxyIndex + 1}/${proxyList.length}`;
-            
-            // Формируем URL с текущим прокси
-            const proxyUrl = proxyList[currentProxyIndex];
-            const finalUrl = proxyUrl ? proxyUrl + encodeURIComponent(apiUrl) : apiUrl;
+            // Используем рабочий прокси для обхода CORS
+            const proxyUrl = 'https://api.codetabs.com/v1/proxy?quest=http://farts.fadedis.xyz:25505/api/status/exploits';
             
             try {
-                const response = await fetch(finalUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    mode: 'cors'
+                // Показываем состояние загрузки
+                Object.keys(executorMappings).forEach(executorId => {
+                    const indicator = document.getElementById(`status-${executorId}`);
+                    const text = document.getElementById(`status-text-${executorId}`);
+                    if (indicator && text) {
+                        indicator.className = 'status-indicator status-loading';
+                        text.textContent = 'Loading...';
+                    }
                 });
+
+                document.getElementById('proxyStatus').textContent = 'Using working proxy server...';
+                
+                const response = await fetch(proxyUrl);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1261,44 +1237,33 @@
                 // Обновляем время последнего обновления
                 const now = new Date();
                 document.getElementById('lastUpdated').textContent = 
-                    `Last updated: ${now.toLocaleTimeString()} (via proxy ${currentProxyIndex + 1})`;
+                    `Last updated: ${now.toLocaleTimeString()}`;
+                document.getElementById('proxyStatus').textContent = 'Proxy connection successful!';
                 
-                // Скрываем предупреждение о CORS
+                // Показываем сообщение об успехе
+                document.getElementById('successMessage').style.display = 'block';
                 document.getElementById('corsWarning').style.display = 'none';
-                
-                // Сбрасываем индекс прокси для следующего запроса
-                currentProxyIndex = 0;
                     
             } catch (error) {
-                console.error(`Error with proxy ${currentProxyIndex}:`, error);
+                console.error('Error fetching executor statuses:', error);
                 
-                // Пробуем следующий прокси
-                currentProxyIndex++;
+                // Показываем ошибку для всех исполнителей
+                Object.keys(executorMappings).forEach(executorId => {
+                    const indicator = document.getElementById(`status-${executorId}`);
+                    const text = document.getElementById(`status-text-${executorId}`);
+                    if (indicator && text) {
+                        indicator.className = 'status-indicator status-unknown';
+                        text.textContent = 'Error loading';
+                    }
+                });
                 
-                if (currentProxyIndex < proxyList.length) {
-                    // Пробуем следующий прокси
-                    setTimeout(fetchExecutorStatuses, 500);
-                } else {
-                    // Все прокси не сработали
-                    Object.keys(executorMappings).forEach(executorId => {
-                        const indicator = document.getElementById(`status-${executorId}`);
-                        const text = document.getElementById(`status-text-${executorId}`);
-                        if (indicator && text) {
-                            indicator.className = 'status-indicator status-unknown';
-                            text.textContent = 'No data';
-                        }
-                    });
-                    
-                    document.getElementById('lastUpdated').textContent = 
-                        'Status updates unavailable due to CORS restrictions';
-                    document.getElementById('proxyStatus').textContent = 'All proxy attempts failed';
-                    
-                    // Показываем предупреждение о CORS
-                    document.getElementById('corsWarning').style.display = 'block';
-                    
-                    // Сбрасываем индекс прокси для следующей попытки
-                    currentProxyIndex = 0;
-                }
+                document.getElementById('lastUpdated').textContent = 
+                    'Error fetching statuses';
+                document.getElementById('proxyStatus').textContent = 'Proxy connection failed';
+                
+                // Показываем предупреждение о CORS
+                document.getElementById('corsWarning').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
             }
         }
 
@@ -1426,8 +1391,8 @@
             // Добавляем обработчик для кнопки обновления
             document.getElementById('refreshStatusButton').addEventListener('click', fetchExecutorStatuses);
             
-            // Автоматическое обновление каждые 10 минут
-            setInterval(fetchExecutorStatuses, 10 * 60 * 1000);
+            // Автоматическое обновление каждые 5 минут
+            setInterval(fetchExecutorStatuses, 5 * 60 * 1000);
         });
 
         // Закрытие модального окна при клике вне его
